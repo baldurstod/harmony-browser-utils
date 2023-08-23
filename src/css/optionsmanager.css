@@ -1,0 +1,95 @@
+#options-manager-outer{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	z-index: 10000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top:0px;
+	left: 0px;
+}
+
+#options-manager-inner{
+	position: relative;
+	/*background-color: rgba(255, 255, 255, 1.0);*/
+	background-color: var(--theme-popup-bg-color);
+	color: var(--main-text-color-dark2);
+	padding:10px;
+	overflow: hidden;
+	max-height: 70%;
+	max-width: 75%;
+	display: flex;
+	flex-direction: column;
+	opacity: 0.9;
+}
+
+#options-manager-inner h1{
+	text-transform: capitalize;
+	text-align: center;
+}
+
+#options-manager-inner-filter{
+	width:100%;
+}
+
+.options-manager-button{
+	cursor:pointer;
+	white-space: nowrap;
+	text-transform: capitalize;
+}
+
+#options-manager-inner table{
+	text-align: left;
+	overflow: hidden auto;
+	display: block;
+	height: 100%;
+}
+
+#options-manager-inner thead{
+	position: sticky;
+	/*display: block;*/
+	top: 0px;
+	background-color: var(--theme-popup-bg-color);
+}
+
+#options-manager-inner thead th{
+	position: sticky;
+	top: 0px;
+	background-color: var(--theme-popup-bg-color);
+}
+
+#options-manager-inner th{
+	text-transform: capitalize;
+}
+
+#options-manager-inner th button, #options-manager-inner td button{
+	width: 100%;
+}
+
+#options-manager-title{
+	cursor:move;
+}
+
+[draggable=true] {
+	cursor: move;
+}
+
+[draggable=true] *{
+	cursor: initial;
+}
+
+#options-manager-outer kbd{
+	background-color: #eee;
+	border-radius: 0.25rem;
+	border: 0.1rem solid #b4b4b4;
+	box-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;
+	color: #333;
+	display: inline-block;
+	line-height: 1;
+	padding: 0.15rem;
+	white-space: nowrap;
+	font-weight: 1000;
+	font-size: 1.3rem;
+}
