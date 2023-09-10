@@ -60,10 +60,42 @@ export const I18n = new (function () {
 			}
 		}
 
+		#processJSON(parentNode) {
+			const className = 'i18n';
+			const elements = parentNode.querySelectorAll('.' + className);
+
+			if (parentNode.classList?.contains(className)) {
+				this.#processElementJSON(parentNode);
+			}
+
+			for (let element of elements) {
+				this.#processElementJSON(element);
+			}
+		}
+
 		#processElement(htmlElement, attribute, subElement) {
 			let dataLabel = htmlElement.getAttribute(attribute);
 			if (dataLabel) {
 				htmlElement[subElement] = this.getString(dataLabel);
+			}
+		}
+
+		#processElementJSON(htmlElement) {
+			const str = htmlElement.getAttribute('data-i18n-json');
+			if (!str) {
+				return;
+			}
+
+			const dataJSON = JSON.parse(str);
+			if (!dataJSON) {
+				return;
+			}
+
+			const values = dataJSON.values;
+
+			const innerHTML = dataJSON.innerHTML;
+			if (innerHTML) {
+				htmlElement.innerHTML = this.formatString(innerHTML, values);
 			}
 		}
 
@@ -82,6 +114,7 @@ export const I18n = new (function () {
 			this.#processList(document, 'i18n-title', 'data-i18n-title', 'title');
 			this.#processList(document, 'i18n-placeholder', 'data-i18n-placeholder', 'placeholder');
 			this.#processList(document, 'i18n-label', 'data-i18n-label', 'label');
+			this.#processJSON(document);
 			this.#executing = false;
 			return;
 		}
@@ -93,6 +126,7 @@ export const I18n = new (function () {
 			this.#processList(htmlElement, 'i18n-title', 'data-i18n-title', 'title');
 			this.#processList(htmlElement, 'i18n-placeholder', 'data-i18n-placeholder', 'placeholder');
 			this.#processList(htmlElement, 'i18n-label', 'data-i18n-label', 'label');
+			this.#processJSON(htmlElement);
 		}
 
 		set lang(lang) {

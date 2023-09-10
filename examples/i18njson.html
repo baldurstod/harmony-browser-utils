@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test</title>
+	</head>
+	<body>
+		<script type="module">
+			import { I18n } from '../src/I18n.js';
+
+			I18n.setOptions({
+				translations: [
+					{
+						'lang': 'english',
+						'strings': {
+							'#english': 'English',
+							'#french': 'French',
+							'#formatted': 'Formatted value 1: ${v1} value 2: ${v2} and value 1 again: ${v1}',
+						}
+					},
+					{
+						'lang': 'french',
+						'strings': {
+							'#english': 'Anglais',
+							'#french': 'Français',
+							'#formatted': 'Valeur 1 formattée: ${v1} valeur 2: ${v2} et à nouveau valeur 1: ${v1}',
+						}
+					},
+				]
+			});
+			I18n.start();
+			let d = document.createElement('div');
+
+			d.classList.add('i18n');
+			d.setAttribute('data-i18n', '#test');
+			d.setAttribute('data-i18n-json', JSON.stringify({
+				innerHTML: '#formatted',
+				values: {
+					v1: '<span style="background-color:#faa;">this is value 1</span>',
+					v2: '<span style="background-color:#aaf">and this is value 2</span>',
+				}
+			}));
+
+
+			const htmlSelect = document.createElement('select');
+			htmlSelect.addEventListener('change', event => {
+				I18n.lang = event.target.value;
+			});
+
+			const languages = ['english', 'french'];
+			for (let language of languages) {
+				const htmlOption = document.createElement('option');
+				htmlOption.setAttribute('value', language);
+				htmlOption.setAttribute('data-i18n', `#${language}`);
+				htmlOption.classList.add('i18n');
+
+				htmlSelect.append(htmlOption);
+			}
+			document.body.append(htmlSelect, d);
+		</script>
+	</body>
+</html>
