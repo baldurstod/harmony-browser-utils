@@ -119,6 +119,15 @@ export const I18n = new (function () {
 			return s;
 		}
 
+		formatString(s, values) {
+			let str = this.getString(s);
+
+			for (let key in values) {
+				str = str.replace(new RegExp("\\\${" + key + "\\}", "gi"), values[key]);
+			}
+			return str;
+		}
+
 		get authors() {
 			if (this.checkLang()) {
 				if (this.#translations.get(this.#lang).authors) {
