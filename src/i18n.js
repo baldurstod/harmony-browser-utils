@@ -31,7 +31,7 @@ export const I18n = new (function () {
 
 		#initObserver() {
 			//const config = {attributes: true, childList: true, subtree: true, attributeFilter:['class', 'data-i18n', 'data-i18n-title', 'data-i18n-placeholder']};
-			const config = {childList: true, subtree: true, attributeFilter: ['i18n']};
+			const config = {childList: true, subtree: true, attributeFilter: ['i18n', 'data-i18n-json', 'data-i18n-values']};
 			const callback = async (mutationsList, observer) => {
 				for(let mutation of mutationsList) {
 					if (mutation.type === 'childList') {
@@ -91,11 +91,17 @@ export const I18n = new (function () {
 				return;
 			}
 
-			const values = dataJSON.values;
+			let valuesJSON;
+			const values = htmlElement.getAttribute('data-i18n-values');
+			if (values) {
+				valuesJSON = JSON.parse(values);
+			} else {
+				valuesJSON = dataJSON.values;
+			}
 
 			const innerHTML = dataJSON.innerHTML;
 			if (innerHTML) {
-				htmlElement.innerHTML = this.formatString(innerHTML, values);
+				htmlElement.innerHTML = this.formatString(innerHTML, valuesJSON);
 			}
 		}
 

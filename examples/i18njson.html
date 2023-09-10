@@ -8,6 +8,10 @@
 		<script type="module">
 			import { I18n } from '../src/I18n.js';
 
+			function setTimeoutPromise(delay) {
+				return new Promise(resolve => setTimeout(resolve, delay));
+			}
+
 			I18n.setOptions({
 				translations: [
 					{
@@ -36,9 +40,15 @@
 			d.setAttribute('data-i18n-json', JSON.stringify({
 				innerHTML: '#formatted',
 				values: {
-					v1: '<span style="background-color:#faa;">this is value 1</span>',
-					v2: '<span style="background-color:#aaf">and this is value 2</span>',
+					// Note those are only used in absence of data-i18n-values
+					v1: '<span style="background-color:#faa;">this is value 1 from data-i18n-json</span>',
+					v2: '<span style="background-color:#aaf">and this is value 2 from data-i18n-json</span>',
 				}
+			}));
+
+			d.setAttribute('data-i18n-values', JSON.stringify({
+				v1: '<span style="background-color:#faa;">this is value 1 from data-i18n-values</span>',
+				v2: '<span style="background-color:#aaf">and this is value 2 from data-i18n-values</span>',
 			}));
 
 
@@ -57,6 +67,15 @@
 				htmlSelect.append(htmlOption);
 			}
 			document.body.append(htmlSelect, d);
+
+			await setTimeoutPromise(2000);
+
+			d.setAttribute('data-i18n-values', JSON.stringify({
+				v1: '<span style="background-color:#faa;">this is value 1 from updated data-i18n-values</span>',
+				v2: '<span style="background-color:#aaf">and this is value 2 from updated data-i18n-values</span>',
+			}));
+
+
 		</script>
 	</body>
 </html>
