@@ -37,9 +37,13 @@ class Notification {
 						className: NOTIFICATION_CLASSNAME + '-copy',
 						innerHTML: contentCopyText,
 						events: {
-							click: async () => {
-								await navigator.clipboard.writeText(this.#htmlElement.innerText);
-
+							click: async (event) => {
+								try {
+									await navigator.clipboard.writeText(this.#htmlElement.innerText);
+									event.target.parentElement.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
+								} catch (e) {
+									console.error(e);
+								}
 							},
 						}
 					}),

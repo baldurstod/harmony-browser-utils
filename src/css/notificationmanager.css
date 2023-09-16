@@ -21,9 +21,17 @@
 	flex: 1;
 	max-width: calc(100% - 20px);
 }
-.notification-manager-notification-close, .notification-manager-notification-copy{
+.notification-manager-notification-close{
 	fill: currentColor;
 	cursor: pointer;
+}
+.notification-manager-notification-copy{
+	fill: currentColor;
+	cursor: pointer;
+	transition: all 0.3s ease-in 0s;
+}
+.notification-manager-notification-copy-success{
+	transform: rotate(1turn);
 }
 .notification-manager-notification-close > svg{
 	width: 20px;
