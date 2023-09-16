@@ -102,6 +102,10 @@ function hide(htmlElement) {
 	display(htmlElement, false);
 }
 
+var img$1 = "data:image/svg+xml,%3csvg viewBox='0 0 357 357'%3e%3cpolygon points='357%2c35.7 321.3%2c0 178.5%2c142.8 35.7%2c0 0%2c35.7 142.8%2c178.5 0%2c321.3 35.7%2c357 178.5%2c214.2 321.3%2c357 357%2c321.3 214.2%2c178.5'/%3e%3c/svg%3e";
+
+var img = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3e%3cpath d='M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z'/%3e%3c/svg%3e";
+
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
   var insertAt = ref.insertAt;
@@ -129,11 +133,12 @@ function styleInject(css, ref) {
   }
 }
 
-var css_248z = ".notification-manager{\r\n\tposition: absolute;\r\n\tz-index: 100;\r\n\tbottom: 0px;\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tflex-direction: column-reverse;\r\n\tmax-height: 50%;\r\n\toverflow-y: auto;\r\n}\r\n.notification-manager-notification{\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5em;\r\n\tpadding: 4px;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.notification-manager-notification-content{\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n.notification-manager-notification-close{\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n.notification-manager-notification-close > svg{\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n.notification-manager-notification-success{\r\n\tbackground-color: #5aa822ff;\r\n}\r\n.notification-manager-notification-warning{\r\n\tbackground-color: #c78a17ff;\r\n}\r\n.notification-manager-notification-error{\r\n\tbackground-color: #c71717ff;\r\n}\r\n.notification-manager-notification-info{\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+var css_248z = ".notification-manager{\r\n\tposition: absolute;\r\n\tz-index: 100;\r\n\tbottom: 0px;\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tflex-direction: column-reverse;\r\n\tmax-height: 50%;\r\n\toverflow-y: auto;\r\n}\r\n.notification-manager-notification{\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5em;\r\n\tpadding: 4px;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.notification-manager-notification-content{\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n.notification-manager-notification-close, .notification-manager-notification-copy{\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n.notification-manager-notification-close > svg{\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n.notification-manager-notification-success{\r\n\tbackground-color: #5aa822ff;\r\n}\r\n.notification-manager-notification-warning{\r\n\tbackground-color: #c78a17ff;\r\n}\r\n.notification-manager-notification-error{\r\n\tbackground-color: #c71717ff;\r\n}\r\n.notification-manager-notification-info{\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
 styleInject(css_248z);
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
-const CLOSE_SVG = '<svg viewBox="0 0 357 357"><polygon points="357,35.7 321.3,0 178.5,142.8 35.7,0 0,35.7 142.8,178.5 0,321.3 35.7,357 178.5,214.2 321.3,357 357,321.3 214.2,178.5"/></svg>';
+const closeText = await (await fetch(img$1)).text();
+const contentCopyText = await (await fetch(img)).text();
 
 class Notification {
 	#htmlElement;
@@ -160,8 +165,18 @@ class Notification {
 						className: NOTIFICATION_CLASSNAME + '-content',
 					}),
 					createElement('div', {
+						className: NOTIFICATION_CLASSNAME + '-copy',
+						innerHTML: contentCopyText,
+						events: {
+							click: async () => {
+								await navigator.clipboard.writeText(this.#htmlElement.innerText);
+
+							},
+						}
+					}),
+					createElement('div', {
 						className: NOTIFICATION_CLASSNAME + '-close',
-						innerHTML: CLOSE_SVG,
+						innerHTML: closeText,
 						events: {
 							click: () => NotificationManager.closeNofication(this),
 						}
@@ -171,7 +186,6 @@ class Notification {
 
 			if (this.type) {
 				this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type);
-
 			}
 
 			if (this.content instanceof HTMLElement) {

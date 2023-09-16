@@ -1,7 +1,11 @@
 import { createElement, hide, show } from 'harmony-ui';
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
-const CLOSE_SVG = '<svg viewBox="0 0 357 357"><polygon points="357,35.7 321.3,0 178.5,142.8 35.7,0 0,35.7 142.8,178.5 0,321.3 35.7,357 178.5,214.2 321.3,357 357,321.3 214.2,178.5"/></svg>';
+
+import closeSVG from './img/close.svg';
+import contentCopySVG from './img/content_copy.svg';
+const closeText = await (await fetch(closeSVG)).text();
+const contentCopyText = await (await fetch(contentCopySVG)).text();
 
 import './css/notificationmanager.css';
 
@@ -30,8 +34,18 @@ class Notification {
 						className: NOTIFICATION_CLASSNAME + '-content',
 					}),
 					createElement('div', {
+						className: NOTIFICATION_CLASSNAME + '-copy',
+						innerHTML: contentCopyText,
+						events: {
+							click: async () => {
+								await navigator.clipboard.writeText(this.#htmlElement.innerText);
+
+							},
+						}
+					}),
+					createElement('div', {
 						className: NOTIFICATION_CLASSNAME + '-close',
-						innerHTML: CLOSE_SVG,
+						innerHTML: closeText,
 						events: {
 							click: () => NotificationManager.closeNofication(this),
 						}
@@ -41,7 +55,6 @@ class Notification {
 
 			if (this.type) {
 				this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type)
-
 			}
 
 			if (this.content instanceof HTMLElement) {
