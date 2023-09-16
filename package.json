@@ -5,6 +5,7 @@
 	"main": "src/index.js",
 	"type": "module",
 	"devDependencies": {
+		"@rollup/plugin-image": "^3.0.2",
 		"@rollup/plugin-node-resolve": "^13.3.0",
 		"rollup": "^2.60.1",
 		"rollup-plugin-postcss": "^4.0.2",
