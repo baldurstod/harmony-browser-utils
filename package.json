@@ -12,6 +12,7 @@
 		"rollup-watch": "^3.2.2"
 	},
 	"dependencies": {
+		"harmony-svg": "github:baldurstod/harmony-svg",
 		"harmony-ui": "github:baldurstod/harmony-ui"
 	}
 }

@@ -1,11 +1,7 @@
 import { createElement, hide, show } from 'harmony-ui';
+import { closeSVG, contentCopySVG } from 'harmony-svg';
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
-
-import closeSVG from './img/close.svg';
-import contentCopySVG from './img/content_copy.svg';
-const closeText = await (await fetch(closeSVG)).text();
-const contentCopyText = await (await fetch(contentCopySVG)).text();
 
 import './css/notificationmanager.css';
 
@@ -35,7 +31,7 @@ class Notification {
 					}),
 					createElement('div', {
 						className: NOTIFICATION_CLASSNAME + '-copy',
-						innerHTML: contentCopyText,
+						innerHTML: contentCopySVG,
 						events: {
 							click: async (event) => {
 								try {
@@ -49,7 +45,7 @@ class Notification {
 					}),
 					createElement('div', {
 						className: NOTIFICATION_CLASSNAME + '-close',
-						innerHTML: closeText,
+						innerHTML: closeSVG,
 						events: {
 							click: () => NotificationManager.closeNofication(this),
 						}

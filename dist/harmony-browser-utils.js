@@ -102,9 +102,9 @@ function hide(htmlElement) {
 	display(htmlElement, false);
 }
 
-var img$1 = "data:image/svg+xml,%3csvg viewBox='0 0 357 357'%3e%3cpolygon points='357%2c35.7 321.3%2c0 178.5%2c142.8 35.7%2c0 0%2c35.7 142.8%2c178.5 0%2c321.3 35.7%2c357 178.5%2c214.2 321.3%2c357 357%2c321.3 214.2%2c178.5'/%3e%3c/svg%3e";
+const closeSVG = '<svg viewBox="0 0 357 357"><polygon points="357,35.7 321.3,0 178.5,142.8 35.7,0 0,35.7 142.8,178.5 0,321.3 35.7,357 178.5,214.2 321.3,357 357,321.3 214.2,178.5"/></svg>';
 
-var img = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3e%3cpath d='M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z'/%3e%3c/svg%3e";
+const contentCopySVG = '<svg height="24" viewBox="0 -960 960 960" width="24"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/></svg>';
 
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
@@ -137,8 +137,6 @@ var css_248z = ".notification-manager{\r\n\tposition: absolute;\r\n\tz-index: 10
 styleInject(css_248z);
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
-const closeText = await (await fetch(img$1)).text();
-const contentCopyText = await (await fetch(img)).text();
 
 class Notification {
 	#htmlElement;
@@ -166,7 +164,7 @@ class Notification {
 					}),
 					createElement('div', {
 						className: NOTIFICATION_CLASSNAME + '-copy',
-						innerHTML: contentCopyText,
+						innerHTML: contentCopySVG,
 						events: {
 							click: async (event) => {
 								try {
@@ -180,7 +178,7 @@ class Notification {
 					}),
 					createElement('div', {
 						className: NOTIFICATION_CLASSNAME + '-close',
-						innerHTML: closeText,
+						innerHTML: closeSVG,
 						events: {
 							click: () => NotificationManager.closeNofication(this),
 						}
