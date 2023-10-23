@@ -37,57 +37,56 @@ class Shortcut {
 	}
 }
 
-export const ShortcutHandler = new (function () {
-	class ShortcutHandler extends EventTarget {
-		constructor() {
-			super();
-			this.shortcuts = new Map();
-			window.addEventListener('keydown', (event) => this.handleKeyDown(event));
-		}
+class ShortcutHandlerClass extends EventTarget {
+	constructor() {
+		super();
+		this.shortcuts = new Map();
+		window.addEventListener('keydown', (event) => this.handleKeyDown(event));
+	}
 
-		handleKeyDown(event) {
-			if (event.target instanceof HTMLInputElement ||
-				event.target instanceof HTMLTextAreaElement
-				) {
-				return;
-			}
-			for (let [name, shortcuts] of this.shortcuts) {
-				for (let shortcut of shortcuts) {
-					if (shortcut.match(event)) {
-						this.dispatchEvent(new CustomEvent(name, {detail:event}));
-						event.preventDefault();
-						event.stopPropagation();
-					}
+	handleKeyDown(event) {
+		if (event.target instanceof HTMLInputElement ||
+			event.target instanceof HTMLTextAreaElement
+			) {
+			return;
+		}
+		for (let [name, shortcuts] of this.shortcuts) {
+			for (let shortcut of shortcuts) {
+				if (shortcut.match(event)) {
+					this.dispatchEvent(new CustomEvent(name, {detail:event}));
+					event.preventDefault();
+					event.stopPropagation();
 				}
 			}
 		}
+	}
 
-		setShortcuts(shortcutMap) {
-			if (!shortcutMap) {
-				return;
-			}
-			this.shortcuts.clear();
-			for (let [name, shortcut] of shortcutMap) {
-				this.addShortcut(name, shortcut);
-			}
+	setShortcuts(shortcutMap) {
+		if (!shortcutMap) {
+			return;
 		}
-
-		setShortcut(name, shortcut) {
-			this.shortcuts.delete(name);
+		this.shortcuts.clear();
+		for (let [name, shortcut] of shortcutMap) {
 			this.addShortcut(name, shortcut);
 		}
+	}
 
-		addShortcut(name, shortcut) {
-			let shortcuts = shortcut.split(';');
-			let shortcutSet = this.shortcuts.get(name);
-			if (!shortcutSet) {
-				shortcutSet = new Set();
-				this.shortcuts.set(name, shortcutSet);
-			}
-			for (let shortcut of shortcuts)  {
-				shortcutSet.add(new Shortcut(shortcut));
-			}
+	setShortcut(name, shortcut) {
+		this.shortcuts.delete(name);
+		this.addShortcut(name, shortcut);
+	}
+
+	addShortcut(name, shortcut) {
+		let shortcuts = shortcut.split(';');
+		let shortcutSet = this.shortcuts.get(name);
+		if (!shortcutSet) {
+			shortcutSet = new Set();
+			this.shortcuts.set(name, shortcutSet);
+		}
+		for (let shortcut of shortcuts)  {
+			shortcutSet.add(new Shortcut(shortcut));
 		}
 	}
-	return ShortcutHandler;
-}());
+}
+
+export const ShortcutHandler = new ShortcutHandlerClass();
