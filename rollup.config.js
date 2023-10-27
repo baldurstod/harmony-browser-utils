@@ -1,6 +1,5 @@
 
 import postcss from 'rollup-plugin-postcss';
-import image from '@rollup/plugin-image';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 
 export default [
@@ -13,7 +12,6 @@ export default [
 		plugins: [
 			postcss({
 			}),
-			image(),
 			nodeResolve(),
 		],
 	},
