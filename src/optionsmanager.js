@@ -363,7 +363,6 @@ export const OptionsManager = new (function () {
 			let htmlDefaultValueCell = createElement('td');
 			let htmlUserValueCell = createElement('td');
 
-			let defaultValue = JSON.stringify(option.dv);
 			let myValue = this.getItem(option.name);
 
 			this.#fillCell(htmlDefaultValueCell, option.type, option.dv);
@@ -523,6 +522,30 @@ export const OptionsManager = new (function () {
 							change: event => {this.setItem(optionName, event.target.checked);showHideResetButton();}
 						}
 					});
+					break;
+				case 'trilean':
+					htmlElement = createElement('select', {
+						value: value,
+						events: {
+							change: event => {
+								let value;
+								switch (event.target.value) {
+									case "0":
+										value = false;
+										break;
+									case "1":
+										value = true;
+										break;
+								}
+								this.setItem(optionName, value);
+								showHideResetButton();
+							}
+						}
+					});
+					for(let o of ['', 0, 1]) {
+						createElement('option', {innerHTML: o, parent: htmlElement});
+					}
+					htmlElement.value = value;
 					break;
 				case 'list':
 					let dataListId = OptionsManager.#getUniqueId();
