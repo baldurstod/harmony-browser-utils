@@ -525,7 +525,6 @@ export const OptionsManager = new (function () {
 					break;
 				case 'trilean':
 					htmlElement = createElement('select', {
-						value: value,
 						events: {
 							change: event => {
 								let value;
@@ -545,7 +544,20 @@ export const OptionsManager = new (function () {
 					for(let o of ['', 0, 1]) {
 						createElement('option', {innerHTML: o, parent: htmlElement});
 					}
-					htmlElement.value = value;
+					let v;
+					switch (value) {
+						case undefined:
+							v = '';
+							break;
+						case false:
+							v = '0';
+							break;
+						case true:
+							v = '1';
+							break;
+					}
+
+					htmlElement.value = v;
 					break;
 				case 'list':
 					let dataListId = OptionsManager.#getUniqueId();
