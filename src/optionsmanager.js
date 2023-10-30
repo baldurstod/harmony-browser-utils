@@ -523,7 +523,7 @@ export const OptionsManager = new (function () {
 						}
 					});
 					break;
-				case 'trilean':
+				case 'ternary':
 					htmlElement = createElement('select', {
 						events: {
 							change: event => {
