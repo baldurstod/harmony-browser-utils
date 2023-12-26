@@ -1,5 +1,4 @@
 
-import postcss from 'rollup-plugin-postcss';
 import {nodeResolve} from '@rollup/plugin-node-resolve';
 
 export default [
@@ -10,8 +9,6 @@ export default [
 			format: 'esm'
 		},
 		plugins: [
-			postcss({
-			}),
 			nodeResolve(),
 		],
 	},
