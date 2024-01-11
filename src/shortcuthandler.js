@@ -38,8 +38,13 @@ class Shortcut {
 }
 
 class ShortcutHandlerClass extends EventTarget {
+	static #instance;
 	constructor() {
+		if (ShortcutHandlerClass.#instance) {
+			return ShortcutHandlerClass.#instance;
+		}
 		super();
+		ShortcutHandlerClass.#instance = this;
 		this.shortcuts = new Map();
 		window.addEventListener('keydown', (event) => this.handleKeyDown(event));
 	}
