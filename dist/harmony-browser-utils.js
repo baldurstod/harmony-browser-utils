@@ -6,4 +6,8 @@ function SaveFile(file) {
 	link.click();
 }
 
-export { SaveFile };
+function supportsPopover() {
+	return HTMLElement.prototype.hasOwnProperty('popover');
+}
+
+export { SaveFile, supportsPopover };
