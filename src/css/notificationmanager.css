@@ -1,4 +1,4 @@
-.notification-manager{
+:host, .notification-manager{
 	position: absolute;
 	z-index: 100;
 	bottom: 0px;

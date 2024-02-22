@@ -1,9 +1,9 @@
-import { createElement, hide, show } from 'harmony-ui';
+import { createElement, shadowRootStyle } from 'harmony-ui';
 import { closeSVG, contentCopySVG } from 'harmony-svg';
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
 
-import './css/notificationmanager.css';
+import notificationManagerCSS from './css/notificationmanager.css';
 
 class Notification {
 	#htmlElement;
@@ -67,47 +67,47 @@ class Notification {
 	}
 }
 
-export const NotificationManager = new (function () {
-	class NotificationManager extends EventTarget {//TODOv3 are we going to send events ?
-		#htmlElement;
-		constructor() {
-			super();
-			this.htmlParent = document.body;
-			this.nofifications = new Set();
-			this.createHtml();
-		}
-
-		set parent(htmlParent) {
-			this.htmlParent = htmlParent;
-			this.htmlParent.append(this.#htmlElement);
-		}
-
-		createHtml() {
-			this.#htmlElement = document.createElement('div');
-			this.#htmlElement.className = 'notification-manager';
-			this.htmlParent.append(this.#htmlElement);
-		}
-
-		#getNotification(content, type, ttl) {
-			for (let notification of this.nofifications) {
-				if ((notification.content ==content) && (notification.type == type)) {
-					notification.ttl = ttl;
-					return notification;
-				}
-			}
-			return new Notification(content, type, ttl);
-		}
-
-		addNotification(content, type, ttl) {
-			let notification = this.#getNotification(content, type, ttl);
-			this.nofifications.add(notification);
-			this.#htmlElement.append(notification.view);
-		}
-
-		closeNofication(notification) {
-			this.nofifications.delete(notification);
-			notification.view.remove();
-		}
+export class NotificationManager {
+	static #htmlElement;
+	static #htmlParent = document.body;
+	static #shadowRoot;
+	static #nofifications = new Set();
+	static {
+		this.#createHtml();
 	}
-	return NotificationManager;
-}());
+
+	static set parent(htmlParent) {
+		this.#htmlParent = htmlParent;
+		this.#htmlParent.append(this.#htmlElement);
+	}
+
+	static #createHtml() {
+		this.#htmlElement = createElement('div', {
+			class: 'notification-manager',
+			parent: this.#htmlParent,
+		});
+		this.#shadowRoot = this.#htmlElement.attachShadow({ mode: "closed" });
+		shadowRootStyle(this.#shadowRoot, notificationManagerCSS);
+	}
+
+	static #getNotification(content, type, ttl) {
+		for (let notification of this.#nofifications) {
+			if ((notification.content ==content) && (notification.type == type)) {
+				notification.ttl = ttl;
+				return notification;
+			}
+		}
+		return new Notification(content, type, ttl);
+	}
+
+	static addNotification(content, type, ttl) {
+		let notification = this.#getNotification(content, type, ttl);
+		this.#nofifications.add(notification);
+		this.#shadowRoot.append(notification.view);
+	}
+
+	static closeNofication(notification) {
+		this.#nofifications.delete(notification);
+		notification.view.remove();
+	}
+}
