@@ -1,8 +1,8 @@
-import { createElement, hide, show } from 'harmony-ui';
+import { createElement, hide, show, shadowRootStyle } from 'harmony-ui';
 
 import { I18n } from './i18n.js';
 
-import './css/optionsmanager.css';
+import optionsManagerCSS from './css/optionsmanager.css';
 
 class OptionsManagerClass extends EventTarget {
 	static #instance;
@@ -18,6 +18,7 @@ class OptionsManagerClass extends EventTarget {
 	#htmlOptionsTable;
 	#htmlOptionsManagerContentThead;
 	static #uniqueId = 0;
+	#shadowRoot;
 
 	constructor() {
 		if (OptionsManagerClass.#instance) {
@@ -298,20 +299,23 @@ class OptionsManagerClass extends EventTarget {
 	}
 
 	#initPanel() {
-		this.#htmlOptionsManagerContainer = createElement('div', {
-			id: 'options-manager-outer',
+		this.#htmlOptionsManagerContainer = createElement('options-manager', {
 			parent: document.body,
 			events: {
 				click: event => hide(this.#htmlOptionsManagerContainer)
 			}
 		});
 
+		this.#shadowRoot = this.#htmlOptionsManagerContainer.attachShadow({ mode: "closed" });
+		shadowRootStyle(this.#shadowRoot, optionsManagerCSS);
+		I18n.observeElement(this.#shadowRoot);
+
 		let options_manager_inner = createElement('div', {
 			id: 'options-manager-inner',
 			draggable: true,
 			'data-left': 0,
 			'data-top': 0,
-			parent: this.#htmlOptionsManagerContainer,
+			parent: this.#shadowRoot,
 			events: {
 				click: event => event.stopPropagation(),
 				dragstart: event => handleDragStart(event),
