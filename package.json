@@ -5,9 +5,8 @@
 	"main": "src/index.js",
 	"type": "module",
 	"devDependencies": {
-		"@rollup/plugin-node-resolve": "^13.3.0",
-		"rollup": "^2.60.1",
-		"rollup-watch": "^3.2.2"
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"rollup": "^4.12.0"
 	},
 	"dependencies": {
 		"harmony-svg": "github:baldurstod/harmony-svg",
