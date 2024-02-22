@@ -7,14 +7,16 @@ export const I18n = new (function () {
 		#translations = new Map();
 		#executing = false;
 		#refreshTimeout;
+		#observerConfig = {childList: true, subtree: true, attributeFilter: ['i18n', 'data-i18n-json', 'data-i18n-values']};
+		#observer;
 
 		constructor() {
 			super();
+			this.#initObserver();
 		}
 
 		start() {
-			this.#initObserver();
-			this.i18n();//Scan everything to get html elements created before I18n
+			this.observeElement(document.body);
 		}
 
 		setOptions(options) {
@@ -31,7 +33,6 @@ export const I18n = new (function () {
 
 		#initObserver() {
 			//const config = {attributes: true, childList: true, subtree: true, attributeFilter:['class', 'data-i18n', 'data-i18n-title', 'data-i18n-placeholder']};
-			const config = {childList: true, subtree: true, attributeFilter: ['i18n', 'data-i18n-json', 'data-i18n-values']};
 			const callback = async (mutationsList, observer) => {
 				for(let mutation of mutationsList) {
 					if (mutation.type === 'childList') {
@@ -45,7 +46,12 @@ export const I18n = new (function () {
 					}
 				}
 			};
-			new MutationObserver(callback).observe(document.body, config);
+			this.#observer = new MutationObserver(callback);
+		}
+
+		observeElement(element) {
+			this.#observer.observe(element, this.#observerConfig);
+			this.updateElement(element);
 		}
 
 		#processList(parentNode, className, attribute, subElement) {
