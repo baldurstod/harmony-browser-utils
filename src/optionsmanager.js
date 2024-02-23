@@ -1,6 +1,4 @@
-import { createElement, hide, show, shadowRootStyle } from 'harmony-ui';
-
-import { I18n } from './i18n.js';
+import { createElement, hide, show, shadowRootStyle, I18n } from 'harmony-ui';
 
 import optionsManagerCSS from './css/optionsmanager.css';
 
@@ -306,7 +304,7 @@ class OptionsManagerClass extends EventTarget {
 			}
 		});
 
-		this.#shadowRoot = this.#htmlOptionsManagerContainer.attachShadow({ mode: "closed" });
+		this.#shadowRoot = this.#htmlOptionsManagerContainer.attachShadow({ mode: 'closed' });
 		shadowRootStyle(this.#shadowRoot, optionsManagerCSS);
 		I18n.observeElement(this.#shadowRoot);
 
@@ -537,10 +535,10 @@ class OptionsManagerClass extends EventTarget {
 						change: event => {
 							let value;
 							switch (event.target.value) {
-								case "0":
+								case '0':
 									value = false;
 									break;
-								case "1":
+								case '1':
 									value = true;
 									break;
 							}

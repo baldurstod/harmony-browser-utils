@@ -1,6 +1,5 @@
-import { createElement, shadowRootStyle } from 'harmony-ui';
+import { createElement, shadowRootStyle, I18n } from 'harmony-ui';
 import { closeSVG, contentCopySVG } from 'harmony-svg';
-import { I18n } from './i18n';
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
 
@@ -87,7 +86,7 @@ export class NotificationManager {
 			class: 'notification-manager',
 			parent: this.#htmlParent,
 		});
-		this.#shadowRoot = this.#htmlElement.attachShadow({ mode: "closed" });
+		this.#shadowRoot = this.#htmlElement.attachShadow({ mode: 'closed' });
 		shadowRootStyle(this.#shadowRoot, notificationManagerCSS);
 		I18n.observeElement(this.#shadowRoot);
 	}
