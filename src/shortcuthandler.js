@@ -82,6 +82,9 @@ class ShortcutHandlerClass extends EventTarget {
 	}
 
 	addShortcut(name, shortcut) {
+		if (!shortcut) {
+			return;
+		}
 		let shortcuts = shortcut.split(';');
 		let shortcutSet = this.shortcuts.get(name);
 		if (!shortcutSet) {
