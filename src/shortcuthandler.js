@@ -55,12 +55,15 @@ class ShortcutHandlerClass extends EventTarget {
 	}
 
 	#handleKeyDown(contextName, event) {
+		const contexts = contextName.split(',');
 		for (let [name, shortcuts] of this.#shortcuts) {
 			for (let shortcut of shortcuts) {
-				if (shortcut.match(contextName, event)) {
-					this.dispatchEvent(new CustomEvent(name, {detail:event}));
-					event.preventDefault();
-					event.stopPropagation();
+				for (let context of contexts) {
+					if (shortcut.match(context, event)) {
+						this.dispatchEvent(new CustomEvent(name, {detail:event}));
+						event.preventDefault();
+						event.stopPropagation();
+					}
 				}
 			}
 		}
