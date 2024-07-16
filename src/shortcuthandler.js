@@ -1,12 +1,12 @@
 class Shortcut {
-	#context;
+	#contexts;
 	#key;
 	#alt = false;
 	#ctrl = false;
 	#meta = false;
 	#shift = false;
 	constructor(context, shortcut) {
-		this.#context = context;
+		this.#contexts = context.split(',');
 		const keys = shortcut.toUpperCase().split('+');
 		for (let key of keys)  {
 			switch (key) {
@@ -32,7 +32,7 @@ class Shortcut {
 	}
 
 	match(context, keyBoardEvent) {
-		return	(context == this.#context) &&
+		return	(this.#contexts.indexOf(context) > -1) &&
 				(keyBoardEvent.altKey == this.#alt) &&
 				(keyBoardEvent.ctrlKey == this.#ctrl) &&
 				(keyBoardEvent.metaKey == this.#meta) &&
