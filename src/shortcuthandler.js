@@ -1,63 +1,63 @@
 class Shortcut {
-	constructor(shortcut) {
-		this.alt = false;
-		this.ctrl = false;
-		this.meta = false;
-		this.shift = false;
-		let keys = shortcut.toUpperCase().split('+');
+	#context;
+	#key;
+	#alt = false;
+	#ctrl = false;
+	#meta = false;
+	#shift = false;
+	constructor(context, shortcut) {
+		this.#context = context;
+		const keys = shortcut.toUpperCase().split('+');
 		for (let key of keys)  {
 			switch (key) {
 				case 'ALT':
-					this.alt = true;
+					this.#alt = true;
 					break;
 				case 'CTRL':
-					this.ctrl = true;
+					this.#ctrl = true;
 					break;
 				case 'META':
-					this.meta = true;
+					this.#meta = true;
 					break;
 				case 'SHIFT':
-					this.shift = true;
+					this.#shift = true;
 					break;
 				case 'PLUS':
-					this.key = '+';
+					this.#key = '+';
 					break;
 				default:
-					this.key = key;
+					this.#key = key;
 			}
 		}
 	}
 
-	match(keyBoardEvent) {
-		return	(keyBoardEvent.altKey == this.alt) &&
-				(keyBoardEvent.ctrlKey == this.ctrl) &&
-				(keyBoardEvent.metaKey == this.meta) &&
-				(keyBoardEvent.shiftKey == this.shift) &&
-				(keyBoardEvent.key.toUpperCase() == this.key);
+	match(context, keyBoardEvent) {
+		return	(context == this.#context) &&
+				(keyBoardEvent.altKey == this.#alt) &&
+				(keyBoardEvent.ctrlKey == this.#ctrl) &&
+				(keyBoardEvent.metaKey == this.#meta) &&
+				(keyBoardEvent.shiftKey == this.#shift) &&
+				(keyBoardEvent.key.toUpperCase() == this.#key);
 	}
 }
 
 class ShortcutHandlerClass extends EventTarget {
 	static #instance;
+	#shortcuts = new Map()
+	#contexts = new Map()
 	constructor() {
 		if (ShortcutHandlerClass.#instance) {
 			return ShortcutHandlerClass.#instance;
 		}
 		super();
 		ShortcutHandlerClass.#instance = this;
-		this.shortcuts = new Map();
-		window.addEventListener('keydown', (event) => this.handleKeyDown(event));
+		this.addContext('window', window);
 	}
 
-	handleKeyDown(event) {
-		if (event.target instanceof HTMLInputElement ||
-			event.target instanceof HTMLTextAreaElement
-			) {
-			return;
-		}
-		for (let [name, shortcuts] of this.shortcuts) {
+	#handleKeyDown(contextName, event) {
+		for (let [name, shortcuts] of this.#shortcuts) {
 			for (let shortcut of shortcuts) {
-				if (shortcut.match(event)) {
+				if (shortcut.match(contextName, event)) {
 					this.dispatchEvent(new CustomEvent(name, {detail:event}));
 					event.preventDefault();
 					event.stopPropagation();
@@ -66,33 +66,37 @@ class ShortcutHandlerClass extends EventTarget {
 		}
 	}
 
-	setShortcuts(shortcutMap) {
+	addContext(name, element) {
+		element.addEventListener('keydown', event => this.#handleKeyDown(name, event));
+	}
+
+	setShortcuts(contextName, shortcutMap) {
 		if (!shortcutMap) {
 			return;
 		}
-		this.shortcuts.clear();
+		this.#shortcuts.clear();
 		for (let [name, shortcut] of shortcutMap) {
-			this.addShortcut(name, shortcut);
+			this.addShortcut(contextName, name, shortcut);
 		}
 	}
 
-	setShortcut(name, shortcut) {
-		this.shortcuts.delete(name);
-		this.addShortcut(name, shortcut);
+	setShortcut(contextName, name, shortcut) {
+		this.#shortcuts.delete(name);
+		this.addShortcut(contextName, name, shortcut);
 	}
 
-	addShortcut(name, shortcut) {
+	addShortcut(contextName, name, shortcut) {
 		if (!shortcut) {
 			return;
 		}
 		let shortcuts = shortcut.split(';');
-		let shortcutSet = this.shortcuts.get(name);
+		let shortcutSet = this.#shortcuts.get(name);
 		if (!shortcutSet) {
 			shortcutSet = new Set();
-			this.shortcuts.set(name, shortcutSet);
+			this.#shortcuts.set(name, shortcutSet);
 		}
 		for (let shortcut of shortcuts)  {
-			shortcutSet.add(new Shortcut(shortcut));
+			shortcutSet.add(new Shortcut(contextName, shortcut));
 		}
 	}
 }
