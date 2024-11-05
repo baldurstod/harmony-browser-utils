@@ -27,7 +27,7 @@ class OptionsManagerClass extends EventTarget {
 
 		this.#defaultValues[Symbol.iterator] = function* () {
 			yield* [...this.entries()].sort(
-				(a, b) => {return a[0] < b[0] ? -1 : 1;}
+				(a, b) => { return a[0] < b[0] ? -1 : 1; }
 			);
 		}
 	}
@@ -89,7 +89,7 @@ class OptionsManagerClass extends EventTarget {
 	}
 
 	addOption(option) {
-		if (!option) {return;}
+		if (!option) { return; }
 		let name = option.name.toLowerCase();
 
 		let type = option.type;
@@ -197,15 +197,15 @@ class OptionsManagerClass extends EventTarget {
 	}
 
 	#valueChanged(name, value) {
-		this.dispatchEvent(new CustomEvent(name, {detail:{name:name, value:value}}));
+		this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value } }));
 		let lastIndex = name.lastIndexOf('.');
 		while (lastIndex != -1) {
 			let wildCardName = name.slice(0, lastIndex);
-			this.dispatchEvent(new CustomEvent(wildCardName + '.*', {detail:{name:name, value:value}}));
+			this.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value } }));
 			lastIndex = name.lastIndexOf('.', lastIndex - 1);
 		}
 
-		this.dispatchEvent(new CustomEvent('*', {detail:{name:name, value:value}}));
+		this.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value } }));
 	}
 
 	getItem(name) {
@@ -321,14 +321,14 @@ class OptionsManagerClass extends EventTarget {
 			}
 		});
 
-		let handleDragStart = function(event) {
+		let handleDragStart = function (event) {
 			let target = event.target;
 
 			target.setAttribute('data-drag-start-layerx', event.layerX);
 			target.setAttribute('data-drag-start-layery', event.layerY);
 		};
 
-		let handleDragEnd = function(event) {
+		let handleDragEnd = function (event) {
 			let target = event.target;
 
 			let startEventX = target.getAttribute('data-drag-start-layerx');
@@ -347,7 +347,7 @@ class OptionsManagerClass extends EventTarget {
 			options_manager_inner.setAttribute('data-top', dataTop);
 		};
 
-		createElement('h1', {id: 'options-manager-title', i18n: '#manage_options', parent: options_manager_inner});
+		createElement('h1', { id: 'options-manager-title', i18n: '#manage_options', parent: options_manager_inner });
 
 		let options_manager_filter = createElement('input', {
 			id: 'options-manager-inner-filter',
@@ -358,14 +358,14 @@ class OptionsManagerClass extends EventTarget {
 			}
 		});
 
-		this.#htmlOptionsTable = createElement('table', {parent: options_manager_inner});
-		this.#htmlOptionsManagerContentThead = createElement('thead', {parent: this.#htmlOptionsTable});
+		this.#htmlOptionsTable = createElement('table', { parent: options_manager_inner });
+		this.#htmlOptionsManagerContentThead = createElement('thead', { parent: this.#htmlOptionsTable });
 	}
 
 	#populateOptionRow(option) {
 		let htmlRow = createElement('tr');
 		let htmlResetButtonCell = createElement('td');
-		let htmlOptionNameCell = createElement('td', {innerHTML: option.name});
+		let htmlOptionNameCell = createElement('td', { innerHTML: option.name });
 		let htmlDefaultValueCell = createElement('td');
 		let htmlUserValueCell = createElement('td');
 
@@ -378,7 +378,7 @@ class OptionsManagerClass extends EventTarget {
 			i18n: '#reset',
 			parent: htmlResetButtonCell,
 			events: {
-				click: (event) => {this.resetItem(option.name);this.#refreshPanel();}
+				click: (event) => { this.resetItem(option.name); this.#refreshPanel(); }
 			}
 		});
 
@@ -389,20 +389,20 @@ class OptionsManagerClass extends EventTarget {
 	}
 
 	#populateMapOptionRow(option) {
-		let htmlRow = createElement('tbody', {innerHTML: `<td></td><td colspan="3">${option.name}</td>`});
+		let htmlRow = createElement('tbody', { innerHTML: `<td></td><td colspan="3">${option.name}</td>` });
 
 		let userValue = this.getItem(option.name);
 		if (userValue && typeof userValue === 'object') {
 			for (let key in userValue) {
-				let htmlSubRow = createElement('tr', {parent: htmlRow});
+				let htmlSubRow = createElement('tr', { parent: htmlRow });
 				let value = userValue[key];
 
 				let htmlRemoveButtonCell = createElement('td');
-				let htmlSubNameCell = createElement('td', {innerHTML: key});
+				let htmlSubNameCell = createElement('td', { innerHTML: key });
 				let htmlSubValueCell = createElement('td');
 				htmlSubRow.append(htmlRemoveButtonCell, htmlSubNameCell, htmlSubValueCell);
 
-				let htmlEdit = createElement('input', {value: value, parent: htmlSubValueCell});
+				let htmlEdit = createElement('input', { value: value, parent: htmlSubValueCell });
 			}
 		}
 		return htmlRow;
@@ -430,16 +430,18 @@ class OptionsManagerClass extends EventTarget {
 		this.#htmlOptionsManagerContentThead.innerHTML = '';
 
 		this.#htmlOptionsManagerContentThead.append(
-			createElement('th', {child: createElement('button', {
-				class: 'options-manager-button',
-				i18n: '#reset_all',
-				events: {
-					click: (event) => {this.resetAllItems();this.#refreshPanel();}
-				}
-			})}),
-			createElement('th', {i18n: '#option_name'}),
-			createElement('th', {i18n: '#option_default_value'}),
-			createElement('th', {i18n: '#option_user_value'}),
+			createElement('th', {
+				child: createElement('button', {
+					class: 'options-manager-button',
+					i18n: '#reset_all',
+					events: {
+						click: (event) => { this.resetAllItems(); this.#refreshPanel(); }
+					}
+				})
+			}),
+			createElement('th', { i18n: '#option_name' }),
+			createElement('th', { i18n: '#option_default_value' }),
+			createElement('th', { i18n: '#option_user_value' }),
 		);
 
 		for (let row of this.#optionsManagerRows) {
@@ -513,10 +515,10 @@ class OptionsManagerClass extends EventTarget {
 				});
 				break;
 			case 'object':
-				htmlElement = createElement('input',  {
+				htmlElement = createElement('input', {
 					value: JSON.stringify(value),
 					events: {
-						change: event => {this.setItem(optionName, JSON.parse(event.target.value));showHideResetButton();}
+						change: event => { this.setItem(optionName, JSON.parse(event.target.value)); showHideResetButton(); }
 					}
 				});
 				break;
@@ -525,7 +527,7 @@ class OptionsManagerClass extends EventTarget {
 					type: 'checkbox',
 					checked: value,
 					events: {
-						change: event => {this.setItem(optionName, event.target.checked);showHideResetButton();}
+						change: event => { this.setItem(optionName, event.target.checked); showHideResetButton(); }
 					}
 				});
 				break;
@@ -547,8 +549,8 @@ class OptionsManagerClass extends EventTarget {
 						}
 					}
 				});
-				for(let o of ['', 0, 1]) {
-					createElement('option', {innerHTML: o, parent: htmlElement});
+				for (let o of ['', 0, 1]) {
+					createElement('option', { innerHTML: o, parent: htmlElement });
 				}
 				let v;
 				switch (value) {
@@ -570,12 +572,12 @@ class OptionsManagerClass extends EventTarget {
 				htmlElement = createElement('select', {
 					value: value,
 					events: {
-						change: event => {this.setItem(optionName, event.target.value);showHideResetButton();}
+						change: event => { this.setItem(optionName, event.target.value); showHideResetButton(); }
 					}
 				});
 				if (option.datalist) {
-					for(let o of option.datalist) {
-						createElement('option', {innerHTML: o, parent: htmlElement});
+					for (let o of option.datalist) {
+						createElement('option', { innerHTML: o, parent: htmlElement });
 					}
 				}
 				htmlElement.value = value;
@@ -584,7 +586,7 @@ class OptionsManagerClass extends EventTarget {
 				htmlElement = createElement('input', {
 					value: value,
 					events: {
-						change: event => {this.setItem(optionName, (readVec2Value(event.target.value)));showHideResetButton();}
+						change: event => { this.setItem(optionName, (readVec2Value(event.target.value))); showHideResetButton(); }
 					}
 				});
 				break;
@@ -604,25 +606,25 @@ class OptionsManagerClass extends EventTarget {
 				}
 				htmlElement.addEventListener('change', event => {this.setItem(optionName, event.target.value);showHideResetButton();});
 				break;*/
-/*			case 'vec4':
-				htmlElement = createElement('input');
-				htmlElement.value = value;//value.join(',');
-				function readValue(value) {
-					let v = value.split(',');
-					if (v.length == 4) {
-						return quat.fromValues(v[0] * 1, v[1] * 1, v[2] * 1, v[3] * 1);
-					}
-					return null;
-				}
-				htmlElement.addEventListener('change', event => {this.setItem(optionName, (readValue(event.target.value)));showHideResetButton();});
-				break;*/
+			/*			case 'vec4':
+							htmlElement = createElement('input');
+							htmlElement.value = value;//value.join(',');
+							function readValue(value) {
+								let v = value.split(',');
+								if (v.length == 4) {
+									return quat.fromValues(v[0] * 1, v[1] * 1, v[2] * 1, v[3] * 1);
+								}
+								return null;
+							}
+							htmlElement.addEventListener('change', event => {this.setItem(optionName, (readValue(event.target.value)));showHideResetButton();});
+							break;*/
 			case 'string':
 			case 'color':
 			default:
 				htmlElement = createElement('input', {
 					value: value,
 					events: {
-						change: event => {this.setItem(optionName, (event.target.value));showHideResetButton();}
+						change: event => { this.setItem(optionName, (event.target.value)); showHideResetButton(); }
 					}
 				});
 				break;
@@ -664,10 +666,10 @@ class OptionsManagerClass extends EventTarget {
 
 	async getList(name) {
 		await this.#initPromise;
-			let option = this.#defaultValues.get(name);
-			if (option && option.type == 'list') {
-				return option.datalist;
-			}
+		let option = this.#defaultValues.get(name);
+		if (option && option.type == 'list') {
+			return option.datalist;
+		}
 	}
 }
 
