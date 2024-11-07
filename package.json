@@ -1,15 +1,19 @@
 {
 	"name": "harmony-browser-utils",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"description": "",
 	"main": "src/index.js",
 	"type": "module",
 	"devDependencies": {
 		"@rollup/plugin-node-resolve": "^15.2.3",
-		"rollup": "^4.12.0"
+		"@rollup/plugin-typescript": "^12.1.1",
+		"rollup": "^4.12.0",
+		"tslib": "^2.8.1"
 	},
 	"dependencies": {
+		"gl-matrix": "^3.4.3",
 		"harmony-svg": "github:baldurstod/harmony-svg",
-		"harmony-ui": "github:baldurstod/harmony-ui"
+		"harmony-ui": "github:baldurstod/harmony-ui",
+		"rollup-plugin-import-css": "^3.5.6"
 	}
 }
