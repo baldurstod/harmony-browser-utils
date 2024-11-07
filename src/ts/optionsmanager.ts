@@ -1,38 +1,41 @@
-import { createElement, hide, show, shadowRootStyle, I18n } from 'harmony-ui';
+import { vec2 } from 'gl-matrix';
+import { createElement, hide, show, shadowRootStyle, I18n, createShadowRoot } from 'harmony-ui';
+import optionsManagerCSS from '../css/optionsmanager.css';
 
-import optionsManagerCSS from './css/optionsmanager.css';
+export type Option = { name: string, editable: boolean, type: string, dv: string, datalist?: Array<any> };
+export type SubOption = { [key: string]: Option };
 
-class OptionsManagerClass extends EventTarget {
-	static #instance;
-	#defaultValues = new Map();
-	#currentValues = new Map();
-	#categories = new Map();
+export class OptionsManager extends EventTarget {
+	static #instance: OptionsManager;
+	#defaultValues = new Map<string, Option>();
+	#currentValues = new Map<string, Option | SubOption>();
+	#categories = new Map<string, Array<any/*TODO:better type*/>>();
 	#dirtyCategories = true;
-	#initPromiseResolve;
+	#initPromiseResolve?: (value?: unknown) => void;
 	#initPromise = new Promise((resolve) => this.#initPromiseResolve = resolve);
 	#currentFilter = '';
-	#optionsManagerRows = new Set();
-	#htmlOptionsManagerContainer;
-	#htmlOptionsTable;
-	#htmlOptionsManagerContentThead;
-	static #uniqueId = 0;
-	#shadowRoot;
+	#optionsManagerRows = new Set<HTMLElement>();
+	#htmlOptionsTable?: HTMLTableElement;
+	#htmlOptionsManagerContentThead?: HTMLElement;
+	#uniqueId = 0;
+	#shadowRoot?: ShadowRoot;
+	logException = false;
 
 	constructor() {
-		if (OptionsManagerClass.#instance) {
-			return OptionsManagerClass.#instance;
+		if (OptionsManager.#instance) {
+			return OptionsManager.#instance;
 		}
 		super();
-		OptionsManagerClass.#instance = this;
+		OptionsManager.#instance = this;
 
-		this.#defaultValues[Symbol.iterator] = function* () {
+		this.#defaultValues[Symbol.iterator] = function* (): MapIterator<[string, Option]> {
 			yield* [...this.entries()].sort(
 				(a, b) => { return a[0] < b[0] ? -1 : 1; }
 			);
 		}
 	}
 
-	async init(parameters) {
+	async init(parameters: { [key: string]: any }) {
 		if (parameters.url) {
 			await this.#initFromURL(parameters.url);
 		} else if (parameters.json) {
@@ -40,30 +43,32 @@ class OptionsManagerClass extends EventTarget {
 		}
 	}
 
-	async #initFromURL(url) {
+	async #initFromURL(url: string) {
 		let response = await fetch(url);
 		this.#initFromJSON(await response.json());
 	}
 
-	#initFromJSON(json) {
+	#initFromJSON(json: { [key: string]: any }) {
 		if (json) {
 			if (json.categories) {
-				json.categories.forEach((category) => this.#addCategory(category));
+				json.categories.forEach((category: string) => this.#addCategory(category));
 			}
 			this.#addCategory('');
 			if (json.options) {
-				json.options.forEach((option) => this.addOption(option));
+				json.options.forEach((option: any/*TODO:better type*/) => this.addOption(option));
 			}
-			this.#initPromiseResolve();
+			if (this.#initPromiseResolve) {
+				this.#initPromiseResolve();
+			}
 		}
 	}
 
-	#addCategory(name) {
+	#addCategory(name: string) {
 		this.#categories.set(name.toLowerCase(), []);
 		this.#dirtyCategories = true;
 	}
 
-	#refreshCategories(name) {
+	#refreshCategories() {
 		if (this.#dirtyCategories) {
 			for (let [categoryName, category] of this.#categories) {
 				category.length = 0;
@@ -88,7 +93,7 @@ class OptionsManagerClass extends EventTarget {
 		this.#dirtyCategories = false;
 	}
 
-	addOption(option) {
+	addOption(option: any/*TODO:better type*/) {
 		if (!option) { return; }
 		let name = option.name.toLowerCase();
 
@@ -96,7 +101,7 @@ class OptionsManagerClass extends EventTarget {
 		let defaultValue = option.default;
 		let datalist = option.datalist;
 		let editable = option.editable;
-		let dv = this.#defaultValues.get(name) || {};
+		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: false, type: '', dv: '' };
 		this.#defaultValues.set(name, dv);
 		dv.name = name;
 		if (type !== undefined) {
@@ -122,13 +127,13 @@ class OptionsManagerClass extends EventTarget {
 				}
 			}
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	setItem(name, value) {
+	setItem(name: string, value: any) {
 		try {
 			if (typeof localStorage != 'undefined') {
 				localStorage.setItem(name, JSON.stringify(value));
@@ -141,62 +146,62 @@ class OptionsManagerClass extends EventTarget {
 				this.#valueChanged(name, value);
 			}
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	getSubItem(name, subName) {
+	getSubItem(name: string, subName: string) {
 		try {
 			let map = this.#currentValues.get(name) ?? {};
 			if (map && (typeof map == 'object')) {
-				return map[subName];
+				return (map as SubOption)[subName];
 			}
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	async setSubItem(name, subName, value) {
+	async setSubItem(name: string, subName: string, value: any) {
 		try {
 			let option = await this.getOption(name);
 			if (option && option.type == 'map') {
 				let map = this.#currentValues.get(name) ?? {};
 
-				if (map[subName] == value) {
+				if ((map as SubOption)[subName] == value) {
 					return;
 				}
-				map[subName] = value;
+				(map as SubOption)[subName] = value;
 				this.#valueChanged(name, map);
 
 				localStorage.setItem(name, JSON.stringify(map));
 			}
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	removeSubItem(name, subName) {
+	removeSubItem(name: string, subName: string) {
 		try {
 			let map = this.#currentValues.get(name) ?? {};
 			if (map && (typeof map == 'object')) {
-				delete map[subName];
+				delete (map as SubOption)[subName];
 				this.#valueChanged(name, map);
 				localStorage.setItem(name, JSON.stringify(map));
 			}
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	#valueChanged(name, value) {
+	#valueChanged(name: string, value: any) {
 		this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value } }));
 		let lastIndex = name.lastIndexOf('.');
 		while (lastIndex != -1) {
@@ -208,7 +213,7 @@ class OptionsManagerClass extends EventTarget {
 		this.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value } }));
 	}
 
-	getItem(name) {
+	getItem(name: string) {
 		try {
 			if (typeof localStorage != 'undefined') {
 				let value = localStorage.getItem(name);
@@ -218,16 +223,16 @@ class OptionsManagerClass extends EventTarget {
 				}
 			}
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 		if (this.#defaultValues.get(name)) {
-			return this.#defaultValues.get(name).dv;
+			return this.#defaultValues.get(name)?.dv;
 		}
 	}
 
-	removeItem(name) {
+	removeItem(name: string) {
 		this.#defaultValues.delete(name);
 		try {
 			if (typeof localStorage != 'undefined') {
@@ -235,13 +240,13 @@ class OptionsManagerClass extends EventTarget {
 			}
 			this.#currentValues.delete(name);
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	resetItem(name) {
+	resetItem(name: string) {
 		let item = this.#defaultValues.get(name);
 		if (item) {
 			let defaultValue = item.dv;
@@ -252,13 +257,13 @@ class OptionsManagerClass extends EventTarget {
 		}
 	}
 
-	resetItems(names) {
-		for (name of names) {
+	resetItems(names: Array<string>) {
+		for (let name of names) {
 			this.resetItem(name);
 		}
 	}
 
-	resetAllItems(name) {
+	resetAllItems() {
 		for (let item of this.#defaultValues.keys()) {
 			this.resetItem(item);
 		}
@@ -272,13 +277,13 @@ class OptionsManagerClass extends EventTarget {
 			}
 			this.#currentValues.clear();
 		} catch (exception) {
-			if (OptionsManager.logException) {
+			if (this.logException) {
 				console.error(exception);
 			}
 		}
 	}
 
-	#filter(filter) {
+	#filter(filter: string) {
 		this.#currentFilter = String(filter).toLowerCase();
 		this.#applyFilter();
 	}
@@ -286,7 +291,10 @@ class OptionsManagerClass extends EventTarget {
 	#applyFilter() {
 		for (let row of this.#optionsManagerRows) {
 			//let row = i[0];
-			let optionName = row.getAttribute('user-data-option-name').toLowerCase();
+			let optionName = row.getAttribute('user-data-option-name')?.toLowerCase();
+			if (!optionName) {
+				continue;
+			}
 
 			if (!this.#currentFilter || optionName.indexOf(this.#currentFilter) != -1) {
 				row.style.display = '';
@@ -297,72 +305,70 @@ class OptionsManagerClass extends EventTarget {
 	}
 
 	#initPanel() {
-		this.#htmlOptionsManagerContainer = createElement('options-manager', {
+		this.#shadowRoot = createShadowRoot('options-manager', {
 			parent: document.body,
+			adoptStyle: optionsManagerCSS,
 			events: {
-				click: event => hide(this.#htmlOptionsManagerContainer)
+				click: () => hide(this.#shadowRoot?.host as HTMLElement)
 			}
 		});
-
-		this.#shadowRoot = this.#htmlOptionsManagerContainer.attachShadow({ mode: 'closed' });
-		shadowRootStyle(this.#shadowRoot, optionsManagerCSS);
 		I18n.observeElement(this.#shadowRoot);
 
-		let options_manager_inner = createElement('div', {
+		const optionsManagerInner = createElement('div', {
 			id: 'options-manager-inner',
 			draggable: true,
 			'data-left': 0,
 			'data-top': 0,
 			parent: this.#shadowRoot,
 			events: {
-				click: event => event.stopPropagation(),
-				dragstart: event => handleDragStart(event),
-				dragend: event => handleDragEnd(event),
+				click: (event: MouseEvent) => event.stopPropagation(),
+				dragstart: (event: MouseEvent) => handleDragStart(event),
+				dragend: (event: MouseEvent) => handleDragEnd(event),
 			}
-		});
+		}) as HTMLElement;
 
-		let handleDragStart = function (event) {
-			let target = event.target;
+		let handleDragStart = function (event: MouseEvent) {
+			let target = event.target as HTMLElement;
 
-			target.setAttribute('data-drag-start-layerx', event.layerX);
-			target.setAttribute('data-drag-start-layery', event.layerY);
+			target?.setAttribute('data-drag-start-layerx', String(event.layerX));
+			target?.setAttribute('data-drag-start-layery', String(event.layerY));
 		};
 
-		let handleDragEnd = function (event) {
-			let target = event.target;
+		let handleDragEnd = function (event: MouseEvent) {
+			let target = event.target as HTMLElement;
 
-			let startEventX = target.getAttribute('data-drag-start-layerx');
-			let startEventY = target.getAttribute('data-drag-start-layery');
+			let startEventX = Number(target.getAttribute('data-drag-start-layerx'));
+			let startEventY = Number(target.getAttribute('data-drag-start-layery'));
 
 			target.style.left = (event.layerX - startEventX) + 'px';
 			target.style.top = (event.layerY - startEventY) + 'px';
 
-			let dataTop = target.getAttribute('data-top') * 1 + (event.layerY - startEventY);
-			let dataLeft = target.getAttribute('data-left') * 1 + (event.layerX - startEventX);
+			let dataTop = Number(target.getAttribute('data-top')) + (event.layerY - startEventY);
+			let dataLeft = Number(target.getAttribute('data-left')) + (event.layerX - startEventX);
 
 			target.style.left = dataLeft + 'px';
 			target.style.top = dataTop + 'px';
 
-			options_manager_inner.setAttribute('data-left', dataLeft);
-			options_manager_inner.setAttribute('data-top', dataTop);
+			optionsManagerInner.setAttribute('data-left', String(dataLeft));
+			optionsManagerInner.setAttribute('data-top', String(dataTop));
 		};
 
-		createElement('h1', { id: 'options-manager-title', i18n: '#manage_options', parent: options_manager_inner });
+		createElement('h1', { id: 'options-manager-title', i18n: '#manage_options', parent: optionsManagerInner });
 
 		let options_manager_filter = createElement('input', {
 			id: 'options-manager-inner-filter',
 			'i18n-placeholder': '#filter',
-			parent: options_manager_inner,
+			parent: optionsManagerInner,
 			events: {
-				input: event => this.#filter(event.target.value)
+				input: (event: Event) => this.#filter((event.target as HTMLInputElement).value)
 			}
 		});
 
-		this.#htmlOptionsTable = createElement('table', { parent: options_manager_inner });
+		this.#htmlOptionsTable = createElement('table', { parent: optionsManagerInner }) as HTMLTableElement;
 		this.#htmlOptionsManagerContentThead = createElement('thead', { parent: this.#htmlOptionsTable });
 	}
 
-	#populateOptionRow(option) {
+	#populateOptionRow(option: Option) {
 		let htmlRow = createElement('tr');
 		let htmlResetButtonCell = createElement('td');
 		let htmlOptionNameCell = createElement('td', { innerHTML: option.name });
@@ -378,17 +384,19 @@ class OptionsManagerClass extends EventTarget {
 			i18n: '#reset',
 			parent: htmlResetButtonCell,
 			events: {
-				click: (event) => { this.resetItem(option.name); this.#refreshPanel(); }
+				click: () => { this.resetItem(option.name); this.#refreshPanel(); }
 			}
 		});
 
 		let valueEdit = this.#createInput(option.name, this.#defaultValues.get(option.name), myValue, htmlResetButtonCell);
-		htmlUserValueCell.appendChild(valueEdit);
-		htmlRow.append(htmlResetButtonCell, htmlOptionNameCell, htmlDefaultValueCell, htmlUserValueCell);
+		if (valueEdit) {
+			htmlUserValueCell.appendChild(valueEdit);
+			htmlRow.append(htmlResetButtonCell, htmlOptionNameCell, htmlDefaultValueCell, htmlUserValueCell);
+		}
 		return htmlRow;
 	}
 
-	#populateMapOptionRow(option) {
+	#populateMapOptionRow(option: Option) {
 		let htmlRow = createElement('tbody', { innerHTML: `<td></td><td colspan="3">${option.name}</td>` });
 
 		let userValue = this.getItem(option.name);
@@ -408,7 +416,7 @@ class OptionsManagerClass extends EventTarget {
 		return htmlRow;
 	}
 
-	#addOptionRow(option) {
+	#addOptionRow(option: Option) {
 		if (option.editable === false) {
 			return;
 		}
@@ -427,22 +435,23 @@ class OptionsManagerClass extends EventTarget {
 
 	#refreshPanel() {
 		this.#refreshCategories();
-		this.#htmlOptionsManagerContentThead.innerHTML = '';
-
-		this.#htmlOptionsManagerContentThead.append(
-			createElement('th', {
-				child: createElement('button', {
-					class: 'options-manager-button',
-					i18n: '#reset_all',
-					events: {
-						click: (event) => { this.resetAllItems(); this.#refreshPanel(); }
-					}
-				})
-			}),
-			createElement('th', { i18n: '#option_name' }),
-			createElement('th', { i18n: '#option_default_value' }),
-			createElement('th', { i18n: '#option_user_value' }),
-		);
+		if (this.#htmlOptionsManagerContentThead) {
+			this.#htmlOptionsManagerContentThead.innerText = '';
+			this.#htmlOptionsManagerContentThead.append(
+				createElement('th', {
+					child: createElement('button', {
+						class: 'options-manager-button',
+						i18n: '#reset_all',
+						events: {
+							click: () => { this.resetAllItems(); this.#refreshPanel(); }
+						}
+					})
+				}),
+				createElement('th', { i18n: '#option_name' }),
+				createElement('th', { i18n: '#option_default_value' }),
+				createElement('th', { i18n: '#option_user_value' }),
+			);
+		}
 
 		for (let row of this.#optionsManagerRows) {
 			row.remove();
@@ -454,7 +463,7 @@ class OptionsManagerClass extends EventTarget {
 				let htmlRow = this.#addOptionRow(option);
 				if (htmlRow) {
 					this.#optionsManagerRows.add(htmlRow);
-					this.#htmlOptionsTable.append(htmlRow);
+					this.#htmlOptionsTable?.append(htmlRow);
 				}
 			}
 		}
@@ -462,7 +471,7 @@ class OptionsManagerClass extends EventTarget {
 		this.#applyFilter();
 	}
 
-	#fillCell(cell, type, value) {
+	#fillCell(cell: HTMLElement, type: string, value: string) {
 		switch (type) {
 			case 'string':
 				cell.innerHTML = value;
@@ -482,14 +491,17 @@ class OptionsManagerClass extends EventTarget {
 		}
 	}
 
-	static #getUniqueId() {
+	#getUniqueId() {
 		return 'options-manager-' + (this.#uniqueId++);
 	}
 
-	#createInput(optionName, option, value, resetButton) {
+	#createInput(optionName: string, option: Option | undefined, value: any, resetButton: HTMLElement) {
+		if (!option) {
+			return;
+		}
 		let showHideResetButton = () => {
-			let defaultValue = this.#defaultValues.get(optionName).dv;
-			defaultValue = defaultValue === null ? null : JSON.stringify(defaultValue);
+			let defaultValue = this.#defaultValues.get(optionName)?.dv;
+			defaultValue = defaultValue === undefined ? undefined : JSON.stringify(defaultValue);
 			let optionValue = this.getItem(optionName);
 			optionValue = optionValue === null ? null : JSON.stringify(optionValue);
 			if ((optionValue) != defaultValue) {
@@ -499,15 +511,15 @@ class OptionsManagerClass extends EventTarget {
 			}
 		}
 
-		let htmlElement;
+		let htmlElement: HTMLElement;
 		switch (option.type) {
 			case 'number':
 			case 'integer':
 				htmlElement = createElement('input', {
 					value: value,
 					events: {
-						change: event => {
-							let value = event.target.value.trim();
+						change: (event: Event) => {
+							let value = (event.target as HTMLInputElement).value.trim();
 							this.setItem(optionName, value === '' ? null : Number(value));
 							showHideResetButton();
 						}
@@ -518,7 +530,7 @@ class OptionsManagerClass extends EventTarget {
 				htmlElement = createElement('input', {
 					value: JSON.stringify(value),
 					events: {
-						change: event => { this.setItem(optionName, JSON.parse(event.target.value)); showHideResetButton(); }
+						change: (event: Event) => { this.setItem(optionName, JSON.parse((event.target as HTMLInputElement).value)); showHideResetButton(); }
 					}
 				});
 				break;
@@ -527,16 +539,16 @@ class OptionsManagerClass extends EventTarget {
 					type: 'checkbox',
 					checked: value,
 					events: {
-						change: event => { this.setItem(optionName, event.target.checked); showHideResetButton(); }
+						change: (event: Event) => { this.setItem(optionName, (event.target as HTMLInputElement).checked); showHideResetButton(); }
 					}
 				});
 				break;
 			case 'ternary':
 				htmlElement = createElement('select', {
 					events: {
-						change: event => {
+						change: (event: Event) => {
 							let value;
-							switch (event.target.value) {
+							switch ((event.target as HTMLSelectElement).value) {
 								case '0':
 									value = false;
 									break;
@@ -552,7 +564,7 @@ class OptionsManagerClass extends EventTarget {
 				for (let o of ['', 0, 1]) {
 					createElement('option', { innerHTML: o, parent: htmlElement });
 				}
-				let v;
+				let v = '';
 				switch (value) {
 					case undefined:
 						v = '';
@@ -565,14 +577,14 @@ class OptionsManagerClass extends EventTarget {
 						break;
 				}
 
-				htmlElement.value = v;
+				(htmlElement as HTMLSelectElement).value = v;
 				break;
 			case 'list':
-				let dataListId = OptionsManagerClass.#getUniqueId();
+				let dataListId = this.#getUniqueId();
 				htmlElement = createElement('select', {
 					value: value,
 					events: {
-						change: event => { this.setItem(optionName, event.target.value); showHideResetButton(); }
+						change: (event: Event) => { this.setItem(optionName, (event.target as HTMLSelectElement).value); showHideResetButton(); }
 					}
 				});
 				if (option.datalist) {
@@ -580,13 +592,13 @@ class OptionsManagerClass extends EventTarget {
 						createElement('option', { innerHTML: o, parent: htmlElement });
 					}
 				}
-				htmlElement.value = value;
+				(htmlElement as HTMLSelectElement).value = value;
 				break;
 			case 'vec2':
 				htmlElement = createElement('input', {
 					value: value,
 					events: {
-						change: event => { this.setItem(optionName, (readVec2Value(event.target.value))); showHideResetButton(); }
+						change: (event: Event) => { this.setItem(optionName, (readVec2Value((event.target as HTMLSelectElement).value))); showHideResetButton(); }
 					}
 				});
 				break;
@@ -624,7 +636,7 @@ class OptionsManagerClass extends EventTarget {
 				htmlElement = createElement('input', {
 					value: value,
 					events: {
-						change: event => { this.setItem(optionName, (event.target.value)); showHideResetButton(); }
+						change: (event: Event) => { this.setItem(optionName, ((event.target as HTMLInputElement).value)); showHideResetButton(); }
 					}
 				});
 				break;
@@ -634,14 +646,14 @@ class OptionsManagerClass extends EventTarget {
 	}
 
 	showOptionsManager() {
-		if (!this.#htmlOptionsManagerContainer) {
+		if (!this.#shadowRoot) {
 			this.#initPanel();
 		}
 		this.#refreshPanel();
-		show(this.#htmlOptionsManagerContainer);
+		show(this.#shadowRoot?.host as HTMLElement);
 	}
 
-	async getOptionsPerType(type) {
+	async getOptionsPerType(type: string) {
 		await this.#initPromise;
 		let ret = new Set();
 
@@ -654,17 +666,17 @@ class OptionsManagerClass extends EventTarget {
 		return ret;
 	}
 
-	async getOption(name) {
+	async getOption(name: string) {
 		await this.#initPromise;
 		return this.#defaultValues.get(name);
 	}
 
-	async getOptionType(name) {
+	async getOptionType(name: string) {
 		await this.#initPromise;
 		return this.#defaultValues.get(name)?.type;
 	}
 
-	async getList(name) {
+	async getList(name: string) {
 		await this.#initPromise;
 		let option = this.#defaultValues.get(name);
 		if (option && option.type == 'list') {
@@ -673,12 +685,10 @@ class OptionsManagerClass extends EventTarget {
 	}
 }
 
-export const OptionsManager = new OptionsManagerClass();
-
-function readVec2Value(value) {
+function readVec2Value(value: string): vec2 | null {
 	let v = value.split(',');
 	if (v.length == 2) {
-		return [v[0] * 1, v[1] * 1];
+		return vec2.fromValues(Number(v[0]), Number(v[1]));
 	}
 	return null;
 }
