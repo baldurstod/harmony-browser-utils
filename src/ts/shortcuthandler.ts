@@ -5,7 +5,7 @@ class Shortcut {
 	#ctrl = false;
 	#meta = false;
 	#shift = false;
-	constructor(context, shortcut) {
+	constructor(context: string, shortcut: string) {
 		this.#contexts = context.split(',');
 		const keys = shortcut.toUpperCase().split('+');
 		for (let key of keys) {
@@ -31,7 +31,7 @@ class Shortcut {
 		}
 	}
 
-	match(context, keyBoardEvent) {
+	match(context: string, keyBoardEvent: KeyboardEvent) {
 		return (this.#contexts.indexOf(context) > -1) &&
 			(keyBoardEvent.altKey == this.#alt) &&
 			(keyBoardEvent.ctrlKey == this.#ctrl) &&
@@ -41,20 +41,20 @@ class Shortcut {
 	}
 }
 
-class ShortcutHandlerClass extends EventTarget {
-	static #instance;
+class ShortcutHandler extends EventTarget {
+	static #instance: ShortcutHandler;
 	#shortcuts = new Map()
 	#contexts = new Map()
 	constructor() {
-		if (ShortcutHandlerClass.#instance) {
-			return ShortcutHandlerClass.#instance;
+		if (ShortcutHandler.#instance) {
+			return ShortcutHandler.#instance;
 		}
 		super();
-		ShortcutHandlerClass.#instance = this;
-		this.addContext('window', window);
+		ShortcutHandler.#instance = this;
+		this.addContext('window', document);
 	}
 
-	#handleKeyDown(contextName, event) {
+	#handleKeyDown(contextName: string, event: Event) {
 		const contexts = contextName.split(',');
 		for (let [name, shortcuts] of this.#shortcuts) {
 			for (let shortcut of shortcuts) {
@@ -69,11 +69,11 @@ class ShortcutHandlerClass extends EventTarget {
 		}
 	}
 
-	addContext(name, element) {
-		element.addEventListener('keydown', event => this.#handleKeyDown(name, event));
+	addContext(name: string, element: HTMLElement | Document) {
+		element.addEventListener('keydown', (event: Event) => this.#handleKeyDown(name, event));
 	}
 
-	setShortcuts(contextName, shortcutMap) {
+	setShortcuts(contextName: string, shortcutMap: Map<string, string>) {
 		if (!shortcutMap) {
 			return;
 		}
@@ -83,12 +83,12 @@ class ShortcutHandlerClass extends EventTarget {
 		}
 	}
 
-	setShortcut(contextName, name, shortcut) {
+	setShortcut(contextName: string, name: string, shortcut: string) {
 		this.#shortcuts.delete(name);
 		this.addShortcut(contextName, name, shortcut);
 	}
 
-	addShortcut(contextName, name, shortcut) {
+	addShortcut(contextName: string, name: string, shortcut: string) {
 		if (!shortcut) {
 			return;
 		}
@@ -103,5 +103,3 @@ class ShortcutHandlerClass extends EventTarget {
 		}
 	}
 }
-
-export const ShortcutHandler = new ShortcutHandlerClass();
