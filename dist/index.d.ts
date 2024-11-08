@@ -14,7 +14,7 @@ export declare class NotificationManager {
     #private;
     constructor();
     setParent(htmlParent: HTMLElement): void;
-    addNotification(content: NotificationContent, type: string, ttl: number): void;
+    addNotification(content: NotificationContent, type: string, ttl?: number): void;
     closeNofication(notification: Notification_2): void;
 }
 

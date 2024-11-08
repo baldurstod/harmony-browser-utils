@@ -97,7 +97,7 @@ export class NotificationManager {
 		this.#htmlParent.append(this.#shadowRoot.host);
 	}
 
-	#getNotification(content: NotificationContent, type: string, ttl: number) {
+	#getNotification(content: NotificationContent, type: string, ttl?: number) {
 		for (let notification of this.#nofifications) {
 			if ((notification.content == content) && (notification.type == type)) {
 				notification.setTtl(ttl);
@@ -107,7 +107,7 @@ export class NotificationManager {
 		return new Notification(content, type, ttl);
 	}
 
-	addNotification(content: NotificationContent, type: string, ttl: number) {
+	addNotification(content: NotificationContent, type: string, ttl?: number) {
 		let notification = this.#getNotification(content, type, ttl);
 		this.#nofifications.add(notification);
 		this.#shadowRoot.append(notification.view);
