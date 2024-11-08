@@ -1211,17 +1211,17 @@ class Shortcut {
             (keyBoardEvent.key.toUpperCase() == this.#key);
     }
 }
-class ShortcutHandlerClass extends EventTarget {
+class ShortcutHandler extends EventTarget {
     static #instance;
     #shortcuts = new Map();
     #contexts = new Map();
     constructor() {
-        if (ShortcutHandlerClass.#instance) {
-            return ShortcutHandlerClass.#instance;
+        if (ShortcutHandler.#instance) {
+            return ShortcutHandler.#instance;
         }
         super();
-        ShortcutHandlerClass.#instance = this;
-        this.addContext('window', window);
+        ShortcutHandler.#instance = this;
+        this.addContext('window', document);
     }
     #handleKeyDown(contextName, event) {
         const contexts = contextName.split(',');
@@ -1238,7 +1238,7 @@ class ShortcutHandlerClass extends EventTarget {
         }
     }
     addContext(name, element) {
-        element.addEventListener('keydown', event => this.#handleKeyDown(name, event));
+        element.addEventListener('keydown', (event) => this.#handleKeyDown(name, event));
     }
     setShortcuts(contextName, shortcutMap) {
         if (!shortcutMap) {
@@ -1268,7 +1268,6 @@ class ShortcutHandlerClass extends EventTarget {
         }
     }
 }
-const ShortcutHandler = new ShortcutHandlerClass();
 
 function supportsPopover() {
     return HTMLElement.prototype.hasOwnProperty('popover');

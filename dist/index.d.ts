@@ -53,15 +53,13 @@ export declare class OptionsManager extends EventTarget {
 
 export declare function SaveFile(file: File): void;
 
-export declare const ShortcutHandler: ShortcutHandlerClass;
-
-declare class ShortcutHandlerClass extends EventTarget {
+export declare class ShortcutHandler extends EventTarget {
     #private;
     constructor();
-    addContext(name: any, element: any): void;
-    setShortcuts(contextName: any, shortcutMap: any): void;
-    setShortcut(contextName: any, name: any, shortcut: any): void;
-    addShortcut(contextName: any, name: any, shortcut: any): void;
+    addContext(name: string, element: HTMLElement | Document): void;
+    setShortcuts(contextName: string, shortcutMap: Map<string, string>): void;
+    setShortcut(contextName: string, name: string, shortcut: string): void;
+    addShortcut(contextName: string, name: string, shortcut: string): void;
 }
 
 export declare type SubOption = {

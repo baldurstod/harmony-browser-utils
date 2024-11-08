@@ -41,7 +41,7 @@ class Shortcut {
 	}
 }
 
-class ShortcutHandler extends EventTarget {
+export class ShortcutHandler extends EventTarget {
 	static #instance: ShortcutHandler;
 	#shortcuts = new Map()
 	#contexts = new Map()
