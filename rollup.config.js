@@ -17,14 +17,12 @@ export default [
 			css(),
 			nodeResolve(),
 			typescript(),
-			/*
 			{
 				name: 'postbuild-commands',
 				closeBundle: async () => {
 					await postBuildCommands()
 				}
 			},
-			*/
 		],
 	},
 ];
