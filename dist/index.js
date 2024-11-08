@@ -353,7 +353,7 @@ class Notification {
     setTtl(ttl) {
         if (ttl) {
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(() => NotificationManager.closeNofication(this), ttl * 1000);
+            this.timeout = setTimeout(() => new NotificationManager().closeNofication(this), ttl * 1000);
         }
     }
     get view() {
@@ -386,7 +386,7 @@ class Notification {
                         className: NOTIFICATION_CLASSNAME + '-close',
                         innerHTML: closeSVG,
                         events: {
-                            click: () => NotificationManager.closeNofication(this),
+                            click: () => new NotificationManager().closeNofication(this),
                         }
                     }),
                 ]
@@ -406,27 +406,26 @@ class Notification {
 }
 class NotificationManager {
     //static #htmlElement: HTMLElement;
-    static #htmlParent = document.body;
-    static #shadowRoot;
-    static #nofifications = new Set();
-    static {
-        this.#createHtml();
+    static #instance;
+    #htmlParent = document.body;
+    #shadowRoot = createShadowRoot('div', {
+        class: 'notification-manager',
+        parent: this.#htmlParent,
+        adoptStyle: notificationManagerCSS,
+    });
+    #nofifications = new Set();
+    constructor() {
+        if (NotificationManager.#instance) {
+            return NotificationManager.#instance;
+        }
+        NotificationManager.#instance = this;
+        I18n.observeElement(this.#shadowRoot);
     }
-    static setParent(htmlParent) {
+    setParent(htmlParent) {
         this.#htmlParent = htmlParent;
         this.#htmlParent.append(this.#shadowRoot.host);
     }
-    static #createHtml() {
-        this.#shadowRoot = createShadowRoot('div', {
-            class: 'notification-manager',
-            parent: this.#htmlParent,
-            adoptStyle: notificationManagerCSS,
-        });
-        //this.#shadowRoot = this.#htmlElement.attachShadow({ mode: 'closed' });
-        //shadowRootStyle(this.#shadowRoot, notificationManagerCSS);
-        I18n.observeElement(this.#shadowRoot);
-    }
-    static #getNotification(content, type, ttl) {
+    #getNotification(content, type, ttl) {
         for (let notification of this.#nofifications) {
             if ((notification.content == content) && (notification.type == type)) {
                 notification.setTtl(ttl);
@@ -435,12 +434,12 @@ class NotificationManager {
         }
         return new Notification(content, type, ttl);
     }
-    static addNotification(content, type, ttl) {
+    addNotification(content, type, ttl) {
         let notification = this.#getNotification(content, type, ttl);
         this.#nofifications.add(notification);
         this.#shadowRoot.append(notification.view);
     }
-    static closeNofication(notification) {
+    closeNofication(notification) {
         this.#nofifications.delete(notification);
         notification.view.remove();
     }

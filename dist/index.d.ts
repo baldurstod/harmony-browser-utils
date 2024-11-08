@@ -12,9 +12,10 @@ export declare type NotificationContent = HTMLElement | string;
 
 export declare class NotificationManager {
     #private;
-    static setParent(htmlParent: HTMLElement): void;
-    static addNotification(content: NotificationContent, type: string, ttl: number): void;
-    static closeNofication(notification: Notification_2): void;
+    constructor();
+    setParent(htmlParent: HTMLElement): void;
+    addNotification(content: NotificationContent, type: string, ttl: number): void;
+    closeNofication(notification: Notification_2): void;
 }
 
 declare type Option_2 = {

@@ -20,7 +20,7 @@ class Notification {
 	setTtl(ttl?: number) {
 		if (ttl) {
 			clearTimeout(this.timeout);
-			this.timeout = setTimeout(() => NotificationManager.closeNofication(this), ttl * 1000);
+			this.timeout = setTimeout(() => new NotificationManager().closeNofication(this), ttl * 1000);
 		}
 	}
 
@@ -53,7 +53,7 @@ class Notification {
 						className: NOTIFICATION_CLASSNAME + '-close',
 						innerHTML: closeSVG,
 						events: {
-							click: () => NotificationManager.closeNofication(this),
+							click: () => new NotificationManager().closeNofication(this),
 						}
 					}),
 				]
@@ -75,30 +75,29 @@ class Notification {
 
 export class NotificationManager {
 	//static #htmlElement: HTMLElement;
-	static #htmlParent = document.body;
-	static #shadowRoot: ShadowRoot;
-	static #nofifications = new Set<Notification>();
-	static {
-		this.#createHtml();
+	static #instance: NotificationManager;
+	#htmlParent = document.body;
+	#shadowRoot: ShadowRoot = createShadowRoot('div', {
+		class: 'notification-manager',
+		parent: this.#htmlParent,
+		adoptStyle: notificationManagerCSS,
+	});
+	#nofifications = new Set<Notification>();
+
+	constructor() {
+		if (NotificationManager.#instance) {
+			return NotificationManager.#instance;
+		}
+		NotificationManager.#instance = this;
+		I18n.observeElement(this.#shadowRoot);
 	}
 
-	static setParent(htmlParent: HTMLElement) {
+	setParent(htmlParent: HTMLElement) {
 		this.#htmlParent = htmlParent;
 		this.#htmlParent.append(this.#shadowRoot.host);
 	}
 
-	static #createHtml() {
-		this.#shadowRoot = createShadowRoot('div', {
-			class: 'notification-manager',
-			parent: this.#htmlParent,
-			adoptStyle: notificationManagerCSS,
-		});
-		//this.#shadowRoot = this.#htmlElement.attachShadow({ mode: 'closed' });
-		//shadowRootStyle(this.#shadowRoot, notificationManagerCSS);
-		I18n.observeElement(this.#shadowRoot);
-	}
-
-	static #getNotification(content: NotificationContent, type: string, ttl: number) {
+	#getNotification(content: NotificationContent, type: string, ttl: number) {
 		for (let notification of this.#nofifications) {
 			if ((notification.content == content) && (notification.type == type)) {
 				notification.setTtl(ttl);
@@ -108,13 +107,13 @@ export class NotificationManager {
 		return new Notification(content, type, ttl);
 	}
 
-	static addNotification(content: NotificationContent, type: string, ttl: number) {
+	addNotification(content: NotificationContent, type: string, ttl: number) {
 		let notification = this.#getNotification(content, type, ttl);
 		this.#nofifications.add(notification);
 		this.#shadowRoot.append(notification.view);
 	}
 
-	static closeNofication(notification: Notification) {
+	closeNofication(notification: Notification) {
 		this.#nofifications.delete(notification);
 		notification.view.remove();
 	}
