@@ -101,7 +101,7 @@ export class OptionsManager extends EventTarget {
 		let defaultValue = option.default;
 		let datalist = option.datalist;
 		let editable = option.editable;
-		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: false, type: '', dv: '' };
+		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: true, type: '', dv: '' };
 		this.#defaultValues.set(name, dv);
 		dv.name = name;
 		if (type !== undefined) {
