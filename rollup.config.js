@@ -24,6 +24,11 @@ export default [
 				}
 			},
 		],
+		external: [
+			'harmony-ui',
+			'harmony-svg',
+			'gl-matrix',
+		],
 	},
 ];
 
