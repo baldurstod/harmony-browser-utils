@@ -22,7 +22,7 @@ declare type Option_2 = {
     name: string;
     editable: boolean;
     type: string;
-    dv: string;
+    dv?: string;
     datalist?: Array<any>;
 };
 export { Option_2 as Option }

@@ -206,7 +206,7 @@ class OptionsManager extends EventTarget {
         let defaultValue = option.default;
         let datalist = option.datalist;
         let editable = option.editable;
-        let dv = this.#defaultValues.get(name) || { name: '', editable: true, type: '', dv: '' };
+        let dv = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
         this.#defaultValues.set(name, dv);
         dv.name = name;
         if (type !== undefined) {
@@ -351,10 +351,8 @@ class OptionsManager extends EventTarget {
         let item = this.#defaultValues.get(name);
         if (item) {
             let defaultValue = item.dv;
-            if (defaultValue !== undefined) {
-                this.#currentValues.delete(name);
-                this.setItem(name, defaultValue);
-            }
+            this.#currentValues.delete(name);
+            this.setItem(name, defaultValue);
         }
     }
     resetItems(names) {
@@ -537,20 +535,26 @@ class OptionsManager extends EventTarget {
     #fillCell(cell, type, value) {
         switch (type) {
             case 'string':
-                cell.innerHTML = value;
+                if (value) {
+                    cell.innerHTML = value;
+                }
                 break;
             case 'shortcut':
-                let arr = value.split('+');
-                for (let key of arr) {
-                    createElement('kbd', {
-                        innerHTML: key,
-                        parent: cell,
-                    });
+                if (value) {
+                    let arr = value.split('+');
+                    for (let key of arr) {
+                        createElement('kbd', {
+                            innerHTML: key,
+                            parent: cell,
+                        });
+                    }
+                    //cell.innerHTML = value;
                 }
-                //cell.innerHTML = value;
                 break;
             default:
-                cell.innerHTML = value;
+                if (value) {
+                    cell.innerHTML = value;
+                }
         }
     }
     #getUniqueId() {

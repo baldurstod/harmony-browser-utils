@@ -2,7 +2,7 @@ import { vec2 } from 'gl-matrix';
 import { createElement, hide, show, shadowRootStyle, I18n, createShadowRoot } from 'harmony-ui';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
-export type Option = { name: string, editable: boolean, type: string, dv: string, datalist?: Array<any> };
+export type Option = { name: string, editable: boolean, type: string, dv?: string, datalist?: Array<any> };
 export type SubOption = { [key: string]: Option };
 
 export class OptionsManager extends EventTarget {
@@ -101,7 +101,7 @@ export class OptionsManager extends EventTarget {
 		let defaultValue = option.default;
 		let datalist = option.datalist;
 		let editable = option.editable;
-		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: true, type: '', dv: '' };
+		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
 		this.#defaultValues.set(name, dv);
 		dv.name = name;
 		if (type !== undefined) {
@@ -250,10 +250,8 @@ export class OptionsManager extends EventTarget {
 		let item = this.#defaultValues.get(name);
 		if (item) {
 			let defaultValue = item.dv;
-			if (defaultValue !== undefined) {
-				this.#currentValues.delete(name);
-				this.setItem(name, defaultValue);
-			}
+			this.#currentValues.delete(name);
+			this.setItem(name, defaultValue);
 		}
 	}
 
@@ -471,23 +469,29 @@ export class OptionsManager extends EventTarget {
 		this.#applyFilter();
 	}
 
-	#fillCell(cell: HTMLElement, type: string, value: string) {
+	#fillCell(cell: HTMLElement, type: string, value?: string) {
 		switch (type) {
 			case 'string':
-				cell.innerHTML = value;
+				if (value) {
+					cell.innerHTML = value;
+				}
 				break;
 			case 'shortcut':
-				let arr = value.split('+');
-				for (let key of arr) {
-					createElement('kbd', {
-						innerHTML: key,
-						parent: cell,
-					});
+				if (value) {
+					let arr = value.split('+');
+					for (let key of arr) {
+						createElement('kbd', {
+							innerHTML: key,
+							parent: cell,
+						});
+					}
+					//cell.innerHTML = value;
 				}
-				//cell.innerHTML = value;
 				break;
 			default:
-				cell.innerHTML = value;
+				if (value) {
+					cell.innerHTML = value;
+				}
 		}
 	}
 
