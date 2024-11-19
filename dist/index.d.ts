@@ -24,6 +24,7 @@ declare type Option_2 = {
     type: string;
     dv?: string;
     datalist?: Array<any>;
+    context?: string;
 };
 export { Option_2 as Option }
 

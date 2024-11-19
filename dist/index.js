@@ -206,6 +206,7 @@ class OptionsManager extends EventTarget {
         let defaultValue = option.default;
         let datalist = option.datalist;
         let editable = option.editable;
+        let context = option.context;
         let dv = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
         this.#defaultValues.set(name, dv);
         dv.name = name;
@@ -220,6 +221,9 @@ class OptionsManager extends EventTarget {
         }
         if (editable !== undefined) {
             dv.editable = editable;
+        }
+        if (context !== undefined) {
+            dv.context = context;
         }
         try {
             if (typeof localStorage != 'undefined') {
@@ -305,14 +309,19 @@ class OptionsManager extends EventTarget {
         }
     }
     #valueChanged(name, value) {
-        this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value } }));
+        const option = this.#defaultValues.get(name);
+        if (!option) {
+            return;
+        }
+        const context = option.context;
+        this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
         let lastIndex = name.lastIndexOf('.');
         while (lastIndex != -1) {
             let wildCardName = name.slice(0, lastIndex);
-            this.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value } }));
+            this.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
             lastIndex = name.lastIndexOf('.', lastIndex - 1);
         }
-        this.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value } }));
+        this.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value, context: context } }));
     }
     getItem(name) {
         try {
