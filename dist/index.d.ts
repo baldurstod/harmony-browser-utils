@@ -47,7 +47,7 @@ export declare class OptionsManager extends EventTarget {
     resetAllItems(): void;
     clear(): void;
     showOptionsManager(): void;
-    getOptionsPerType(type: string): Promise<Set<unknown>>;
+    getOptionsPerType(type: string): Promise<Map<string, any>>;
     getOption(name: string): Promise<Option_2 | undefined>;
     getOptionType(name: string): Promise<string | undefined>;
     getList(name: string): Promise<any[] | undefined>;

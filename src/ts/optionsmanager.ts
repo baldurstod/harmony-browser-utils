@@ -668,12 +668,12 @@ export class OptionsManager extends EventTarget {
 
 	async getOptionsPerType(type: string) {
 		await this.#initPromise;
-		let ret = new Set();
+		let ret = new Map<string, any>();
 
 		for (let option of this.#defaultValues.values()) {
 			if (option.type == type) {
 				let optionName = option.name;
-				ret.add([optionName, this.#currentValues.get(optionName)]);
+				ret.set(optionName, this.#currentValues.get(optionName));
 			}
 		}
 		return ret;
