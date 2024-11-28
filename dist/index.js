@@ -207,6 +207,7 @@ class OptionsManager extends EventTarget {
         let datalist = option.datalist;
         let editable = option.editable;
         let context = option.context;
+        let preventResetAll = option.prevent_reset_all;
         let dv = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
         this.#defaultValues.set(name, dv);
         dv.name = name;
@@ -224,6 +225,9 @@ class OptionsManager extends EventTarget {
         }
         if (context !== undefined) {
             dv.context = context;
+        }
+        if (preventResetAll !== undefined) {
+            dv.preventResetAll = preventResetAll;
         }
         try {
             if (typeof localStorage != 'undefined') {
@@ -370,7 +374,10 @@ class OptionsManager extends EventTarget {
         }
     }
     resetAllItems() {
-        for (let item of this.#defaultValues.keys()) {
+        for (let [item, option] of this.#defaultValues) {
+            if (option.preventResetAll) {
+                continue;
+            }
             this.resetItem(item);
         }
     }
