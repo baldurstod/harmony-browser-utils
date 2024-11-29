@@ -25,7 +25,7 @@ declare type Option_2 = {
     dv?: string;
     datalist?: Array<any>;
     context?: string;
-    preventResetAll?: boolean;
+    protected?: boolean;
 };
 export { Option_2 as Option }
 

@@ -2,7 +2,7 @@ import { vec2 } from 'gl-matrix';
 import { createElement, hide, show, shadowRootStyle, I18n, createShadowRoot } from 'harmony-ui';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
-export type Option = { name: string, editable: boolean, type: string, dv?: string, datalist?: Array<any>, context?: string, preventResetAll?: boolean };
+export type Option = { name: string, editable: boolean, type: string, dv?: string, datalist?: Array<any>, context?: string, protected?: boolean };
 export type SubOption = { [key: string]: Option };
 
 export class OptionsManager extends EventTarget {
@@ -102,7 +102,7 @@ export class OptionsManager extends EventTarget {
 		let datalist = option.datalist;
 		let editable = option.editable;
 		let context = option.context;
-		let preventResetAll = option.prevent_reset_all;
+		let protec = option.protected;
 		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
 		this.#defaultValues.set(name, dv);
 		dv.name = name;
@@ -121,8 +121,8 @@ export class OptionsManager extends EventTarget {
 		if (context !== undefined) {
 			dv.context = context;
 		}
-		if (preventResetAll !== undefined) {
-			dv.preventResetAll = preventResetAll;
+		if (protec !== undefined) {
+			dv.protected = protec;
 		}
 
 		try {
@@ -276,7 +276,7 @@ export class OptionsManager extends EventTarget {
 
 	resetAllItems() {
 		for (let [item, option] of this.#defaultValues) {
-			if (option.preventResetAll) {
+			if (option.protected) {
 				continue;
 			}
 			this.resetItem(item);
