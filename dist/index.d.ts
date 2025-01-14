@@ -29,6 +29,10 @@ declare type Option_2 = {
 };
 export { Option_2 as Option }
 
+export declare type OptionMap = {
+    [key: string]: OptionValue;
+};
+
 export declare class OptionsManager extends EventTarget {
     #private;
     logException: boolean;
@@ -38,7 +42,7 @@ export declare class OptionsManager extends EventTarget {
     }): Promise<void>;
     addOption(option: any): void;
     setItem(name: string, value: any): void;
-    getSubItem(name: string, subName: string): Option_2 | undefined;
+    getSubItem(name: string, subName: string): Promise<OptionValue>;
     setSubItem(name: string, subName: string, value: any): Promise<void>;
     removeSubItem(name: string, subName: string): void;
     getItem(name: string): any;
@@ -53,6 +57,8 @@ export declare class OptionsManager extends EventTarget {
     getOptionType(name: string): Promise<string | undefined>;
     getList(name: string): Promise<any[] | undefined>;
 }
+
+export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 
 export declare function SaveFile(file: File): void;
 

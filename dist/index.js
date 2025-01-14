@@ -265,11 +265,14 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    getSubItem(name, subName) {
+    async getSubItem(name, subName) {
         try {
-            let map = this.#currentValues.get(name) ?? {};
-            if (map && (typeof map == 'object')) {
-                return map[subName];
+            let option = await this.getOption(name);
+            if (option && option.type == 'map') {
+                let map = this.#currentValues.get(name) ?? {};
+                if (map && (typeof map == 'object')) {
+                    return map[subName];
+                }
             }
         }
         catch (exception) {

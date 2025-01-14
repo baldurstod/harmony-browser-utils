@@ -3,12 +3,14 @@ import { createElement, hide, show, shadowRootStyle, I18n, createShadowRoot } fr
 import optionsManagerCSS from '../css/optionsmanager.css';
 
 export type Option = { name: string, editable: boolean, type: string, dv?: string, datalist?: Array<any>, context?: string, protected?: boolean };
+export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
+export type OptionMap = { [key: string]: OptionValue };
 export type SubOption = { [key: string]: Option };
 
 export class OptionsManager extends EventTarget {
 	static #instance: OptionsManager;
 	#defaultValues = new Map<string, Option>();
-	#currentValues = new Map<string, Option | SubOption>();
+	#currentValues = new Map<string, OptionValue>();
 	#categories = new Map<string, Array<any/*TODO:better type*/>>();
 	#dirtyCategories = true;
 	#initPromiseResolve?: (value?: unknown) => void;
@@ -160,11 +162,14 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	getSubItem(name: string, subName: string) {
+	async getSubItem(name: string, subName: string) {
 		try {
-			let map = this.#currentValues.get(name) ?? {};
-			if (map && (typeof map == 'object')) {
-				return (map as SubOption)[subName];
+			let option = await this.getOption(name);
+			if (option && option.type == 'map') {
+				let map = this.#currentValues.get(name) ?? {};
+				if (map && (typeof map == 'object')) {
+					return (map as OptionMap)[subName];
+				}
 			}
 		} catch (exception) {
 			if (this.logException) {
@@ -179,10 +184,10 @@ export class OptionsManager extends EventTarget {
 			if (option && option.type == 'map') {
 				let map = this.#currentValues.get(name) ?? {};
 
-				if ((map as SubOption)[subName] == value) {
+				if ((map as OptionMap)[subName] == value) {
 					return;
 				}
-				(map as SubOption)[subName] = value;
+				(map as OptionMap)[subName] = value;
 				this.#valueChanged(name, map);
 
 				localStorage.setItem(name, JSON.stringify(map));
@@ -198,7 +203,7 @@ export class OptionsManager extends EventTarget {
 		try {
 			let map = this.#currentValues.get(name) ?? {};
 			if (map && (typeof map == 'object')) {
-				delete (map as SubOption)[subName];
+				delete (map as OptionMap)[subName];
 				this.#valueChanged(name, map);
 				localStorage.setItem(name, JSON.stringify(map));
 			}
