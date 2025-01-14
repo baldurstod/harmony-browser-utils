@@ -98,7 +98,7 @@ export class NotificationManager {
 	}
 
 	#getNotification(content: NotificationContent, type: string, ttl?: number) {
-		for (let notification of this.#nofifications) {
+		for (const notification of this.#nofifications) {
 			if ((notification.content == content) && (notification.type == type)) {
 				notification.setTtl(ttl);
 				return notification;
@@ -108,7 +108,7 @@ export class NotificationManager {
 	}
 
 	addNotification(content: NotificationContent, type: string, ttl?: number) {
-		let notification = this.#getNotification(content, type, ttl);
+		const notification = this.#getNotification(content, type, ttl);
 		this.#nofifications.add(notification);
 		this.#shadowRoot.append(notification.view);
 	}

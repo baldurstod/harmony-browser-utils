@@ -46,7 +46,7 @@ export class OptionsManager extends EventTarget {
 	}
 
 	async #initFromURL(url: string) {
-		let response = await fetch(url);
+		const response = await fetch(url);
 		this.#initFromJSON(await response.json());
 	}
 
@@ -72,14 +72,14 @@ export class OptionsManager extends EventTarget {
 
 	#refreshCategories() {
 		if (this.#dirtyCategories) {
-			for (let [categoryName, category] of this.#categories) {
+			for (const [categoryName, category] of this.#categories) {
 				category.length = 0;
 			}
 
-			for (let [optionName, option] of this.#defaultValues) {
+			for (const [optionName, option] of this.#defaultValues) {
 				let maxLength = -1;
 				let cat = null;
-				for (let [categoryName, category] of this.#categories) {
+				for (const [categoryName, category] of this.#categories) {
 					if (categoryName.length > maxLength) {
 						if (optionName.startsWith(categoryName) || categoryName === '') {
 							maxLength = categoryName.length;
@@ -97,15 +97,15 @@ export class OptionsManager extends EventTarget {
 
 	addOption(option: any/*TODO:better type*/) {
 		if (!option) { return; }
-		let name = option.name.toLowerCase();
+		const name = option.name.toLowerCase();
 
-		let type = option.type;
-		let defaultValue = option.default;
-		let datalist = option.datalist;
-		let editable = option.editable;
-		let context = option.context;
-		let protec = option.protected;
-		let dv: Option = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
+		const type = option.type;
+		const defaultValue = option.default;
+		const datalist = option.datalist;
+		const editable = option.editable;
+		const context = option.context;
+		const protec = option.protected;
+		const dv: Option = this.#defaultValues.get(name) || { name: '', editable: true, type: '' };
 		this.#defaultValues.set(name, dv);
 		dv.name = name;
 		if (type !== undefined) {
@@ -129,7 +129,7 @@ export class OptionsManager extends EventTarget {
 
 		try {
 			if (typeof localStorage != 'undefined') {
-				let value = this.getItem(name);
+				const value = this.getItem(name);
 				if (value === undefined) {
 					this.setItem(name, defaultValue);
 				} else {
@@ -164,9 +164,9 @@ export class OptionsManager extends EventTarget {
 
 	async getSubItem(name: string, subName: string) {
 		try {
-			let option = await this.getOption(name);
+			const option = await this.getOption(name);
 			if (option && option.type == 'map') {
-				let map = this.#currentValues.get(name) ?? {};
+				const map = this.#currentValues.get(name) ?? {};
 				if (map && (typeof map == 'object')) {
 					return (map as OptionMap)[subName];
 				}
@@ -180,9 +180,9 @@ export class OptionsManager extends EventTarget {
 
 	async setSubItem(name: string, subName: string, value: any) {
 		try {
-			let option = await this.getOption(name);
+			const option = await this.getOption(name);
 			if (option && option.type == 'map') {
-				let map = this.#currentValues.get(name) ?? {};
+				const map = this.#currentValues.get(name) ?? {};
 
 				if ((map as OptionMap)[subName] == value) {
 					return;
@@ -201,7 +201,7 @@ export class OptionsManager extends EventTarget {
 
 	removeSubItem(name: string, subName: string) {
 		try {
-			let map = this.#currentValues.get(name) ?? {};
+			const map = this.#currentValues.get(name) ?? {};
 			if (map && (typeof map == 'object')) {
 				delete (map as OptionMap)[subName];
 				this.#valueChanged(name, map);
@@ -223,7 +223,7 @@ export class OptionsManager extends EventTarget {
 		this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
 		let lastIndex = name.lastIndexOf('.');
 		while (lastIndex != -1) {
-			let wildCardName = name.slice(0, lastIndex);
+			const wildCardName = name.slice(0, lastIndex);
 			this.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
 			lastIndex = name.lastIndexOf('.', lastIndex - 1);
 		}
@@ -234,9 +234,9 @@ export class OptionsManager extends EventTarget {
 	getItem(name: string) {
 		try {
 			if (typeof localStorage != 'undefined') {
-				let value = localStorage.getItem(name);
+				const value = localStorage.getItem(name);
 				if (value) {
-					let parsedValue = JSON.parse(value);
+					const parsedValue = JSON.parse(value);
 					return parsedValue;
 				}
 			}
@@ -265,22 +265,22 @@ export class OptionsManager extends EventTarget {
 	}
 
 	resetItem(name: string) {
-		let item = this.#defaultValues.get(name);
+		const item = this.#defaultValues.get(name);
 		if (item) {
-			let defaultValue = item.dv;
+			const defaultValue = item.dv;
 			this.#currentValues.delete(name);
 			this.setItem(name, defaultValue);
 		}
 	}
 
 	resetItems(names: Array<string>) {
-		for (let name of names) {
+		for (const name of names) {
 			this.resetItem(name);
 		}
 	}
 
 	resetAllItems() {
-		for (let [item, option] of this.#defaultValues) {
+		for (const [item, option] of this.#defaultValues) {
 			if (option.protected) {
 				continue;
 			}
@@ -308,9 +308,9 @@ export class OptionsManager extends EventTarget {
 	}
 
 	#applyFilter() {
-		for (let row of this.#optionsManagerRows) {
+		for (const row of this.#optionsManagerRows) {
 			//let row = i[0];
-			let optionName = row.getAttribute('user-data-option-name')?.toLowerCase();
+			const optionName = row.getAttribute('user-data-option-name')?.toLowerCase();
 			if (!optionName) {
 				continue;
 			}
@@ -346,24 +346,24 @@ export class OptionsManager extends EventTarget {
 			}
 		}) as HTMLElement;
 
-		let handleDragStart = function (event: MouseEvent) {
-			let target = event.target as HTMLElement;
+		const handleDragStart = function (event: MouseEvent) {
+			const target = event.target as HTMLElement;
 
 			target?.setAttribute('data-drag-start-layerx', String(event.layerX));
 			target?.setAttribute('data-drag-start-layery', String(event.layerY));
 		};
 
-		let handleDragEnd = function (event: MouseEvent) {
-			let target = event.target as HTMLElement;
+		const handleDragEnd = function (event: MouseEvent) {
+			const target = event.target as HTMLElement;
 
-			let startEventX = Number(target.getAttribute('data-drag-start-layerx'));
-			let startEventY = Number(target.getAttribute('data-drag-start-layery'));
+			const startEventX = Number(target.getAttribute('data-drag-start-layerx'));
+			const startEventY = Number(target.getAttribute('data-drag-start-layery'));
 
 			target.style.left = (event.layerX - startEventX) + 'px';
 			target.style.top = (event.layerY - startEventY) + 'px';
 
-			let dataTop = Number(target.getAttribute('data-top')) + (event.layerY - startEventY);
-			let dataLeft = Number(target.getAttribute('data-left')) + (event.layerX - startEventX);
+			const dataTop = Number(target.getAttribute('data-top')) + (event.layerY - startEventY);
+			const dataLeft = Number(target.getAttribute('data-left')) + (event.layerX - startEventX);
 
 			target.style.left = dataLeft + 'px';
 			target.style.top = dataTop + 'px';
@@ -374,7 +374,7 @@ export class OptionsManager extends EventTarget {
 
 		createElement('h1', { id: 'options-manager-title', i18n: '#manage_options', parent: optionsManagerInner });
 
-		let options_manager_filter = createElement('input', {
+		const options_manager_filter = createElement('input', {
 			id: 'options-manager-inner-filter',
 			'i18n-placeholder': '#filter',
 			parent: optionsManagerInner,
@@ -388,17 +388,17 @@ export class OptionsManager extends EventTarget {
 	}
 
 	#populateOptionRow(option: Option) {
-		let htmlRow = createElement('tr');
-		let htmlResetButtonCell = createElement('td');
-		let htmlOptionNameCell = createElement('td', { innerHTML: option.name });
-		let htmlDefaultValueCell = createElement('td');
-		let htmlUserValueCell = createElement('td');
+		const htmlRow = createElement('tr');
+		const htmlResetButtonCell = createElement('td');
+		const htmlOptionNameCell = createElement('td', { innerHTML: option.name });
+		const htmlDefaultValueCell = createElement('td');
+		const htmlUserValueCell = createElement('td');
 
-		let myValue = this.getItem(option.name);
+		const myValue = this.getItem(option.name);
 
 		this.#fillCell(htmlDefaultValueCell, option.type, option.dv);
 
-		let resetButton = createElement('button', {
+		const resetButton = createElement('button', {
 			class: 'options-manager-button',
 			i18n: '#reset',
 			parent: htmlResetButtonCell,
@@ -407,7 +407,7 @@ export class OptionsManager extends EventTarget {
 			}
 		});
 
-		let valueEdit = this.#createInput(option.name, this.#defaultValues.get(option.name), myValue, htmlResetButtonCell);
+		const valueEdit = this.#createInput(option.name, this.#defaultValues.get(option.name), myValue, htmlResetButtonCell);
 		if (valueEdit) {
 			htmlUserValueCell.appendChild(valueEdit);
 			htmlRow.append(htmlResetButtonCell, htmlOptionNameCell, htmlDefaultValueCell, htmlUserValueCell);
@@ -416,20 +416,20 @@ export class OptionsManager extends EventTarget {
 	}
 
 	#populateMapOptionRow(option: Option) {
-		let htmlRow = createElement('tbody', { innerHTML: `<td></td><td colspan="3">${option.name}</td>` });
+		const htmlRow = createElement('tbody', { innerHTML: `<td></td><td colspan="3">${option.name}</td>` });
 
-		let userValue = this.getItem(option.name);
+		const userValue = this.getItem(option.name);
 		if (userValue && typeof userValue === 'object') {
-			for (let key in userValue) {
-				let htmlSubRow = createElement('tr', { parent: htmlRow });
-				let value = userValue[key];
+			for (const key in userValue) {
+				const htmlSubRow = createElement('tr', { parent: htmlRow });
+				const value = userValue[key];
 
-				let htmlRemoveButtonCell = createElement('td');
-				let htmlSubNameCell = createElement('td', { innerHTML: key });
-				let htmlSubValueCell = createElement('td');
+				const htmlRemoveButtonCell = createElement('td');
+				const htmlSubNameCell = createElement('td', { innerHTML: key });
+				const htmlSubValueCell = createElement('td');
 				htmlSubRow.append(htmlRemoveButtonCell, htmlSubNameCell, htmlSubValueCell);
 
-				let htmlEdit = createElement('input', { value: value, parent: htmlSubValueCell });
+				const htmlEdit = createElement('input', { value: value, parent: htmlSubValueCell });
 			}
 		}
 		return htmlRow;
@@ -472,14 +472,14 @@ export class OptionsManager extends EventTarget {
 			);
 		}
 
-		for (let row of this.#optionsManagerRows) {
+		for (const row of this.#optionsManagerRows) {
 			row.remove();
 		}
 		this.#optionsManagerRows.clear();
 
-		for (let [categoryName, category] of this.#categories) {
-			for (let option of category) {
-				let htmlRow = this.#addOptionRow(option);
+		for (const [categoryName, category] of this.#categories) {
+			for (const option of category) {
+				const htmlRow = this.#addOptionRow(option);
 				if (htmlRow) {
 					this.#optionsManagerRows.add(htmlRow);
 					this.#htmlOptionsTable?.append(htmlRow);
@@ -499,8 +499,8 @@ export class OptionsManager extends EventTarget {
 				break;
 			case 'shortcut':
 				if (value) {
-					let arr = value.split('+');
-					for (let key of arr) {
+					const arr = value.split('+');
+					for (const key of arr) {
 						createElement('kbd', {
 							innerHTML: key,
 							parent: cell,
@@ -524,7 +524,7 @@ export class OptionsManager extends EventTarget {
 		if (!option) {
 			return;
 		}
-		let showHideResetButton = () => {
+		const showHideResetButton = () => {
 			let defaultValue = this.#defaultValues.get(optionName)?.dv;
 			defaultValue = defaultValue === undefined ? undefined : JSON.stringify(defaultValue);
 			let optionValue = this.getItem(optionName);
@@ -544,7 +544,7 @@ export class OptionsManager extends EventTarget {
 					value: value,
 					events: {
 						change: (event: Event) => {
-							let value = (event.target as HTMLInputElement).value.trim();
+							const value = (event.target as HTMLInputElement).value.trim();
 							this.setItem(optionName, value === '' ? null : Number(value));
 							showHideResetButton();
 						}
@@ -586,7 +586,7 @@ export class OptionsManager extends EventTarget {
 						}
 					}
 				});
-				for (let o of ['', 0, 1]) {
+				for (const o of ['', 0, 1]) {
 					createElement('option', { innerHTML: o, parent: htmlElement });
 				}
 				let v = '';
@@ -605,7 +605,7 @@ export class OptionsManager extends EventTarget {
 				(htmlElement as HTMLSelectElement).value = v;
 				break;
 			case 'list':
-				let dataListId = this.#getUniqueId();
+				const dataListId = this.#getUniqueId();
 				htmlElement = createElement('select', {
 					value: value,
 					events: {
@@ -613,7 +613,7 @@ export class OptionsManager extends EventTarget {
 					}
 				});
 				if (option.datalist) {
-					for (let o of option.datalist) {
+					for (const o of option.datalist) {
 						createElement('option', { innerHTML: o, parent: htmlElement });
 					}
 				}
@@ -680,11 +680,11 @@ export class OptionsManager extends EventTarget {
 
 	async getOptionsPerType(type: string) {
 		await this.#initPromise;
-		let ret = new Map<string, any>();
+		const ret = new Map<string, any>();
 
-		for (let option of this.#defaultValues.values()) {
+		for (const option of this.#defaultValues.values()) {
 			if (option.type == type) {
-				let optionName = option.name;
+				const optionName = option.name;
 				ret.set(optionName, this.#currentValues.get(optionName));
 			}
 		}
@@ -703,7 +703,7 @@ export class OptionsManager extends EventTarget {
 
 	async getList(name: string) {
 		await this.#initPromise;
-		let option = this.#defaultValues.get(name);
+		const option = this.#defaultValues.get(name);
 		if (option && option.type == 'list') {
 			return option.datalist;
 		}
@@ -711,7 +711,7 @@ export class OptionsManager extends EventTarget {
 }
 
 function readVec2Value(value: string): vec2 | null {
-	let v = value.split(',');
+	const v = value.split(',');
 	if (v.length == 2) {
 		return vec2.fromValues(Number(v[0]), Number(v[1]));
 	}

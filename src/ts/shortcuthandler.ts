@@ -8,7 +8,7 @@ class Shortcut {
 	constructor(context: string, shortcut: string) {
 		this.#contexts = context.split(',');
 		const keys = shortcut.toUpperCase().split('+');
-		for (let key of keys) {
+		for (const key of keys) {
 			switch (key) {
 				case 'ALT':
 					this.#alt = true;
@@ -56,9 +56,9 @@ export class ShortcutHandler extends EventTarget {
 
 	#handleKeyDown(contextName: string, event: Event) {
 		const contexts = contextName.split(',');
-		for (let [name, shortcuts] of this.#shortcuts) {
-			for (let shortcut of shortcuts) {
-				for (let context of contexts) {
+		for (const [name, shortcuts] of this.#shortcuts) {
+			for (const shortcut of shortcuts) {
+				for (const context of contexts) {
 					if (shortcut.match(context, event)) {
 						this.dispatchEvent(new CustomEvent(name, { detail: event }));
 						event.preventDefault();
@@ -78,7 +78,7 @@ export class ShortcutHandler extends EventTarget {
 			return;
 		}
 		this.#shortcuts.clear();
-		for (let [name, shortcut] of shortcutMap) {
+		for (const [name, shortcut] of shortcutMap) {
 			this.addShortcut(contextName, name, shortcut);
 		}
 	}
@@ -92,13 +92,13 @@ export class ShortcutHandler extends EventTarget {
 		if (!shortcut) {
 			return;
 		}
-		let shortcuts = shortcut.split(';');
+		const shortcuts = shortcut.split(';');
 		let shortcutSet = this.#shortcuts.get(name);
 		if (!shortcutSet) {
 			shortcutSet = new Set();
 			this.#shortcuts.set(name, shortcutSet);
 		}
-		for (let shortcut of shortcuts) {
+		for (const shortcut of shortcuts) {
 			shortcutSet.add(new Shortcut(contextName, shortcut));
 		}
 	}
