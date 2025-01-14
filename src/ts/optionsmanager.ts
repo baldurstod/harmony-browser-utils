@@ -1,5 +1,5 @@
 import { vec2 } from 'gl-matrix';
-import { createElement, hide, show, shadowRootStyle, I18n, createShadowRoot } from 'harmony-ui';
+import { createElement, hide, show, I18n, createShadowRoot } from 'harmony-ui';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
 export type Option = { name: string, editable: boolean, type: string, dv?: string, datalist?: Array<any>, context?: string, protected?: boolean };
@@ -605,7 +605,7 @@ export class OptionsManager extends EventTarget {
 				(htmlElement as HTMLSelectElement).value = v;
 				break;
 			case 'list':
-				const dataListId = this.#getUniqueId();
+				this.#getUniqueId();
 				htmlElement = createElement('select', {
 					value: value,
 					events: {

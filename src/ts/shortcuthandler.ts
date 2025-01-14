@@ -43,8 +43,8 @@ class Shortcut {
 
 export class ShortcutHandler extends EventTarget {
 	static #instance: ShortcutHandler;
-	#shortcuts = new Map()
-	#contexts = new Map()
+	#shortcuts = new Map<string, Set<Shortcut>>();
+
 	constructor() {
 		if (ShortcutHandler.#instance) {
 			return ShortcutHandler.#instance;
@@ -54,7 +54,7 @@ export class ShortcutHandler extends EventTarget {
 		this.addContext('window', document);
 	}
 
-	#handleKeyDown(contextName: string, event: Event) {
+	#handleKeyDown(contextName: string, event: KeyboardEvent) {
 		const contexts = contextName.split(',');
 		for (const [name, shortcuts] of this.#shortcuts) {
 			for (const shortcut of shortcuts) {
@@ -70,7 +70,7 @@ export class ShortcutHandler extends EventTarget {
 	}
 
 	addContext(name: string, element: HTMLElement | Document) {
-		element.addEventListener('keydown', (event: Event) => this.#handleKeyDown(name, event));
+		element.addEventListener('keydown', (event: Event) => this.#handleKeyDown(name, event as KeyboardEvent));
 	}
 
 	setShortcuts(contextName: string, shortcutMap: Map<string, string>) {
@@ -95,7 +95,7 @@ export class ShortcutHandler extends EventTarget {
 		const shortcuts = shortcut.split(';');
 		let shortcutSet = this.#shortcuts.get(name);
 		if (!shortcutSet) {
-			shortcutSet = new Set();
+			shortcutSet = new Set<Shortcut>();
 			this.#shortcuts.set(name, shortcutSet);
 		}
 		for (const shortcut of shortcuts) {

@@ -36,9 +36,9 @@ async function postBuildCommands() {
 	fs.copyFile(TEMP_BUILD, './dist/index.js', err => { if (err) throw err });
 	return new Promise(resolve => child_process.exec(
 		'api-extractor run --local --verbose --typescript-compiler-folder ./node_modules/typescript',
-		(error, stdout, stderr) => {
+		(error) => {
 			if (error) {
-				console.log(error);
+				window.console.log(error);
 			}
 			resolve("done")
 		},

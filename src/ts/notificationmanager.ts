@@ -1,4 +1,4 @@
-import { createElement, shadowRootStyle, I18n, createShadowRoot } from 'harmony-ui';
+import { createElement, I18n, createShadowRoot } from 'harmony-ui';
 import { closeSVG, contentCopySVG } from 'harmony-svg';
 import notificationManagerCSS from '../css/notificationmanager.css';
 
