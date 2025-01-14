@@ -62,13 +62,13 @@ export declare type OptionValue = string | number | boolean | bigint | OptionMap
 
 export declare function SaveFile(file: File): void;
 
-export declare class ShortcutHandler extends EventTarget {
+export declare class ShortcutHandler {
     #private;
-    constructor();
-    addContext(name: string, element: HTMLElement | Document): void;
-    setShortcuts(contextName: string, shortcutMap: Map<string, string>): void;
-    setShortcut(contextName: string, name: string, shortcut: string): void;
-    addShortcut(contextName: string, name: string, shortcut: string): void;
+    static addContext(name: string, element: HTMLElement | Document): void;
+    static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void;
+    static setShortcut(contextName: string, name: string, shortcut: string): void;
+    static addShortcut(contextName: string, name: string, shortcut: string): void;
+    static addEventListener(type: string, callback: (evt: CustomEvent<KeyboardEvent>) => void, options?: AddEventListenerOptions | boolean): void;
 }
 
 export declare type SubOption = {

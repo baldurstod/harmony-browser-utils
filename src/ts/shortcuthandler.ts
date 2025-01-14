@@ -41,26 +41,21 @@ class Shortcut {
 	}
 }
 
-export class ShortcutHandler extends EventTarget {
-	static #instance: ShortcutHandler;
-	#shortcuts = new Map<string, Set<Shortcut>>();
+export class ShortcutHandler  {
+	static #shortcuts = new Map<string, Set<Shortcut>>();
+	static #eventTarget = new EventTarget();
 
-	constructor() {
-		if (ShortcutHandler.#instance) {
-			return ShortcutHandler.#instance;
-		}
-		super();
-		ShortcutHandler.#instance = this;
+	static {
 		this.addContext('window', document);
 	}
 
-	#handleKeyDown(contextName: string, event: KeyboardEvent) {
+	static #handleKeyDown(contextName: string, event: KeyboardEvent) {
 		const contexts = contextName.split(',');
 		for (const [name, shortcuts] of this.#shortcuts) {
 			for (const shortcut of shortcuts) {
 				for (const context of contexts) {
 					if (shortcut.match(context, event)) {
-						this.dispatchEvent(new CustomEvent(name, { detail: event }));
+						this.#eventTarget.dispatchEvent(new CustomEvent(name, { detail: event }));
 						event.preventDefault();
 						event.stopPropagation();
 					}
@@ -69,11 +64,11 @@ export class ShortcutHandler extends EventTarget {
 		}
 	}
 
-	addContext(name: string, element: HTMLElement | Document) {
+	static addContext(name: string, element: HTMLElement | Document) {
 		element.addEventListener('keydown', (event: Event) => this.#handleKeyDown(name, event as KeyboardEvent));
 	}
 
-	setShortcuts(contextName: string, shortcutMap: Map<string, string>) {
+	static setShortcuts(contextName: string, shortcutMap: Map<string, string>) {
 		if (!shortcutMap) {
 			return;
 		}
@@ -83,12 +78,12 @@ export class ShortcutHandler extends EventTarget {
 		}
 	}
 
-	setShortcut(contextName: string, name: string, shortcut: string) {
+	static setShortcut(contextName: string, name: string, shortcut: string) {
 		this.#shortcuts.delete(name);
 		this.addShortcut(contextName, name, shortcut);
 	}
 
-	addShortcut(contextName: string, name: string, shortcut: string) {
+	static addShortcut(contextName: string, name: string, shortcut: string) {
 		if (!shortcut) {
 			return;
 		}
@@ -101,5 +96,9 @@ export class ShortcutHandler extends EventTarget {
 		for (const shortcut of shortcuts) {
 			shortcutSet.add(new Shortcut(contextName, shortcut));
 		}
+	}
+
+	static addEventListener(type: string, callback: (evt: CustomEvent<KeyboardEvent>) => void, options?: AddEventListenerOptions | boolean): void {
+		this.#eventTarget.addEventListener(type, callback as EventListener, options);
 	}
 }
