@@ -28,13 +28,13 @@ class Notification {
 		if (!this.#htmlElement) {
 			let htmlElementContent;
 			this.#htmlElement = createElement('div', {
-				className: NOTIFICATION_CLASSNAME,
+				class: NOTIFICATION_CLASSNAME,
 				childs: [
 					htmlElementContent = createElement('div', {
-						className: NOTIFICATION_CLASSNAME + '-content',
+						class: NOTIFICATION_CLASSNAME + '-content',
 					}),
 					createElement('div', {
-						className: NOTIFICATION_CLASSNAME + '-copy',
+						class: NOTIFICATION_CLASSNAME + '-copy',
 						innerHTML: contentCopySVG,
 						events: {
 							click: async (event: Event) => {
@@ -50,7 +50,7 @@ class Notification {
 						}
 					}),
 					createElement('div', {
-						className: NOTIFICATION_CLASSNAME + '-close',
+						class: NOTIFICATION_CLASSNAME + '-close',
 						innerHTML: closeSVG,
 						events: {
 							click: () => new NotificationManager().closeNofication(this),
