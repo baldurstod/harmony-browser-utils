@@ -459,7 +459,7 @@ class OptionsManager extends EventTarget {
         createElement('h1', { id: 'options-manager-title', i18n: '#manage_options', parent: optionsManagerInner });
         createElement('input', {
             id: 'options-manager-inner-filter',
-            'i18n-placeholder': '#filter',
+            i18n: { placeholder: '#filter', },
             parent: optionsManagerInner,
             events: {
                 input: (event) => this.#filter(event.target.value)

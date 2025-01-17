@@ -376,7 +376,7 @@ export class OptionsManager extends EventTarget {
 
 		const options_manager_filter = createElement('input', {
 			id: 'options-manager-inner-filter',
-			'i18n-placeholder': '#filter',
+			i18n: { placeholder: '#filter', },
 			parent: optionsManagerInner,
 			events: {
 				input: (event: Event) => this.#filter((event.target as HTMLInputElement).value)
