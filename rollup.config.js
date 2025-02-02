@@ -16,7 +16,11 @@ export default [
 		plugins: [
 			css(),
 			nodeResolve(),
-			typescript(),
+			typescript({
+				"declaration": true,
+				"declarationMap": true,
+				"declarationDir": "dist/dts",
+			}),
 			{
 				name: 'postbuild-commands',
 				closeBundle: async () => {
@@ -28,6 +32,18 @@ export default [
 			'harmony-ui',
 			'harmony-svg',
 			'gl-matrix',
+		],
+	},
+	{
+		input: './src/index.ts',
+		output: {
+			file: './dist/browser.js',
+			format: 'esm'
+		},
+		plugins: [
+			css(),
+			nodeResolve(),
+			typescript(),
 		],
 	},
 ];

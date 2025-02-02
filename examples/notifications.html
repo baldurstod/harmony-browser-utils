@@ -11,9 +11,9 @@
 	</head>
 	<body>
 		<script type="module">
-			import { NotificationManager } from '../dist/harmony-browser-utils.js';
+			import { NotificationManager } from '../dist/browser.js';
 
-			NotificationManager.addNotification('Notification content', 'success');
+			new NotificationManager().addNotification('Notification content', 'success');
 
 		</script>
 	</body>
