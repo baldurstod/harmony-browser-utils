@@ -20,7 +20,7 @@ class Notification {
 	setTtl(ttl?: number) {
 		if (ttl) {
 			clearTimeout(this.timeout);
-			this.timeout = setTimeout(() => new NotificationManager().closeNofication(this), ttl * 1000);
+			this.timeout = setTimeout(() => closeNofication(this), ttl * 1000);
 		}
 	}
 
@@ -53,7 +53,7 @@ class Notification {
 						class: NOTIFICATION_CLASSNAME + '-close',
 						innerHTML: closeSVG,
 						events: {
-							click: () => new NotificationManager().closeNofication(this),
+							click: () => closeNofication(this),
 						}
 					}),
 				]
@@ -73,48 +73,38 @@ class Notification {
 	}
 }
 
-export class NotificationManager {
-	//static #htmlElement: HTMLElement;
-	static #instance: NotificationManager;
-	#htmlParent = document.body;
-	#shadowRoot: ShadowRoot = createShadowRoot('div', {
-		class: 'notification-manager',
-		parent: this.#htmlParent,
-		adoptStyle: notificationManagerCSS,
-	});
-	#nofifications = new Set<Notification>();
+let htmlParent = document.body;
+const shadowRoot = createShadowRoot('div', {
+	class: 'notification-manager',
+	parent: htmlParent,
+	adoptStyle: notificationManagerCSS,
+});
+I18n.observeElement(shadowRoot);
+const nofifications = new Set<Notification>();
 
-	constructor() {
-		if (NotificationManager.#instance) {
-			return NotificationManager.#instance;
+
+export function setNotificationsContainer(htmlParent: HTMLElement) {
+	htmlParent = htmlParent;
+	htmlParent.append(shadowRoot.host);
+}
+
+function getNotification(content: NotificationContent, type: string, ttl?: number) {
+	for (const notification of nofifications) {
+		if ((notification.content == content) && (notification.type == type)) {
+			notification.setTtl(ttl);
+			return notification;
 		}
-		NotificationManager.#instance = this;
-		I18n.observeElement(this.#shadowRoot);
 	}
+	return new Notification(content, type, ttl);
+}
 
-	setParent(htmlParent: HTMLElement) {
-		this.#htmlParent = htmlParent;
-		this.#htmlParent.append(this.#shadowRoot.host);
-	}
+export function addNotification(content: NotificationContent, type: string, ttl?: number) {
+	const notification = getNotification(content, type, ttl);
+	nofifications.add(notification);
+	shadowRoot.append(notification.view);
+}
 
-	#getNotification(content: NotificationContent, type: string, ttl?: number) {
-		for (const notification of this.#nofifications) {
-			if ((notification.content == content) && (notification.type == type)) {
-				notification.setTtl(ttl);
-				return notification;
-			}
-		}
-		return new Notification(content, type, ttl);
-	}
-
-	addNotification(content: NotificationContent, type: string, ttl?: number) {
-		const notification = this.#getNotification(content, type, ttl);
-		this.#nofifications.add(notification);
-		this.#shadowRoot.append(notification.view);
-	}
-
-	closeNofication(notification: Notification) {
-		this.#nofifications.delete(notification);
-		notification.view.remove();
-	}
+export function closeNofication(notification: Notification) {
+	nofifications.delete(notification);
+	notification.view.remove();
 }

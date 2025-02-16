@@ -436,7 +436,7 @@ class Notification {
     setTtl(ttl) {
         if (ttl) {
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(() => new NotificationManager().closeNofication(this), ttl * 1000);
+            this.timeout = setTimeout(() => closeNofication(this), ttl * 1000);
         }
     }
     get view() {
@@ -469,7 +469,7 @@ class Notification {
                         class: NOTIFICATION_CLASSNAME + '-close',
                         innerHTML: closeSVG,
                         events: {
-                            click: () => new NotificationManager().closeNofication(this),
+                            click: () => closeNofication(this),
                         }
                     }),
                 ]
@@ -487,45 +487,35 @@ class Notification {
         return this.#htmlElement;
     }
 }
-class NotificationManager {
-    //static #htmlElement: HTMLElement;
-    static #instance;
-    #htmlParent = document.body;
-    #shadowRoot = createShadowRoot('div', {
-        class: 'notification-manager',
-        parent: this.#htmlParent,
-        adoptStyle: notificationManagerCSS,
-    });
-    #nofifications = new Set();
-    constructor() {
-        if (NotificationManager.#instance) {
-            return NotificationManager.#instance;
+let htmlParent = document.body;
+const shadowRoot = createShadowRoot('div', {
+    class: 'notification-manager',
+    parent: htmlParent,
+    adoptStyle: notificationManagerCSS,
+});
+I18n.observeElement(shadowRoot);
+const nofifications = new Set();
+function setNotificationsContainer(htmlParent) {
+    htmlParent = htmlParent;
+    htmlParent.append(shadowRoot.host);
+}
+function getNotification(content, type, ttl) {
+    for (const notification of nofifications) {
+        if ((notification.content == content) && (notification.type == type)) {
+            notification.setTtl(ttl);
+            return notification;
         }
-        NotificationManager.#instance = this;
-        I18n.observeElement(this.#shadowRoot);
     }
-    setParent(htmlParent) {
-        this.#htmlParent = htmlParent;
-        this.#htmlParent.append(this.#shadowRoot.host);
-    }
-    #getNotification(content, type, ttl) {
-        for (const notification of this.#nofifications) {
-            if ((notification.content == content) && (notification.type == type)) {
-                notification.setTtl(ttl);
-                return notification;
-            }
-        }
-        return new Notification(content, type, ttl);
-    }
-    addNotification(content, type, ttl) {
-        const notification = this.#getNotification(content, type, ttl);
-        this.#nofifications.add(notification);
-        this.#shadowRoot.append(notification.view);
-    }
-    closeNofication(notification) {
-        this.#nofifications.delete(notification);
-        notification.view.remove();
-    }
+    return new Notification(content, type, ttl);
+}
+function addNotification(content, type, ttl) {
+    const notification = getNotification(content, type, ttl);
+    nofifications.add(notification);
+    shadowRoot.append(notification.view);
+}
+function closeNofication(notification) {
+    nofifications.delete(notification);
+    notification.view.remove();
 }
 
 /**
@@ -1375,4 +1365,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { NotificationManager, OptionsManager, SaveFile, ShortcutHandler, supportsPopover };
+export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, setNotificationsContainer, supportsPopover };

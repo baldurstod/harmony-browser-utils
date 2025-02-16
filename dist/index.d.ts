@@ -1,3 +1,7 @@
+export declare function addNotification(content: NotificationContent, type: string, ttl?: number): void;
+
+export declare function closeNofication(notification: Notification_2): void;
+
 declare class Notification_2 {
     #private;
     timeout: number;
@@ -9,14 +13,6 @@ declare class Notification_2 {
 }
 
 export declare type NotificationContent = HTMLElement | string;
-
-export declare class NotificationManager {
-    #private;
-    constructor();
-    setParent(htmlParent: HTMLElement): void;
-    addNotification(content: NotificationContent, type: string, ttl?: number): void;
-    closeNofication(notification: Notification_2): void;
-}
 
 declare type Option_2 = {
     name: string;
@@ -61,6 +57,8 @@ export declare class OptionsManager extends EventTarget {
 export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 
 export declare function SaveFile(file: File): void;
+
+export declare function setNotificationsContainer(htmlParent: HTMLElement): void;
 
 export declare class ShortcutHandler {
     #private;

@@ -25,7 +25,7 @@ class Notification {
     setTtl(ttl) {
         if (ttl) {
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(() => new NotificationManager().closeNofication(this), ttl * 1000);
+            this.timeout = setTimeout(() => closeNofication(this), ttl * 1000);
         }
     }
     get view() {
@@ -58,7 +58,7 @@ class Notification {
                         class: NOTIFICATION_CLASSNAME + '-close',
                         innerHTML: closeSVG,
                         events: {
-                            click: () => new NotificationManager().closeNofication(this),
+                            click: () => closeNofication(this),
                         }
                     }),
                 ]
@@ -76,45 +76,35 @@ class Notification {
         return this.#htmlElement;
     }
 }
-class NotificationManager {
-    //static #htmlElement: HTMLElement;
-    static #instance;
-    #htmlParent = document.body;
-    #shadowRoot = createShadowRoot('div', {
-        class: 'notification-manager',
-        parent: this.#htmlParent,
-        adoptStyle: notificationManagerCSS,
-    });
-    #nofifications = new Set();
-    constructor() {
-        if (NotificationManager.#instance) {
-            return NotificationManager.#instance;
+let htmlParent = document.body;
+const shadowRoot = createShadowRoot('div', {
+    class: 'notification-manager',
+    parent: htmlParent,
+    adoptStyle: notificationManagerCSS,
+});
+I18n.observeElement(shadowRoot);
+const nofifications = new Set();
+function setNotificationsContainer(htmlParent) {
+    htmlParent = htmlParent;
+    htmlParent.append(shadowRoot.host);
+}
+function getNotification(content, type, ttl) {
+    for (const notification of nofifications) {
+        if ((notification.content == content) && (notification.type == type)) {
+            notification.setTtl(ttl);
+            return notification;
         }
-        NotificationManager.#instance = this;
-        I18n.observeElement(this.#shadowRoot);
     }
-    setParent(htmlParent) {
-        this.#htmlParent = htmlParent;
-        this.#htmlParent.append(this.#shadowRoot.host);
-    }
-    #getNotification(content, type, ttl) {
-        for (const notification of this.#nofifications) {
-            if ((notification.content == content) && (notification.type == type)) {
-                notification.setTtl(ttl);
-                return notification;
-            }
-        }
-        return new Notification(content, type, ttl);
-    }
-    addNotification(content, type, ttl) {
-        const notification = this.#getNotification(content, type, ttl);
-        this.#nofifications.add(notification);
-        this.#shadowRoot.append(notification.view);
-    }
-    closeNofication(notification) {
-        this.#nofifications.delete(notification);
-        notification.view.remove();
-    }
+    return new Notification(content, type, ttl);
+}
+function addNotification(content, type, ttl) {
+    const notification = getNotification(content, type, ttl);
+    nofifications.add(notification);
+    shadowRoot.append(notification.view);
+}
+function closeNofication(notification) {
+    nofifications.delete(notification);
+    notification.view.remove();
 }
 
 var optionsManagerCSS = ":host{\r\n\tposition: absolute;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: auto;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\ttop:0px;\r\n\tleft: 0px;\r\n}\r\n\r\n#options-manager-inner{\r\n\tposition: relative;\r\n\t/*background-color: rgba(255, 255, 255, 1.0);*/\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--main-text-color-dark2);\r\n\tpadding:10px;\r\n\toverflow: hidden;\r\n\tmax-height: 70%;\r\n\tmax-width: 75%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\topacity: 0.9;\r\n}\r\n\r\n#options-manager-inner h1{\r\n\ttext-transform: capitalize;\r\n\ttext-align: center;\r\n}\r\n\r\n#options-manager-inner-filter{\r\n\twidth:100%;\r\n}\r\n\r\n.options-manager-button{\r\n\tcursor:pointer;\r\n\twhite-space: nowrap;\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner table{\r\n\ttext-align: left;\r\n\toverflow: hidden auto;\r\n\tdisplay: block;\r\n\theight: 100%;\r\n}\r\n\r\n#options-manager-inner thead{\r\n\tposition: sticky;\r\n\t/*display: block;*/\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner thead th{\r\n\tposition: sticky;\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner th{\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner th button, #options-manager-inner td button{\r\n\twidth: 100%;\r\n}\r\n\r\n#options-manager-title{\r\n\tcursor:move;\r\n}\r\n\r\n[draggable=true] {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] *{\r\n\tcursor: initial;\r\n}\r\n\r\n#options-manager-outer kbd{\r\n\tbackground-color: #eee;\r\n\tborder-radius: 0.25rem;\r\n\tborder: 0.1rem solid #b4b4b4;\r\n\tbox-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;\r\n\tcolor: #333;\r\n\tdisplay: inline-block;\r\n\tline-height: 1;\r\n\tpadding: 0.15rem;\r\n\twhite-space: nowrap;\r\n\tfont-weight: 1000;\r\n\tfont-size: 1.3rem;\r\n}\r\n";
@@ -869,4 +859,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { NotificationManager, OptionsManager, SaveFile, ShortcutHandler, supportsPopover };
+export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, setNotificationsContainer, supportsPopover };
