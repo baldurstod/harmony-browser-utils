@@ -1,6 +1,6 @@
 import { createElement, I18n, createShadowRoot } from 'harmony-ui';
 import { closeSVG, contentCopySVG } from 'harmony-svg';
-import notificationManagerCSS from '../css/notificationmanager.css';
+import notificationsCSS from '../css/notifications.css';
 
 const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
 
@@ -11,6 +11,7 @@ class Notification {
 	timeout: number = 0;
 	content: NotificationContent;
 	type: string;
+
 	constructor(content: NotificationContent, type: string, ttl?: number) {
 		this.content = content;
 		this.type = type;
@@ -77,7 +78,7 @@ let htmlParent = document.body;
 const shadowRoot = createShadowRoot('div', {
 	class: 'notification-manager',
 	parent: htmlParent,
-	adoptStyle: notificationManagerCSS,
+	adoptStyle: notificationsCSS,
 });
 I18n.observeElement(shadowRoot);
 const nofifications = new Set<Notification>();
