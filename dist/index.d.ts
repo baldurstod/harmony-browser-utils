@@ -2,6 +2,10 @@ export declare function addNotification(content: NotificationContent, type: stri
 
 export declare function closeNofication(notification: Notification_2): void;
 
+export declare function loadScript(script: string): Promise<boolean>;
+
+export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
+
 declare class Notification_2 {
     #private;
     timeout: number;

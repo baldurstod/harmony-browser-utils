@@ -9,6 +9,12 @@ const closeSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0
 
 const contentCopySVG = '<svg height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/></svg>';
 
+async function shadowRootStyle(shadowRoot, cssText) {
+    const sheet = new CSSStyleSheet;
+    await sheet.replace(cssText);
+    shadowRoot.adoptedStyleSheets.push(sheet);
+}
+
 const ET = new EventTarget();
 
 const I18N_DELAY_BEFORE_REFRESH = 100;
@@ -24,11 +30,40 @@ function AddI18nElement(element, descriptor) {
     if (typeof descriptor == 'string') {
         descriptor = { innerText: descriptor };
     }
-    I18nElements.set(element, descriptor);
+    const existing = I18nElements.get(element);
+    if (existing) {
+        if (descriptor === null) {
+            I18nElements.delete(element);
+            return;
+        }
+        for (const target of targets) {
+            const desc = descriptor[target];
+            if (desc === null) {
+                delete existing[target];
+            }
+            else if (desc !== undefined) {
+                existing[target] = desc;
+            }
+        }
+        if (descriptor.values) {
+            if (!existing.values) {
+                existing.values = {};
+            }
+            for (const name in descriptor.values) {
+                existing.values[name] = descriptor.values[name];
+            }
+        }
+    }
+    else {
+        if (descriptor) {
+            I18nElements.set(element, descriptor);
+        }
+    }
 }
 class I18n {
     static #started = false;
     static #lang = 'english';
+    static #defaultLang = 'english';
     static #translations = new Map();
     static #executing = false;
     static #refreshTimeout;
@@ -47,8 +82,8 @@ class I18n {
     }
     static setOptions(options) {
         if (options.translations) {
-            for (let translation of options.translations) {
-                this.addTranslation(translation);
+            for (const translation of options.translations) {
+                this.#addTranslation(translation);
             }
             this.#eventTarget.dispatchEvent(new CustomEvent(I18nEvents.TranslationsUpdated));
             this.#eventTarget.dispatchEvent(new CustomEvent(I18nEvents.Any));
@@ -56,16 +91,22 @@ class I18n {
         this.i18n();
     }
     static addTranslation(translation) {
+        this.#addTranslation(translation);
+        if (translation.lang == this.#lang) {
+            this.i18n();
+        }
+    }
+    static #addTranslation(translation) {
         this.#translations.set(translation.lang, translation);
     }
     static #initObserver() {
         if (this.#observer) {
             return;
         }
-        const callback = async (mutationsList, observer) => {
-            for (let mutation of mutationsList) {
+        const callback = async (mutationsList) => {
+            for (const mutation of mutationsList) {
                 if (mutation.type === 'childList') {
-                    for (let node of mutation.addedNodes) {
+                    for (const node of mutation.addedNodes) {
                         if (node instanceof HTMLElement) {
                             this.updateElement(node);
                         }
@@ -89,7 +130,7 @@ class I18n {
         if (parentNode.classList?.contains(className)) {
             this.#processElement(parentNode, attribute, subElement);
         }
-        for (let element of elements) {
+        for (const element of elements) {
             this.#processElement(element, attribute, subElement);
         }
     }
@@ -99,12 +140,12 @@ class I18n {
         if (parentNode.classList?.contains(className)) {
             this.#processElementJSON(parentNode);
         }
-        for (let element of elements) {
+        for (const element of elements) {
             this.#processElementJSON(element);
         }
     }
     static #processElement(htmlElement, attribute, subElement) {
-        let dataLabel = htmlElement.getAttribute(attribute);
+        const dataLabel = htmlElement.getAttribute(attribute);
         if (dataLabel) {
             htmlElement[subElement] = this.getString(dataLabel);
         }
@@ -113,16 +154,11 @@ class I18n {
     static #processElement2(htmlElement) {
         const descriptor = I18nElements.get(htmlElement);
         if (descriptor) {
-            const values = descriptor.values;
+            const values = descriptor.values ?? {};
             for (const target of targets) {
                 const desc = descriptor[target];
-                if (desc) {
-                    if (values) {
-                        htmlElement[target] = this.formatString(desc, values);
-                    }
-                    else {
-                        htmlElement[target] = this.getString(desc);
-                    }
+                if (desc && (htmlElement[target] !== undefined)) {
+                    htmlElement[target] = this.formatString(desc, values);
                 }
             }
         }
@@ -149,8 +185,8 @@ class I18n {
             htmlElement.innerHTML = this.formatString(innerHTML, valuesJSON);
         }
         const innerText = dataJSON.innerText;
-        if (innerText) {
-            (htmlElement).innerText = this.formatString(innerText, valuesJSON);
+        if (innerText && (htmlElement.innerText !== undefined)) {
+            htmlElement.innerText = this.formatString(innerText, valuesJSON);
         }
     }
     static i18n() {
@@ -168,7 +204,7 @@ class I18n {
             this.#processList(element, 'i18n', 'data-i18n', 'innerHTML');
             this.#processJSON(element);
         }
-        for (const [element, _] of I18nElements) {
+        for (const [element] of I18nElements) {
             this.#processElement2(element);
         }
         this.#executing = false;
@@ -193,27 +229,26 @@ class I18n {
             this.i18n();
         }
     }
+    static setDefaultLang(defaultLang) {
+        this.#defaultLang = defaultLang;
+    }
     static addEventListener(type, callback, options) {
         this.#eventTarget.addEventListener(type, callback, options);
     }
     static getString(s) {
-        const strings = this.#translations.get(this.#lang)?.strings;
-        if (strings) {
-            let s2 = strings[s];
-            if (typeof s2 == 'string') {
-                return s2;
-            }
-            else {
-                console.warn('Missing translation for key ' + s);
-                return s;
-            }
+        const s2 = this.#translations.get(this.#lang)?.strings?.[s] ?? this.#translations.get(this.#defaultLang)?.strings?.[s];
+        if (typeof s2 == 'string') {
+            return s2;
         }
-        return s;
+        else {
+            console.warn('Missing translation for key ' + s);
+            return s;
+        }
     }
     static formatString(s, values) {
         let str = this.getString(s);
-        for (let key in values) {
-            str = str.replace(new RegExp("\\\${" + key + "\\}", "gi"), values[key]);
+        for (const key in values) {
+            str = str.replace(new RegExp("\\${" + key + "\\}", "gi"), String(values[key]));
         }
         return str;
     }
@@ -225,6 +260,15 @@ class I18n {
     }
     static getAuthors() {
         return this.#translations.get(this.#lang)?.authors ?? [];
+    }
+    static setValue(element, name, value) {
+        if (!element) {
+            return;
+        }
+        const i18n = {};
+        i18n[name] = value;
+        AddI18nElement(element, { values: i18n });
+        this.#processElement2(element);
     }
 }
 
@@ -275,16 +319,6 @@ function createElementOptions(element, options, shadowRoot) {
                 case 'i18n':
                     AddI18nElement(element, optionValue);
                     break;
-                case 'i18nJSON':
-                case 'i18n-json':
-                    element.setAttribute('data-i18n-json', JSON.stringify(optionValue));
-                    element.classList.add('i18n');
-                    break;
-                case 'i18nValues':
-                case 'i18n-values':
-                    element.setAttribute('data-i18n-values', JSON.stringify(optionValue));
-                    element.classList.add('i18n');
-                    break;
                 case 'parent':
                     optionValue.append(element);
                     break;
@@ -295,8 +329,8 @@ function createElementOptions(element, options, shadowRoot) {
                     optionValue.forEach((entry) => append(shadowRoot ?? element, entry));
                     break;
                 case 'events':
-                    for (let eventType in optionValue) {
-                        let eventParams = optionValue[eventType];
+                    for (const eventType in optionValue) {
+                        const eventParams = optionValue[eventType];
                         if (typeof eventParams === 'function') {
                             element.addEventListener(eventType, eventParams);
                         }
@@ -306,7 +340,7 @@ function createElementOptions(element, options, shadowRoot) {
                     }
                     break;
                 case 'properties':
-                    for (let name in optionValue) {
+                    for (const name in optionValue) {
                         element[name] = optionValue[name];
                     }
                     break;
@@ -322,7 +356,7 @@ function createElementOptions(element, options, shadowRoot) {
                     element.innerText = optionValue;
                     break;
                 case 'attributes':
-                    for (let attributeName in optionValue) {
+                    for (const attributeName in optionValue) {
                         element.setAttribute(attributeName, optionValue[attributeName]);
                     }
                     break;
@@ -342,6 +376,9 @@ function createElementOptions(element, options, shadowRoot) {
                     break;
                 case 'style':
                     element.style.cssText = optionValue;
+                    break;
+                case 'checked':
+                    element.checked = optionValue;
                     break;
                 case 'elementCreated':
                     break;
@@ -396,6 +433,10 @@ function hide(htmlElement) {
     display(htmlElement, false);
 }
 
+function toBool(s) {
+    return s === '1' || s === 'true';
+}
+
 var ManipulatorDirection;
 (function (ManipulatorDirection) {
     ManipulatorDirection["All"] = "all";
@@ -403,6 +444,12 @@ var ManipulatorDirection;
     ManipulatorDirection["Y"] = "y";
     ManipulatorDirection["None"] = "none";
 })(ManipulatorDirection || (ManipulatorDirection = {}));
+var ManipulatorUpdatedEventType;
+(function (ManipulatorUpdatedEventType) {
+    ManipulatorUpdatedEventType["Position"] = "position";
+    ManipulatorUpdatedEventType["Size"] = "size";
+    ManipulatorUpdatedEventType["Rotation"] = "rotation";
+})(ManipulatorUpdatedEventType || (ManipulatorUpdatedEventType = {}));
 var ManipulatorCorner;
 (function (ManipulatorCorner) {
     ManipulatorCorner[ManipulatorCorner["None"] = -1] = "None";
@@ -419,6 +466,462 @@ var ManipulatorSide;
     ManipulatorSide[ManipulatorSide["Left"] = 2] = "Left";
     ManipulatorSide[ManipulatorSide["Right"] = 3] = "Right";
 })(ManipulatorSide || (ManipulatorSide = {}));
+var ManipulatorResizeOrigin;
+(function (ManipulatorResizeOrigin) {
+    ManipulatorResizeOrigin[ManipulatorResizeOrigin["OppositeCorner"] = 0] = "OppositeCorner";
+    ManipulatorResizeOrigin[ManipulatorResizeOrigin["Center"] = 1] = "Center";
+})(ManipulatorResizeOrigin || (ManipulatorResizeOrigin = {}));
+
+var panelCSS = ":host {\n\tdisplay: flex;\n\tflex: 1;\n\tflex-direction: column;\n\n\tflex: 0 0 auto;\n\t/*flex-grow: 0;\n\tflex-shrink: 0;\n\tflex-basis: auto;*/\n\t/*flex-basis: 0;*/\n\t/*flex: 1;*/\n\t/*height:100%;\n\twidth:100%;*/\n\n\t/*padding: 5px !important;*/\n\tbox-sizing: border-box;\n\tpointer-events: all;\n\toverflow: hidden;\n\tposition: relative;\n\tflex-direction: column;\n\tbox-sizing: border-box;\n}\n\n.harmony-panel-row {\n\tflex-direction: row;\n}\n\n.harmony-panel-row>harmony-panel {\n\theight: 100%;\n}\n\n.harmony-panel-column {\n\tflex-direction: column;\n}\n\n.harmony-panel-column>harmony-panel {\n\twidth: 100%;\n}\n\n.harmony-panel-splitter {\n\tdisplay: none;\n\tflex: 0 0 10px;\n\tbackground-color: red;\n}\n\n.title {\n\tcursor: pointer;\n\ttext-align: center;\n\tfont-size: 1.5em;\n\tpadding: 4px;\n\toverflow: hidden;\n}\n\n.content {\n\twidth: 100%;\n\tbox-sizing: border-box;\n}\n\n[collapsible='1']>.title::after {\n\tcontent: \"-\";\n\tright: 5px;\n\tposition: absolute;\n}\n\n[collapsed='1']>.title::after {\n\tcontent: \"+\";\n}\n";
+
+let nextId = 0;
+//let spliter: HTMLElement = createElement('div', { class: 'harmony-panel-splitter' }) as HTMLElement;
+let highlitPanel;
+class HTMLHarmonyPanelElement extends HTMLElement {
+    #doOnce = true;
+    #parent = null;
+    #panels = new Set();
+    #size = 1;
+    #direction = 'undefined';
+    #isContainer = false;
+    #isMovable = false;
+    #isCollapsible = false;
+    #isCollapsed = false;
+    customPanelId = nextId++;
+    htmlTitle;
+    htmlContent;
+    #isDummy = false;
+    #shadowRoot;
+    constructor() {
+        super();
+        this.#shadowRoot = this.attachShadow({ mode: 'closed' });
+        shadowRootStyle(this.#shadowRoot, panelCSS);
+        //this.addEventListener('dragstart', event => this._handleDragStart(event));
+        //this.addEventListener('dragover', event => this._handleDragOver(event));
+        //this.addEventListener('drop', event => this._handleDrop(event));
+        //this.addEventListener('mouseenter', event => this._handleMouseEnter(event));
+        //this.addEventListener('mousemove', event => this._handleMouseMove(event));
+        //this.addEventListener('mouseleave', event => this._handleMouseLeave(event));
+        this.htmlTitle = createElement('div', {
+            class: 'title',
+            parent: this.#shadowRoot,
+            events: {
+                click: () => this.#toggleCollapse(),
+            }
+        });
+        this.htmlContent = createElement('div', {
+            class: 'content',
+            parent: this.#shadowRoot,
+        });
+    }
+    connectedCallback() {
+        if (this.#doOnce) {
+            //this.append(...this.childNodes);
+            this.#doOnce = false;
+        }
+        super.append(this.htmlTitle);
+        super.append(this.htmlContent);
+        //let parentElement = this.parentElement;
+        /*if (this._parent && (this._parent != parentElement)) {
+            this._parent._removePanel(this);
+        }
+
+        if (parentElement && parentElement.tagName == 'HARMONY-PANEL') {
+            parentElement._addPanel(this);
+            this._parent = parentElement;
+        }*/
+        /*if (!this._firstTime) {
+            this._firstTime = true;
+            //this.style.backgroundColor = `rgb(${255*Math.random()},${255*Math.random()},${255*Math.random()})`;
+            //this.append(this.CustomPanelId);
+            this.title = this.CustomPanelId;
+            this.direction = this._direction;
+            //this.size = this._size;
+            //this.draggable = true;
+        }*/
+    }
+    append() {
+        this.htmlContent.append(...arguments);
+    }
+    prepend() {
+        this.htmlContent.prepend(...arguments);
+    }
+    /*
+        appendChild(child: HTMLElement) {
+            this.htmlContent.appendChild(child);
+        }
+    */
+    get innerHTML() {
+        return this.htmlContent.innerHTML;
+    }
+    set innerHTML(innerHTML) {
+        this.htmlContent.innerHTML = innerHTML;
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue == newValue) {
+            return;
+        }
+        if (name == 'panel-direction') {
+            this.#direction = newValue;
+        }
+        else if (name == 'panel-size') {
+            this.size = Number(newValue);
+        }
+        else if (name == 'is-container') {
+            this.isContainer = toBool(newValue);
+        }
+        else if (name == 'is-movable') {
+            this.isMovable = toBool(newValue);
+        }
+        else if (name == 'collapsible') {
+            this.collapsible = toBool(newValue);
+        }
+        else if (name == 'collapsed') {
+            this.collapsed = toBool(newValue);
+        }
+        else if (name == 'title') {
+            this.title = newValue;
+        }
+        else if (name == 'title-i18n') {
+            this.titleI18n = newValue;
+        }
+    }
+    static get observedAttributes() {
+        return ['panel-direction', 'panel-size', 'is-container', 'is-movable', 'title', 'title-i18n', 'collapsible', 'collapsed'];
+    }
+    /*
+        _handleDragStart(event) {
+            if (this._isMovable == false) {
+                event.preventDefault();
+                return;
+            }
+            event.stopPropagation();
+            event.dataTransfer.setData('text/plain', null);
+            dragged = event.target;
+        }
+
+        _handleDragOver(event) {
+            if (this._isContainer != false) {
+                event.preventDefault();
+            }
+            event.stopPropagation();
+        }
+
+        _handleDrop(event) {
+            if (this._isContainer != false) {
+                event.stopPropagation();
+                event.preventDefault();
+                if (dragged) {
+                    if (this != dragged) {
+                        this._addChild(dragged, event.offsetX, event.offsetY);
+                        //OptionsManager.setItem('app.layout.disposition', HTMLHarmonyPanelElement.saveDisposition());
+                    }
+                }
+            }
+            dragged = null;
+        }
+
+        _handleMouseEnter(event) {
+            //console.error(this, event);
+            //clearInterval(HTMLHarmonyPanelElement._interval);
+            //HTMLHarmonyPanelElement._interval = setInterval(event => this.style.opacity = (Math.floor(new Date().getTime() / 500) % 2) / 2 + 0.5, 100);
+            //event.stopPropagation();
+        }
+
+        _handleMouseMove(event) {
+            const delta = 5;
+            //console.error(event.offsetX, event.offsetY);
+            //this.style.opacity = (Math.floor(new Date().getTime() / 1000) % 2);
+            //HTMLHarmonyPanelElement.highlitPanel = this;
+            event.stopPropagation();
+            if (event.offsetX < delta || event.offsetY < delta) {
+                HTMLHarmonyPanelElement.highlitPanel = this;
+                this.parentNode.insertBefore(HTMLHarmonyPanelElement._spliter, this);
+            } else if ((this.offsetWidth - event.offsetX) < delta || (this.offsetHeight - event.offsetY) < delta) {
+                HTMLHarmonyPanelElement.highlitPanel = this;
+                this.parentNode.insertBefore(HTMLHarmonyPanelElement._spliter, this.nextSibling);
+            } else {
+                HTMLHarmonyPanelElement.highlitPanel = null;
+            }
+
+        }
+
+        _handleMouseLeave(event) {
+            //console.error(this, event);
+            //clearInterval(HTMLHarmonyPanelElement._interval);
+        }
+            */
+    static set highlitPanel(panel) {
+        if (highlitPanel) {
+            highlitPanel.style.filter = '';
+        }
+        highlitPanel = panel;
+        if (highlitPanel) {
+            highlitPanel.style.filter = 'grayscale(80%)'; ///'contrast(200%)';
+        }
+    }
+    /*
+        _addChild(child, x, y) {
+            let percent = 0.2;
+            let percent2 = 0.8;
+            let height = this.clientHeight;
+            let width = this.clientWidth;
+
+            if (this._direction == undefined) {
+                if (x <= width * percent) {
+                    this.prepend(dragged);
+                    this.direction = 'row';
+                }
+                if (x >= width * percent2) {
+                    this.append(dragged);
+                    this.direction = 'row';
+                }
+                if (y <= height * percent) {
+                    this.prepend(dragged);
+                    this.direction = 'column';
+                }
+                if (y >= height * percent2) {
+                    this.append(dragged);
+                    this.direction = 'column';
+                }
+            } else if (this._direction == 'row') {
+                if (x <= width * percent) {
+                    this.prepend(dragged);
+                }
+                if (x >= width * percent2) {
+                    this.append(dragged);
+                }
+                if (y <= height * percent) {
+                    this._split(dragged, true, 'column');
+                }
+                if (y >= height * percent2) {
+                    this._split(dragged, false, 'column');
+                }
+            } else if (this._direction == 'column') {
+                if (x <= width * percent) {
+                    this._split(dragged, true, 'row');
+                }
+                if (x >= width * percent2) {
+                    this._split(dragged, false, 'row');
+                }
+                if (y <= height * percent) {
+                    this.prepend(dragged);
+                }
+                if (y >= height * percent2) {
+                    this.append(dragged);
+                }
+            }
+        }*/
+    /*
+        _split(newNode, before, direction) {
+            let panel = HTMLHarmonyPanelElement._createDummy();//document.createElement('harmony-panel');
+            /*panel.id = HTMLHarmonyPanelElement.nextId;
+            panel._isDummy = true;
+            panel.classList.add('dummy');* /
+            panel.size = this.size;
+            this.style.flex = this.style.flex;
+            this.after(panel);
+            if (before) {
+                panel.append(newNode);
+                panel.append(this);
+            } else {
+                panel.append(this);
+                panel.append(newNode);
+            }
+            panel.direction = direction;
+        }
+    */
+    /*
+        static _createDummy() {
+            let dummy = document.createElement('harmony-panel');
+            dummy.id = HTMLHarmonyPanelElement.#nextId;
+            dummy._isDummy = true;
+            dummy.classList.add('dummy');
+            return dummy;
+        }
+    */
+    /*
+        _addPanel(panel) {
+            this._panels.add(panel);
+        }
+
+        _removePanel(panel) {
+            this._panels.delete(panel);
+            if (this._isDummy) {
+                if (this._panels.size == 0) {
+                    this.remove();
+                } else if (this._panels.size == 1) {
+                    this.after(this._panels.values().next().value);
+                    this.remove();
+                }
+            }
+        }
+    */
+    /*
+        set active(active) {
+            if (this._active != active) {
+                this.dispatchEvent(new CustomEvent('activated'));
+            }
+            this._active = active;
+            this.style.display = active ? '' : 'none';
+            if (active) {
+                this._header.classList.add('activated');
+            } else {
+                this._header.classList.remove('activated');
+            }
+        }
+        */
+    /*
+        _click() {
+            this.active = true;
+            if (this._group) {
+                this._group.active = this;
+            }
+        }
+    */
+    set direction(direction) {
+        this.#direction = direction;
+        this.classList.remove('harmony-panel-row');
+        this.classList.remove('harmony-panel-column');
+        if (direction == 'row') {
+            this.classList.add('harmony-panel-row');
+        }
+        else if (direction == 'column') {
+            this.classList.add('harmony-panel-column');
+        }
+    }
+    get direction() {
+        return this.#direction;
+    }
+    set size(size) {
+        /*if (size === undefined) {
+            return;
+        }*/
+        this.#size = size;
+        //this.style.flexBasis = size;
+        this.style.flex = String(size);
+    }
+    get size() {
+        return this.#size;
+    }
+    set isContainer(isContainer) {
+        this.#isContainer = isContainer;
+    }
+    set isMovable(isMovable) {
+        this.#isMovable = isMovable;
+    }
+    set collapsible(collapsible) {
+        this.#isCollapsible = collapsible;
+        this.setAttribute('collapsible', String(this.#isCollapsible ? 1 : 0));
+    }
+    set collapsed(collapsed) {
+        this.#isCollapsed = (collapsed == true) ? this.#isCollapsible : false;
+        this.setAttribute('collapsed', String(this.#isCollapsed ? 1 : 0));
+        if (this.#isCollapsed) {
+            this.htmlContent.style.display = 'none';
+        }
+        else {
+            this.htmlContent.style.display = '';
+        }
+    }
+    set title(title) {
+        if (title) {
+            this.htmlTitle = this.htmlTitle ?? document.createElement('div');
+            this.htmlTitle.innerHTML = title;
+            super.prepend(this.htmlTitle);
+        }
+        else {
+            this.htmlTitle.remove();
+        }
+    }
+    set titleI18n(titleI18n) {
+        this.htmlTitle.classList.add('i18n');
+        this.htmlTitle.setAttribute('data-i18n', titleI18n);
+        this.htmlTitle.remove();
+        this.title = titleI18n;
+    }
+    #toggleCollapse() {
+        this.collapsed = !this.#isCollapsed;
+    }
+    static get nextId() {
+        return `harmony-panel-dummy-${++nextId}`;
+    }
+    static saveDisposition() {
+        const list = document.getElementsByTagName('harmony-panel');
+        const json = { panels: {}, dummies: [] };
+        for (const panel of list) {
+            if (panel.id && panel.parentElement && panel.parentElement.id && panel.parentElement.tagName == 'HARMONY-PANEL') {
+                json.panels[panel.id] = { parent: panel.parentElement.id, size: panel.size, direction: panel.direction };
+                if (panel.#isDummy) {
+                    json.dummies.push(panel.id);
+                }
+            }
+        }
+        return json;
+    }
+    static restoreDisposition(json) {
+        return;
+        /*
+        if (!json || !json.dummies || !json.panels) { return; }
+
+        let dummiesList = new Map();
+        for (let oldDummy of json.dummies) {
+            let newDummy = HTMLHarmonyPanelElement._createDummy();
+            document.body.append(newDummy);
+            dummiesList.set(oldDummy, newDummy.id);
+        }
+
+        let list = document.getElementsByTagName('harmony-panel');
+        for (let panel of list) {
+            if (panel.id) {
+                let p = json.panels[panel.id];
+                if (p) {
+                    if (p.size != 1 || panel._isDummy) {
+                        panel.size = p.size;
+                    }
+                    panel.direction = p.direction;
+                    let newParentId = dummiesList.get(p.parent) || p.parent;
+                    if (p && newParentId) {
+                        let parent = document.getElementById(newParentId);
+                        /*if (!parent && p.dummy) {
+                            parent = document.createElement('harmony-panel');
+                        }* /
+                        if (parent) {
+                            parent.append(panel);
+                        } else {
+                            console.error('no parent', panel, newParentId);
+                        }
+                    }
+                }
+            }
+        }*/
+    }
+}
+
+class HTMLHarmonyElement extends HTMLElement {
+    initialized = false;
+    initElement() {
+        if (this.initialized) {
+            return;
+        }
+        this.initialized = true;
+        this.createElement();
+    }
+    createElement() {
+    }
+    connectedCallback() {
+        this.initElement();
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        this.initElement();
+        this.onAttributeChanged(name, oldValue, newValue);
+    }
+    onAttributeChanged(name, oldValue, newValue) {
+    }
+    static get observedAttributes() {
+        return ['label'];
+    }
+}
 
 var notificationManagerCSS = ":host, .notification-manager{\r\n\tposition: absolute;\r\n\tz-index: 100;\r\n\tbottom: 0px;\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tflex-direction: column-reverse;\r\n\tmax-height: 50%;\r\n\toverflow-y: auto;\r\n}\r\n.notification-manager-notification{\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5em;\r\n\tpadding: 4px;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.notification-manager-notification-content{\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n.notification-manager-notification-close{\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n.notification-manager-notification-copy{\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n.notification-manager-notification-copy-success{\r\n\ttransform: rotate(1turn);\r\n}\r\n.notification-manager-notification-close > svg{\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n.notification-manager-notification-success{\r\n\tbackground-color: #5aa822ff;\r\n}\r\n.notification-manager-notification-warning{\r\n\tbackground-color: #c78a17ff;\r\n}\r\n.notification-manager-notification-error{\r\n\tbackground-color: #c71717ff;\r\n}\r\n.notification-manager-notification-info{\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
 
@@ -522,6 +1025,7 @@ function closeNofication(notification) {
  * Common utilities
  * @module glMatrix
  */
+// Configuration Constants
 var ARRAY_TYPE = typeof Float32Array !== 'undefined' ? Float32Array : Array;
 if (!Math.hypot) Math.hypot = function () {
   var y = 0,
@@ -1361,8 +1865,28 @@ class ShortcutHandler {
     }
 }
 
+function loadScript(script) {
+    return new Promise((resolve) => {
+        createElement('script', {
+            src: script,
+            parent: document.body,
+            events: {
+                load: () => resolve(true),
+            }
+        });
+    });
+}
+async function loadScripts(scripts) {
+    const promises = [];
+    for (const script of scripts) {
+        promises.push(loadScript(script));
+    }
+    await Promise.all(promises);
+    return true;
+}
+
 function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, setNotificationsContainer, supportsPopover };
+export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, loadScript, loadScripts, setNotificationsContainer, supportsPopover };

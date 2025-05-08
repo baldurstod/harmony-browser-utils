@@ -1,4 +1,4 @@
-import { createShadowRoot, I18n, createElement, hide, show } from 'harmony-ui';
+import { createElement, createShadowRoot, I18n, hide, show } from 'harmony-ui';
 import { contentCopySVG, closeSVG } from 'harmony-svg';
 import { vec2 } from 'gl-matrix';
 
@@ -855,8 +855,28 @@ class ShortcutHandler {
     }
 }
 
+function loadScript(script) {
+    return new Promise((resolve) => {
+        createElement('script', {
+            src: script,
+            parent: document.body,
+            events: {
+                load: () => resolve(true),
+            }
+        });
+    });
+}
+async function loadScripts(scripts) {
+    const promises = [];
+    for (const script of scripts) {
+        promises.push(loadScript(script));
+    }
+    await Promise.all(promises);
+    return true;
+}
+
 function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, setNotificationsContainer, supportsPopover };
+export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, loadScript, loadScripts, setNotificationsContainer, supportsPopover };
