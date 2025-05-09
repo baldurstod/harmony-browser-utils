@@ -35,7 +35,7 @@ export default [
 		],
 	},
 	{
-		input: './src/index.ts',
+		input: './src/browser.ts',
 		output: {
 			file: './dist/browser.js',
 			format: 'esm'
