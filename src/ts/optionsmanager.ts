@@ -587,7 +587,7 @@ export class OptionsManager extends EventTarget {
 					}
 				});
 				for (const o of ['', 0, 1]) {
-					createElement('option', { innerHTML: o, parent: htmlElement });
+					createElement('option', { innerHTML: String(o), parent: htmlElement });
 				}
 				let v = '';
 				switch (value) {
