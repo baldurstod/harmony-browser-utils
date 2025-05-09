@@ -1,6 +1,8 @@
-export declare function addNotification(content: NotificationContent, type: string, ttl?: number): void;
+export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams): Notification_2;
 
-export declare function closeNofication(notification: Notification_2): void;
+export declare function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+
+export declare function closeNotification(notification: Notification_2 | number): void;
 
 export declare function loadScript(script: string): Promise<boolean>;
 
@@ -10,13 +12,49 @@ declare class Notification_2 {
     #private;
     timeout: number;
     content: NotificationContent;
-    type: string;
-    constructor(content: NotificationContent, type: string, ttl?: number);
-    setTtl(ttl?: number): void;
-    get view(): HTMLElement;
+    type: NotificationType;
+    constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams);
+    setTtl(ttl: number): void;
+    get htmlElement(): HTMLElement;
+    get id(): number;
 }
+export { Notification_2 as Notification }
 
 export declare type NotificationContent = HTMLElement | string;
+
+export declare enum NotificationEvents {
+    Added = "notificationadded",
+    Removed = "notificationremoved"
+}
+
+export declare type NotificationParams = {
+    parent?: HTMLElement | ShadowRoot;
+};
+
+export declare type NotificationRemovedEventData = {
+    notification: Notification_2;
+};
+
+export declare enum NotificationsPlacement {
+    Top = "top",
+    Bottom = "bottom",
+    Left = "left",
+    Right = "right",
+    TopLeft = "top-left",
+    TopRight = "top-right",
+    BottomLeft = "bottom-left",
+    BottomRight = "bottom-right",
+    Center = "center",
+    DockedTop = "docked-top",
+    DockedBottom = "docked-bottom"
+}
+
+export declare enum NotificationType {
+    Success = "success",
+    Warning = "warning",
+    Error = "error",
+    Info = "info"
+}
 
 declare type Option_2 = {
     name: string;
@@ -62,7 +100,7 @@ export declare type OptionValue = string | number | boolean | bigint | OptionMap
 
 export declare function SaveFile(file: File): void;
 
-export declare function setNotificationsContainer(htmlParent: HTMLElement): void;
+export declare function setNotificationsPlacement(placement: NotificationsPlacement): void;
 
 export declare class ShortcutHandler {
     #private;

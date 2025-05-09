@@ -1,20 +1,66 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Test</title>
-		<style>
-			body{
-				margin:0;
-			}
-		</style>
-	</head>
-	<body>
-		<script type="module">
-			import { addNotification } from '../dist/browser.js';
 
-			addNotification('Notification content', 'success');
+<head>
+	<meta charset="utf-8">
+	<title>Test</title>
+	<style>
+		body {
+			margin: 0;
+			display: flex;
+			justify-content: center;
+		}
+	</style>
+</head>
 
-		</script>
-	</body>
+<body style="height:1000px;">
+	<script type="module">
+		import { addNotification, setNotificationsPlacement, NotificationsPlacement, HarmonyUi, HarmonyUtils, addNotificationEventListener, NotificationEvents } from '../dist/browser.js';
+		setNotificationsPlacement(NotificationsPlacement.Bottom);
+
+		let index = 0
+		for (; index < 5; index++) {
+			await HarmonyUtils.setTimeoutPromise(Math.random() * 1000)
+			addNotification('Notification content ' + index, 'success', 5 * Math.random());
+		}
+
+		function setPlacement(placement) {
+			setNotificationsPlacement(placement);
+		}
+
+		const buttons = [];
+		function addButton(title, placement) {
+			buttons.push(HarmonyUi.createElement('button', {
+				innerText: title,
+				$click: () => setNotificationsPlacement(placement),
+			}));
+		}
+
+		addButton('top', NotificationsPlacement.Top);
+		addButton('bottom', NotificationsPlacement.Bottom);
+		addButton('left', NotificationsPlacement.Left);
+		addButton('right', NotificationsPlacement.Right);
+		addButton('top left', NotificationsPlacement.TopLeft);
+		addButton('top right', NotificationsPlacement.TopRight);
+		addButton('bottom left', NotificationsPlacement.BottomLeft);
+		addButton('bottom right', NotificationsPlacement.BottomRight);
+
+		HarmonyUi.createElement('div', {
+			style: 'margin:auto;',
+			parent: document.body,
+			innerText: 'disposition',
+			childs: buttons,
+		});
+
+		HarmonyUtils.setTimeoutPromise()
+
+		addNotificationEventListener(NotificationEvents.Removed, async () => {
+			await HarmonyUtils.setTimeoutPromise(Math.random() * 1000)
+			addNotification('Notification content ' + index++, 'success', 5 * Math.random());
+		})
+
+
+	</script>
+</body>
+
 </html>

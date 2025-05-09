@@ -1,14 +1,57 @@
-:host, .notification-manager{
-	position: absolute;
+:host {
+	position: fixed;
 	z-index: 100;
-	bottom: 0px;
-	width: 100%;
 	display: flex;
-	flex-direction: column-reverse;
-	max-height: 50%;
 	overflow-y: auto;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
 }
-.notification-manager-notification{
+
+.inner {
+	position: absolute;
+	display: flex;
+	pointer-events: all;
+}
+
+.top {
+	width: 100%;
+	flex-direction: column;
+}
+
+.bottom {
+	width: 100%;
+	flex-direction: column-reverse;
+	bottom: 0;
+}
+
+.left,
+.right {
+	flex-direction: column;
+	justify-content: center;
+	height: 100%;
+}
+
+.top-right,
+.top-left {
+	padding: 1rem;
+	flex-direction: column;
+}
+
+.top-right,
+.right,
+.bottom-right {
+	right: 0;
+}
+
+.bottom-right,
+.bottom-left {
+	bottom: 0;
+	padding: 1rem;
+	flex-direction: column-reverse;
+}
+
+.notification {
 	background-color: var(--theme-popup-bg-color);
 	color: var(--theme-text-color);
 	font-size: 1.5em;
@@ -16,36 +59,45 @@
 	display: flex;
 	align-items: center;
 }
-.notification-manager-notification-content{
+
+.notification-content {
 	overflow: auto;
 	flex: 1;
 	max-width: calc(100% - 20px);
 }
-.notification-manager-notification-close{
+
+.notification-close {
 	fill: currentColor;
 	cursor: pointer;
 }
-.notification-manager-notification-copy{
+
+.notification-copy {
 	fill: currentColor;
 	cursor: pointer;
 	transition: all 0.3s ease-in 0s;
 }
-.notification-manager-notification-copy-success{
+
+.notification-copy-success {
 	transform: rotate(1turn);
 }
-.notification-manager-notification-close > svg{
+
+.notification-close>svg {
 	width: 20px;
 	margin: 5px;
 }
-.notification-manager-notification-success{
+
+.notification-success {
 	background-color: #5aa822ff;
 }
-.notification-manager-notification-warning{
+
+.notification-warning {
 	background-color: #c78a17ff;
 }
-.notification-manager-notification-error{
+
+.notification-error {
 	background-color: #c71717ff;
 }
-.notification-manager-notification-info{
+
+.notification-info {
 	background-color: #2e88e8ff;
 }

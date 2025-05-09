@@ -2,30 +2,66 @@ import { createElement, I18n, createShadowRoot } from 'harmony-ui';
 import { closeSVG, contentCopySVG } from 'harmony-svg';
 import notificationsCSS from '../css/notifications.css';
 
-const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
+const NOTIFICATION_CLASSNAME = 'notification';
 
 export type NotificationContent = HTMLElement | string;
 
-class Notification {
+export enum NotificationsPlacement {
+	Top = 'top',
+	Bottom = 'bottom',
+	Left = 'left',
+	Right = 'right',
+	TopLeft = 'top-left',
+	TopRight = 'top-right',
+	BottomLeft = 'bottom-left',
+	BottomRight = 'bottom-right',
+	Center = 'center',
+	DockedTop = 'docked-top',
+	DockedBottom = 'docked-bottom',
+}
+
+export enum NotificationType {
+	Success = 'success',
+	Warning = 'warning',
+	Error = 'error',
+	Info = 'info',
+}
+
+export enum NotificationEvents {
+	Added = 'notificationadded',
+	Removed = 'notificationremoved',
+}
+
+export type NotificationRemovedEventData = { notification: Notification };
+
+export type NotificationParams = {
+	parent?: HTMLElement | ShadowRoot;
+}
+
+export class Notification {
 	#htmlElement?: HTMLElement;
 	timeout: number = 0;
 	content: NotificationContent;
-	type: string;
+	type: NotificationType;
+	#id: number;
+	#parent?: HTMLElement | ShadowRoot;
 
-	constructor(content: NotificationContent, type: string, ttl?: number) {
+	constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams) {
 		this.content = content;
 		this.type = type;
 		this.setTtl(ttl);
+		this.#id = ++notificationId;
+		this.#parent = params?.parent;
 	}
 
-	setTtl(ttl?: number) {
-		if (ttl) {
+	setTtl(ttl: number) {
+		if (ttl != 0) {
 			clearTimeout(this.timeout);
-			this.timeout = setTimeout(() => closeNofication(this), ttl * 1000);
+			this.timeout = setTimeout(() => closeNotification(this), ttl * 1000);
 		}
 	}
 
-	get view() {
+	get htmlElement() {
 		if (!this.#htmlElement) {
 			let htmlElementContent;
 			this.#htmlElement = createElement('div', {
@@ -40,7 +76,7 @@ class Notification {
 						events: {
 							click: async (event: Event) => {
 								try {
-									if (this.#htmlElement) {
+									if (this.#htmlElement && navigator.clipboard) {
 										await navigator.clipboard.writeText(this.#htmlElement.innerText);
 										(event.target as HTMLElement).parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
 									}
@@ -54,7 +90,7 @@ class Notification {
 						class: NOTIFICATION_CLASSNAME + '-close',
 						innerHTML: closeSVG,
 						events: {
-							click: () => closeNofication(this),
+							click: () => closeNotification(this),
 						}
 					}),
 				]
@@ -72,40 +108,50 @@ class Notification {
 		}
 		return this.#htmlElement;
 	}
-}
 
-let htmlParent = document.body;
-const shadowRoot = createShadowRoot('div', {
-	class: 'notification-manager',
-	parent: htmlParent,
-	adoptStyle: notificationsCSS,
-});
-I18n.observeElement(shadowRoot);
-const nofifications = new Set<Notification>();
-
-
-export function setNotificationsContainer(htmlParent: HTMLElement) {
-	htmlParent = htmlParent;
-	htmlParent.append(shadowRoot.host);
-}
-
-function getNotification(content: NotificationContent, type: string, ttl?: number) {
-	for (const notification of nofifications) {
-		if ((notification.content == content) && (notification.type == type)) {
-			notification.setTtl(ttl);
-			return notification;
-		}
+	get id(): number {
+		return this.#id;
 	}
-	return new Notification(content, type, ttl);
 }
 
-export function addNotification(content: NotificationContent, type: string, ttl?: number) {
-	const notification = getNotification(content, type, ttl);
-	nofifications.add(notification);
-	shadowRoot.append(notification.view);
+let htmlInner: HTMLElement;
+const shadowRoot = createShadowRoot('div', {
+	parent: document.body,
+	adoptStyle: notificationsCSS,
+	child: htmlInner = createElement('div'),
+});
+I18n.observeElement(htmlInner);
+setNotificationsPlacement(NotificationsPlacement.TopRight);
+
+let notificationId = 0;
+const notifications = new Map<number, Notification>();
+
+export function setNotificationsPlacement(placement: NotificationsPlacement) {
+	htmlInner.className = `inner ${placement}`;
 }
 
-export function closeNofication(notification: Notification) {
-	nofifications.delete(notification);
-	notification.view.remove();
+export function addNotification(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams): Notification {
+	const notification = new Notification(content, type, ttl, params);
+	notifications.set(notification.id, notification);
+	htmlInner.append(notification.htmlElement);
+	return notification;
+}
+
+export function closeNotification(notification: Notification | number) {
+	if (typeof notification == 'number') {
+		notification = notifications.get(notification)!;
+	}
+
+	if (notification) {
+		notifications.delete(notification.id);
+		notification.htmlElement.remove();
+
+		Controller.dispatchEvent(new CustomEvent<NotificationRemovedEventData>(NotificationEvents.Removed, { detail: { notification: notification } }));
+	}
+}
+
+const Controller = new EventTarget();
+
+export function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void {
+	Controller.addEventListener(type, callback, options);
 }

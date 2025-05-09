@@ -9,26 +9,56 @@ function SaveFile(file) {
     link.click();
 }
 
-var notificationsCSS = ":host, .notification-manager{\r\n\tposition: absolute;\r\n\tz-index: 100;\r\n\tbottom: 0px;\r\n\twidth: 100%;\r\n\tdisplay: flex;\r\n\tflex-direction: column-reverse;\r\n\tmax-height: 50%;\r\n\toverflow-y: auto;\r\n}\r\n.notification-manager-notification{\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5em;\r\n\tpadding: 4px;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n.notification-manager-notification-content{\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n.notification-manager-notification-close{\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n.notification-manager-notification-copy{\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n.notification-manager-notification-copy-success{\r\n\ttransform: rotate(1turn);\r\n}\r\n.notification-manager-notification-close > svg{\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n.notification-manager-notification-success{\r\n\tbackground-color: #5aa822ff;\r\n}\r\n.notification-manager-notification-warning{\r\n\tbackground-color: #c78a17ff;\r\n}\r\n.notification-manager-notification-error{\r\n\tbackground-color: #c71717ff;\r\n}\r\n.notification-manager-notification-info{\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+var notificationsCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 100;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.notification {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5em;\r\n\tpadding: 4px;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.notification-success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.notification-warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.notification-error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.notification-info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
 
-const NOTIFICATION_CLASSNAME = 'notification-manager-notification';
+const NOTIFICATION_CLASSNAME = 'notification';
+var NotificationsPlacement;
+(function (NotificationsPlacement) {
+    NotificationsPlacement["Top"] = "top";
+    NotificationsPlacement["Bottom"] = "bottom";
+    NotificationsPlacement["Left"] = "left";
+    NotificationsPlacement["Right"] = "right";
+    NotificationsPlacement["TopLeft"] = "top-left";
+    NotificationsPlacement["TopRight"] = "top-right";
+    NotificationsPlacement["BottomLeft"] = "bottom-left";
+    NotificationsPlacement["BottomRight"] = "bottom-right";
+    NotificationsPlacement["Center"] = "center";
+    NotificationsPlacement["DockedTop"] = "docked-top";
+    NotificationsPlacement["DockedBottom"] = "docked-bottom";
+})(NotificationsPlacement || (NotificationsPlacement = {}));
+var NotificationType;
+(function (NotificationType) {
+    NotificationType["Success"] = "success";
+    NotificationType["Warning"] = "warning";
+    NotificationType["Error"] = "error";
+    NotificationType["Info"] = "info";
+})(NotificationType || (NotificationType = {}));
+var NotificationEvents;
+(function (NotificationEvents) {
+    NotificationEvents["Added"] = "notificationadded";
+    NotificationEvents["Removed"] = "notificationremoved";
+})(NotificationEvents || (NotificationEvents = {}));
 class Notification {
     #htmlElement;
     timeout = 0;
     content;
     type;
-    constructor(content, type, ttl) {
+    #id;
+    #parent;
+    constructor(content, type, ttl, params) {
         this.content = content;
         this.type = type;
         this.setTtl(ttl);
+        this.#id = ++notificationId;
+        this.#parent = params?.parent;
     }
     setTtl(ttl) {
-        if (ttl) {
+        if (ttl != 0) {
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(() => closeNofication(this), ttl * 1000);
+            this.timeout = setTimeout(() => closeNotification(this), ttl * 1000);
         }
     }
-    get view() {
+    get htmlElement() {
         if (!this.#htmlElement) {
             let htmlElementContent;
             this.#htmlElement = createElement('div', {
@@ -43,7 +73,7 @@ class Notification {
                         events: {
                             click: async (event) => {
                                 try {
-                                    if (this.#htmlElement) {
+                                    if (this.#htmlElement && navigator.clipboard) {
                                         await navigator.clipboard.writeText(this.#htmlElement.innerText);
                                         event.target.parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
                                     }
@@ -58,7 +88,7 @@ class Notification {
                         class: NOTIFICATION_CLASSNAME + '-close',
                         innerHTML: closeSVG,
                         events: {
-                            click: () => closeNofication(this),
+                            click: () => closeNotification(this),
                         }
                     }),
                 ]
@@ -75,36 +105,42 @@ class Notification {
         }
         return this.#htmlElement;
     }
-}
-let htmlParent = document.body;
-const shadowRoot = createShadowRoot('div', {
-    class: 'notification-manager',
-    parent: htmlParent,
-    adoptStyle: notificationsCSS,
-});
-I18n.observeElement(shadowRoot);
-const nofifications = new Set();
-function setNotificationsContainer(htmlParent) {
-    htmlParent = htmlParent;
-    htmlParent.append(shadowRoot.host);
-}
-function getNotification(content, type, ttl) {
-    for (const notification of nofifications) {
-        if ((notification.content == content) && (notification.type == type)) {
-            notification.setTtl(ttl);
-            return notification;
-        }
+    get id() {
+        return this.#id;
     }
-    return new Notification(content, type, ttl);
 }
-function addNotification(content, type, ttl) {
-    const notification = getNotification(content, type, ttl);
-    nofifications.add(notification);
-    shadowRoot.append(notification.view);
+let htmlInner;
+createShadowRoot('div', {
+    parent: document.body,
+    adoptStyle: notificationsCSS,
+    child: htmlInner = createElement('div'),
+});
+I18n.observeElement(htmlInner);
+setNotificationsPlacement(NotificationsPlacement.TopRight);
+let notificationId = 0;
+const notifications = new Map();
+function setNotificationsPlacement(placement) {
+    htmlInner.className = `inner ${placement}`;
 }
-function closeNofication(notification) {
-    nofifications.delete(notification);
-    notification.view.remove();
+function addNotification(content, type, ttl, params) {
+    const notification = new Notification(content, type, ttl, params);
+    notifications.set(notification.id, notification);
+    htmlInner.append(notification.htmlElement);
+    return notification;
+}
+function closeNotification(notification) {
+    if (typeof notification == 'number') {
+        notification = notifications.get(notification);
+    }
+    if (notification) {
+        notifications.delete(notification.id);
+        notification.htmlElement.remove();
+        Controller.dispatchEvent(new CustomEvent(NotificationEvents.Removed, { detail: { notification: notification } }));
+    }
+}
+const Controller = new EventTarget();
+function addNotificationEventListener(type, callback, options) {
+    Controller.addEventListener(type, callback, options);
 }
 
 var optionsManagerCSS = ":host{\r\n\tposition: absolute;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: auto;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\ttop:0px;\r\n\tleft: 0px;\r\n}\r\n\r\n#options-manager-inner{\r\n\tposition: relative;\r\n\t/*background-color: rgba(255, 255, 255, 1.0);*/\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--main-text-color-dark2);\r\n\tpadding:10px;\r\n\toverflow: hidden;\r\n\tmax-height: 70%;\r\n\tmax-width: 75%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\topacity: 0.9;\r\n}\r\n\r\n#options-manager-inner h1{\r\n\ttext-transform: capitalize;\r\n\ttext-align: center;\r\n}\r\n\r\n#options-manager-inner-filter{\r\n\twidth:100%;\r\n}\r\n\r\n.options-manager-button{\r\n\tcursor:pointer;\r\n\twhite-space: nowrap;\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner table{\r\n\ttext-align: left;\r\n\toverflow: hidden auto;\r\n\tdisplay: block;\r\n\theight: 100%;\r\n}\r\n\r\n#options-manager-inner thead{\r\n\tposition: sticky;\r\n\t/*display: block;*/\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner thead th{\r\n\tposition: sticky;\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner th{\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner th button, #options-manager-inner td button{\r\n\twidth: 100%;\r\n}\r\n\r\n#options-manager-title{\r\n\tcursor:move;\r\n}\r\n\r\n[draggable=true] {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] *{\r\n\tcursor: initial;\r\n}\r\n\r\n#options-manager-outer kbd{\r\n\tbackground-color: #eee;\r\n\tborder-radius: 0.25rem;\r\n\tborder: 0.1rem solid #b4b4b4;\r\n\tbox-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;\r\n\tcolor: #333;\r\n\tdisplay: inline-block;\r\n\tline-height: 1;\r\n\tpadding: 0.15rem;\r\n\twhite-space: nowrap;\r\n\tfont-weight: 1000;\r\n\tfont-size: 1.3rem;\r\n}\r\n";
@@ -636,7 +672,7 @@ class OptionsManager extends EventTarget {
                     }
                 });
                 for (const o of ['', 0, 1]) {
-                    createElement('option', { innerHTML: o, parent: htmlElement });
+                    createElement('option', { innerHTML: String(o), parent: htmlElement });
                 }
                 let v = '';
                 switch (value) {
@@ -879,4 +915,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { OptionsManager, SaveFile, ShortcutHandler, addNotification, closeNofication, loadScript, loadScripts, setNotificationsContainer, supportsPopover };
+export { Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, SaveFile, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, setNotificationsPlacement, supportsPopover };
