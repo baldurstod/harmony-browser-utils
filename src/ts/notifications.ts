@@ -46,6 +46,7 @@ export class Notification {
 	#ttl: number = 0;
 	#htmlProgressBar?: HTMLElement;
 	#parent?: HTMLElement | ShadowRoot;
+	#start: number = 0;
 
 	constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams) {
 		this.content = content;
@@ -57,74 +58,84 @@ export class Notification {
 	}
 
 	get htmlElement() {
-		if (!this.#htmlElement) {
-			let htmlElementContent;
-			this.#htmlElement = createElement('div', {
-				class: NOTIFICATION_CLASSNAME,
-				childs: [
-					createElement('div', {
-						class: 'notification-line1',
-						child:
-							this.#htmlProgressBar = createElement('div', {
-								class: 'notification-progress',
-							}),
-					}),
-					createElement('div', {
-						class: 'notification-line2',
-						childs: [
-							htmlElementContent = createElement('div', {
-								class: NOTIFICATION_CLASSNAME + '-content',
-							}),
-							createElement('div', {
-								class: NOTIFICATION_CLASSNAME + '-copy',
-								innerHTML: contentCopySVG,
-								events: {
-									click: async (event: Event) => {
-										try {
-											if (this.#htmlElement && navigator.clipboard) {
-												await navigator.clipboard.writeText(this.#htmlElement.innerText);
-												(event.target as HTMLElement).parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
-											}
-										} catch (e) {
-											console.error(e);
+		if (this.#htmlElement) {
+			return this.#htmlElement;
+		}
+
+		let htmlElementContent;
+		this.#htmlElement = createElement('div', {
+			class: NOTIFICATION_CLASSNAME,
+			childs: [
+				createElement('div', {
+					class: 'notification-line1',
+					child:
+						this.#htmlProgressBar = createElement('div', {
+							class: 'notification-progress',
+						}),
+				}),
+				createElement('div', {
+					class: 'notification-line2',
+					childs: [
+						htmlElementContent = createElement('div', {
+							class: NOTIFICATION_CLASSNAME + '-content',
+						}),
+						createElement('div', {
+							class: NOTIFICATION_CLASSNAME + '-copy',
+							innerHTML: contentCopySVG,
+							events: {
+								click: async (event: Event) => {
+									try {
+										if (this.#htmlElement && navigator.clipboard) {
+											await navigator.clipboard.writeText(this.#htmlElement.innerText);
+											(event.target as HTMLElement).parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
 										}
-									},
-								}
-							}),
-							createElement('div', {
-								class: NOTIFICATION_CLASSNAME + '-close',
-								innerHTML: closeSVG,
-								events: {
-									click: () => closeNotification(this),
-								}
-							}),
-						]
-					}),
-				]
-			});
+									} catch (e) {
+										console.error(e);
+									}
+								},
+							}
+						}),
+						createElement('div', {
+							class: NOTIFICATION_CLASSNAME + '-close',
+							innerHTML: closeSVG,
+							events: {
+								click: () => closeNotification(this),
+							}
+						}),
+					]
+				}),
+			]
+		});
 
-			if (this.type) {
-				this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type)
-			}
+		if (this.type) {
+			this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type)
+		}
 
-			if (this.content instanceof HTMLElement) {
-				htmlElementContent.append(this.content);
-			} else {
-				htmlElementContent.innerText = this.content;
-			}
+		if (this.content instanceof HTMLElement) {
+			htmlElementContent.append(this.content);
+		} else {
+			htmlElementContent.innerText = this.content;
+		}
 
-			if (this.#ttl != 0) {
-				this.#htmlProgressBar.style.cssText = `transition: all ${this.#ttl}s linear;`;
-			}
+		if (this.#ttl != 0) {
+			this.#start = performance.now();
+			window.requestAnimationFrame(() => this.#run());
 		}
 		return this.#htmlElement;
 	}
 
-	connected() {
-		if (this.#ttl != 0) {
-			this.#htmlProgressBar!.offsetWidth;// Don't remove, there is an intended side effect
-			this.#htmlProgressBar!.style.width = '0';
-			setTimeout(() => closeNotification(this), this.#ttl * 1000);
+	#run() {
+		const now = performance.now();
+		const elapsed = (now - this.#start);
+		const percent = elapsed / this.#ttl / 10;
+
+		if (percent < 100) {
+			this.#htmlProgressBar!.style.width = `${100 - percent}%`;
+
+			window.requestAnimationFrame(() => this.#run());
+		} else {
+			//setTimeout(() => closeNotification(this), this.#ttl * 1000);
+			closeNotification(this);
 		}
 	}
 
@@ -153,7 +164,6 @@ export function addNotification(content: NotificationContent, type: Notification
 	const notification = new Notification(content, type, ttl, params);
 	notifications.set(notification.id, notification);
 	htmlInner.append(notification.htmlElement);
-	notification.connected();
 	return notification;
 }
 

@@ -19,11 +19,11 @@
 		setNotificationsPlacement(NotificationsPlacement.Bottom);
 
 		const timescale = 5;
+		const types = ['success', 'warning', 'error', 'info'];
 
 		let index = 0
 		for (; index < 5; index++) {
-			//await HarmonyUtils.setTimeoutPromise(Math.random() * 1000)
-			addNotification('Notification content ' + index, 'success', timescale * Math.random());
+			addNotification('Notification content ' + index, getRandomType(), timescale * Math.random());
 		}
 
 		function setPlacement(placement) {
@@ -57,11 +57,12 @@
 		HarmonyUtils.setTimeoutPromise()
 
 		addNotificationEventListener(NotificationEvents.Removed, async () => {
-			await HarmonyUtils.setTimeoutPromise(Math.random() * 10)
-			addNotification('Notification content ' + index++, 'success', timescale * Math.random());
+			addNotification('Notification content ' + index++, getRandomType(), timescale * Math.random());
 		})
 
-
+		function getRandomType() {
+			return types[Math.floor(Math.random() * 4)];
+		}
 	</script>
 </body>
 

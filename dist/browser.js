@@ -4308,7 +4308,7 @@ var index = /*#__PURE__*/Object.freeze({
     visible: visible
 });
 
-var notificationsCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.notification {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5em;\r\n\t/*padding: 4px;*/\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tflex-direction: column;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 2px;\r\n\twidth: 100%;\r\n\tbackground-color: brown;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.notification-success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.notification-warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.notification-error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.notification-info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+var notificationsCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.notification {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tpadding: 0.1rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tflex-direction: column;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.notification-success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.notification-warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.notification-error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.notification-info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
 
 const NOTIFICATION_CLASSNAME = 'notification';
 var NotificationsPlacement;
@@ -4345,6 +4345,7 @@ class Notification {
     #ttl = 0;
     #htmlProgressBar;
     #parent;
+    #start = 0;
     constructor(content, type, ttl, params) {
         this.content = content;
         this.type = type;
@@ -4354,71 +4355,79 @@ class Notification {
         this.#parent = params?.parent;
     }
     get htmlElement() {
-        if (!this.#htmlElement) {
-            let htmlElementContent;
-            this.#htmlElement = createElement('div', {
-                class: NOTIFICATION_CLASSNAME,
-                childs: [
-                    createElement('div', {
-                        class: 'notification-line1',
-                        child: this.#htmlProgressBar = createElement('div', {
-                            class: 'notification-progress',
+        if (this.#htmlElement) {
+            return this.#htmlElement;
+        }
+        let htmlElementContent;
+        this.#htmlElement = createElement('div', {
+            class: NOTIFICATION_CLASSNAME,
+            childs: [
+                createElement('div', {
+                    class: 'notification-line1',
+                    child: this.#htmlProgressBar = createElement('div', {
+                        class: 'notification-progress',
+                    }),
+                }),
+                createElement('div', {
+                    class: 'notification-line2',
+                    childs: [
+                        htmlElementContent = createElement('div', {
+                            class: NOTIFICATION_CLASSNAME + '-content',
                         }),
-                    }),
-                    createElement('div', {
-                        class: 'notification-line2',
-                        childs: [
-                            htmlElementContent = createElement('div', {
-                                class: NOTIFICATION_CLASSNAME + '-content',
-                            }),
-                            createElement('div', {
-                                class: NOTIFICATION_CLASSNAME + '-copy',
-                                innerHTML: contentCopySVG,
-                                events: {
-                                    click: async (event) => {
-                                        try {
-                                            if (this.#htmlElement && navigator.clipboard) {
-                                                await navigator.clipboard.writeText(this.#htmlElement.innerText);
-                                                event.target.parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
-                                            }
+                        createElement('div', {
+                            class: NOTIFICATION_CLASSNAME + '-copy',
+                            innerHTML: contentCopySVG,
+                            events: {
+                                click: async (event) => {
+                                    try {
+                                        if (this.#htmlElement && navigator.clipboard) {
+                                            await navigator.clipboard.writeText(this.#htmlElement.innerText);
+                                            event.target.parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
                                         }
-                                        catch (e) {
-                                            console.error(e);
-                                        }
-                                    },
-                                }
-                            }),
-                            createElement('div', {
-                                class: NOTIFICATION_CLASSNAME + '-close',
-                                innerHTML: closeSVG,
-                                events: {
-                                    click: () => closeNotification(this),
-                                }
-                            }),
-                        ]
-                    }),
-                ]
-            });
-            if (this.type) {
-                this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type);
-            }
-            if (this.content instanceof HTMLElement) {
-                htmlElementContent.append(this.content);
-            }
-            else {
-                htmlElementContent.innerText = this.content;
-            }
-            if (this.#ttl != 0) {
-                this.#htmlProgressBar.style.cssText = `transition: all ${this.#ttl}s linear;`;
-            }
+                                    }
+                                    catch (e) {
+                                        console.error(e);
+                                    }
+                                },
+                            }
+                        }),
+                        createElement('div', {
+                            class: NOTIFICATION_CLASSNAME + '-close',
+                            innerHTML: closeSVG,
+                            events: {
+                                click: () => closeNotification(this),
+                            }
+                        }),
+                    ]
+                }),
+            ]
+        });
+        if (this.type) {
+            this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type);
+        }
+        if (this.content instanceof HTMLElement) {
+            htmlElementContent.append(this.content);
+        }
+        else {
+            htmlElementContent.innerText = this.content;
+        }
+        if (this.#ttl != 0) {
+            this.#start = performance.now();
+            window.requestAnimationFrame(() => this.#run());
         }
         return this.#htmlElement;
     }
-    connected() {
-        if (this.#ttl != 0) {
-            this.#htmlProgressBar.offsetWidth; // Don't remove, there is an intended side effect
-            this.#htmlProgressBar.style.width = '0';
-            setTimeout(() => closeNotification(this), this.#ttl * 1000);
+    #run() {
+        const now = performance.now();
+        const elapsed = (now - this.#start);
+        const percent = elapsed / this.#ttl / 10;
+        if (percent < 100) {
+            this.#htmlProgressBar.style.width = `${100 - percent}%`;
+            window.requestAnimationFrame(() => this.#run());
+        }
+        else {
+            //setTimeout(() => closeNotification(this), this.#ttl * 1000);
+            closeNotification(this);
         }
     }
     get id() {
@@ -4442,7 +4451,6 @@ function addNotification(content, type, ttl, params) {
     const notification = new Notification(content, type, ttl, params);
     notifications.set(notification.id, notification);
     htmlInner.append(notification.htmlElement);
-    notification.connected();
     return notification;
 }
 function closeNotification(notification) {
