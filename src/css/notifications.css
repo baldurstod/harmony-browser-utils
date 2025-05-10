@@ -1,6 +1,6 @@
 :host {
 	position: fixed;
-	z-index: 100;
+	z-index: 10000;
 	display: flex;
 	overflow-y: auto;
 	width: 100%;
@@ -55,9 +55,25 @@
 	background-color: var(--theme-popup-bg-color);
 	color: var(--theme-text-color);
 	font-size: 1.5em;
-	padding: 4px;
+	/*padding: 4px;*/
 	display: flex;
 	align-items: center;
+	flex-direction: column;
+}
+
+.notification-line1 {
+	display: flex;
+	width: 100%;
+}
+
+.notification-progress {
+	height: 2px;
+	width: 100%;
+	background-color: brown;
+}
+
+.notification-line2 {
+	display: flex;
 }
 
 .notification-content {

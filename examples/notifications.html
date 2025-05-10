@@ -18,10 +18,12 @@
 		import { addNotification, setNotificationsPlacement, NotificationsPlacement, HarmonyUi, HarmonyUtils, addNotificationEventListener, NotificationEvents } from '../dist/browser.js';
 		setNotificationsPlacement(NotificationsPlacement.Bottom);
 
+		const timescale = 5;
+
 		let index = 0
 		for (; index < 5; index++) {
-			await HarmonyUtils.setTimeoutPromise(Math.random() * 1000)
-			addNotification('Notification content ' + index, 'success', 5 * Math.random());
+			//await HarmonyUtils.setTimeoutPromise(Math.random() * 1000)
+			addNotification('Notification content ' + index, 'success', timescale * Math.random());
 		}
 
 		function setPlacement(placement) {
@@ -55,8 +57,8 @@
 		HarmonyUtils.setTimeoutPromise()
 
 		addNotificationEventListener(NotificationEvents.Removed, async () => {
-			await HarmonyUtils.setTimeoutPromise(Math.random() * 1000)
-			addNotification('Notification content ' + index++, 'success', 5 * Math.random());
+			await HarmonyUtils.setTimeoutPromise(Math.random() * 10)
+			addNotification('Notification content ' + index++, 'success', timescale * Math.random());
 		})
 
 

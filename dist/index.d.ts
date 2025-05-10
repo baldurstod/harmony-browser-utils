@@ -10,12 +10,11 @@ export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
 
 declare class Notification_2 {
     #private;
-    timeout: number;
     content: NotificationContent;
     type: NotificationType;
     constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams);
-    setTtl(ttl: number): void;
     get htmlElement(): HTMLElement;
+    connected(): void;
     get id(): number;
 }
 export { Notification_2 as Notification }
