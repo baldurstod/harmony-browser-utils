@@ -114,7 +114,7 @@ export class Notification {
 		if (this.content instanceof HTMLElement) {
 			htmlElementContent.append(this.content);
 		} else {
-			htmlElementContent.innerText = this.content;
+			htmlElementContent.innerHTML = this.content;
 		}
 
 		if (this.#ttl != 0) {

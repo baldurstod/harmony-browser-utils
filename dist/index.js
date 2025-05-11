@@ -110,7 +110,7 @@ class Notification {
             htmlElementContent.append(this.content);
         }
         else {
-            htmlElementContent.innerText = this.content;
+            htmlElementContent.innerHTML = this.content;
         }
         if (this.#ttl != 0) {
             this.#start = performance.now();
