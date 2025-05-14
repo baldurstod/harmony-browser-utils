@@ -1,8 +1,8 @@
-import { createElement, I18n, createShadowRoot } from 'harmony-ui';
-import { closeSVG, contentCopySVG } from 'harmony-svg';
+import { createElement, I18n, createShadowRoot, documentStyle, defineHarmonyCircularProgress, HTMLHarmonyCircularProgressElement } from 'harmony-ui';
+import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG } from 'harmony-svg';
+import { themeCSS } from 'harmony-css';
+import notificationsContainerCSS from '../css/notificationcontainer.css';
 import notificationsCSS from '../css/notifications.css';
-
-const NOTIFICATION_CLASSNAME = 'notification';
 
 export type NotificationContent = HTMLElement | string;
 
@@ -39,33 +39,93 @@ export type NotificationParams = {
 }
 
 export class Notification {
-	#htmlElement?: HTMLElement;
-	content: NotificationContent;
-	type: NotificationType;
+	#shadowRoot?: ShadowRoot;
+	//#htmlElement?: HTMLElement;
+	#content: NotificationContent;
+	#type: NotificationType;
 	#id: number;
 	#ttl: number = 0;
-	#htmlProgressBar?: HTMLElement;
+	#htmlType?: HTMLElement;
+	#htmlProgress?: HTMLHarmonyCircularProgressElement;
 	#parent?: HTMLElement | ShadowRoot;
 	#start: number = 0;
 
 	constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams) {
-		this.content = content;
-		this.type = type;
+		this.#content = content;
+		this.#type = type;
 		//this.#setTtl(ttl);
 		this.#ttl = ttl;
 		this.#id = ++notificationId;
 		this.#parent = params?.parent;
+
+		documentStyle(themeCSS);
 	}
 
-	get htmlElement() {
-		if (this.#htmlElement) {
-			return this.#htmlElement;
+	get htmlElement(): HTMLElement {
+		if (this.#shadowRoot) {
+			return this.#shadowRoot.host as HTMLElement;
 		}
 
-		let htmlElementContent;
-		this.#htmlElement = createElement('div', {
-			class: NOTIFICATION_CLASSNAME,
+		defineHarmonyCircularProgress();
+		let svg: string = '';
+		switch (this.#type) {
+			case NotificationType.Error:
+				svg = errorSVG;
+				break;
+			case NotificationType.Info:
+				svg = infoSVG;
+				break;
+			case NotificationType.Warning:
+				svg = warningSVG;
+				break;
+			case NotificationType.Success:
+				svg = checkCircleSVG;
+				break;
+		}
+
+		let htmlElementContent: HTMLElement;
+		this.#shadowRoot = createShadowRoot('div', {
+			adoptStyle: notificationsCSS,
 			childs: [
+				this.#htmlType = createElement('div', {
+					class: 'type',
+					childs: [
+						this.#htmlProgress = createElement('h-cp', {
+							class: 'progress',
+						}) as HTMLHarmonyCircularProgressElement,
+						createElement('div', {
+							class: 'svg',
+							innerHTML: svg,
+						}),
+					],
+				}),
+				htmlElementContent = createElement('div', {
+					class: 'notification-content',
+				}),
+				createElement('div', {
+					class: 'notification-copy',
+					innerHTML: contentCopySVG,
+					events: {
+						click: async (event: Event) => {
+							try {
+								if (navigator.clipboard) {
+									await navigator.clipboard.writeText(htmlElementContent.innerText);
+									(event.target as HTMLElement).parentElement?.classList.toggle('notification-copy-success');
+								}
+							} catch (e) {
+								console.error(e);
+							}
+						},
+					}
+				}),
+				createElement('div', {
+					class: 'notification-close',
+					innerHTML: closeSVG,
+					events: {
+						click: () => closeNotification(this),
+					}
+				}),
+				/*
 				createElement('div', {
 					class: 'notification-line1',
 					child:
@@ -76,65 +136,37 @@ export class Notification {
 				createElement('div', {
 					class: 'notification-line2',
 					childs: [
-						htmlElementContent = createElement('div', {
-							class: NOTIFICATION_CLASSNAME + '-content',
-						}),
-						createElement('div', {
-							class: NOTIFICATION_CLASSNAME + '-copy',
-							innerHTML: contentCopySVG,
-							events: {
-								click: async (event: Event) => {
-									try {
-										if (this.#htmlElement && navigator.clipboard) {
-											await navigator.clipboard.writeText(this.#htmlElement.innerText);
-											(event.target as HTMLElement).parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
-										}
-									} catch (e) {
-										console.error(e);
-									}
-								},
-							}
-						}),
-						createElement('div', {
-							class: NOTIFICATION_CLASSNAME + '-close',
-							innerHTML: closeSVG,
-							events: {
-								click: () => closeNotification(this),
-							}
-						}),
 					]
 				}),
+				*/
 			]
 		});
 
-		if (this.type) {
-			this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type)
-		}
+		this.#htmlType.classList.add(this.#type);
 
-		if (this.content instanceof HTMLElement) {
-			htmlElementContent.append(this.content);
+
+		if (this.#content instanceof HTMLElement) {
+			htmlElementContent.append(this.#content);
 		} else {
-			htmlElementContent.innerHTML = this.content;
+			htmlElementContent.innerHTML = this.#content;
 		}
 
 		if (this.#ttl != 0) {
 			this.#start = performance.now();
 			window.requestAnimationFrame(() => this.#run());
 		}
-		return this.#htmlElement;
+		return this.#shadowRoot.host as HTMLElement;
 	}
 
 	#run() {
 		const now = performance.now();
 		const elapsed = (now - this.#start);
-		const percent = elapsed / this.#ttl / 10;
+		const progress = elapsed / this.#ttl / 1000;
 
-		if (percent < 100) {
-			this.#htmlProgressBar!.style.width = `${100 - percent}%`;
-
+		if (progress < 1) {
+			this.#htmlProgress?.setProgress(1 - progress);
 			window.requestAnimationFrame(() => this.#run());
 		} else {
-			//setTimeout(() => closeNotification(this), this.#ttl * 1000);
 			closeNotification(this);
 		}
 	}
@@ -147,7 +179,7 @@ export class Notification {
 let htmlInner: HTMLElement;
 const shadowRoot = createShadowRoot('div', {
 	parent: document.body,
-	adoptStyle: notificationsCSS,
+	adoptStyle: notificationsContainerCSS,
 	child: htmlInner = createElement('div'),
 });
 I18n.observeElement(htmlInner);

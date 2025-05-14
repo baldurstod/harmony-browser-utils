@@ -1,6 +1,6 @@
 {
 	"name": "harmony-browser-utils",
-	"version": "0.7.3",
+	"version": "0.7.4",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"type": "module",
@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"gl-matrix": "^3.4.3",
+		"harmony-css": "github:baldurstod/harmony-css",
 		"harmony-svg": "github:baldurstod/harmony-svg",
 		"harmony-ui": "github:baldurstod/harmony-ui",
 		"harmony-utils": "github:baldurstod/harmony-utils"

@@ -10,8 +10,6 @@ export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
 
 declare class Notification_2 {
     #private;
-    content: NotificationContent;
-    type: NotificationType;
     constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams);
     get htmlElement(): HTMLElement;
     get id(): number;

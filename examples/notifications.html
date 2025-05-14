@@ -19,10 +19,11 @@
 		setNotificationsPlacement(NotificationsPlacement.Bottom);
 
 		const timescale = 5;
+		const count = 1;
 		const types = ['success', 'warning', 'error', 'info'];
 
 		let index = 0
-		for (; index < 5; index++) {
+		for (; index < count; index++) {
 			addNotification('Notification content ' + index, getRandomType(), timescale * Math.random());
 		}
 

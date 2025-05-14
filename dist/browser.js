@@ -165,15 +165,21 @@ var index$1 = /*#__PURE__*/Object.freeze({
     setTimeoutPromise: setTimeoutPromise
 });
 
+const checkCircleSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>';
+
 const checkOutlineSVG = '<svg xmlns="http://www.w3.org/2000/svg"  height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="m 381,-240 424,-424 -57,-56 -368,367 -169,-170 -57,57 z m 0,113 -339,-339 169,-170 170,170 366,-367 172,168 z"/><path fill="#ffffff" d="m 381,-240 424,-424 -57,-56 -368,367 -169,-170 -57,57 z m 366,-593 c -498,-84.66667 -249,-42.33333 0,0 z"/></svg>';
 
 const closeSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>';
 
 const contentCopySVG = '<svg height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/></svg>';
 
+const errorSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>';
+
 const folderOpenSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640H447l-80-80H160v480l96-320h684L837-217q-8 26-29.5 41.5T760-160H160Zm84-80h516l72-240H316l-72 240Zm0 0 72-240-72 240Zm-84-400v-80 80Z"/></svg>';
 
 const infoSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>';
+
+const warningSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"/></svg>';
 
 function cloneEvent(event) {
     return new event.constructor(event.type, event);
@@ -2873,6 +2879,127 @@ function defineHarmonyPanel() {
     }
 }
 
+var circularProgressCSS = ":host {\n\t--track-color: var(--harmony-circular-progress-track-color, #CCC);\n\t--progress-color: var(--harmony-circular-progress-progress-color, #F00);\n\tdisplay: inline-flex;\n}\n\n.track {\n\tcolor: var(--track-color);\n\topacity: 30%;\n\tstroke-width: 10%;\n}\n\n.progress {\n\tcolor: var(--progress-color);\n\tstroke-dasharray: calc(var(--progress) * pi * 100% * 0.8) calc((1 - var(--progress)) * pi * 100% * 0.8);\n\tstroke-width: 10%;\n\tstroke-dashoffset: calc(pi * 100% * 0.8 * 0.25);\n}\n";
+
+class HTMLHarmonyElement extends HTMLElement {
+    initialized = false;
+    initElement() {
+        if (this.initialized) {
+            return;
+        }
+        this.initialized = true;
+        this.createElement();
+    }
+    createElement() {
+    }
+    connectedCallback() {
+        this.initElement();
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        this.initElement();
+        this.onAttributeChanged(name, oldValue, newValue);
+    }
+    onAttributeChanged(name, oldValue, newValue) {
+    }
+    static get observedAttributes() {
+        return ['label'];
+    }
+}
+
+class HTMLHarmonyCircularProgressElement extends HTMLHarmonyElement {
+    #shadowRoot;
+    #disabled = false;
+    #htmlLabel;
+    #htmlSVG;
+    #htmlTrack;
+    #htmlProgress;
+    #start = 0;
+    #end = Math.PI * 2;
+    #progress = 0.5;
+    createElement() {
+        this.#shadowRoot = this.attachShadow({ mode: 'closed' });
+        shadowRootStyle(this.#shadowRoot, circularProgressCSS);
+        I18n.observeElement(this.#shadowRoot);
+        this.#htmlLabel = createElement('div', {
+            parent: this.#shadowRoot,
+            class: 'label',
+        });
+        this.#htmlSVG = createElementNS('http://www.w3.org/2000/svg', 'svg', {
+            style: `--progress:${this.#progress};`,
+            parent: this.#shadowRoot,
+            childs: [
+                this.#htmlTrack = createElementNS('http://www.w3.org/2000/svg', 'circle', {
+                    class: 'track',
+                    attributes: {
+                        cx: '50%',
+                        cy: '50%',
+                        r: '40%',
+                        fill: 'none',
+                        'stroke-width': '10%',
+                        'shape-rendering': 'geometricPrecision',
+                        stroke: 'currentColor',
+                    }
+                }),
+                this.#htmlProgress = createElementNS('http://www.w3.org/2000/svg', 'circle', {
+                    class: 'progress',
+                    attributes: {
+                        cx: '50%',
+                        cy: '50%',
+                        r: '40%',
+                        fill: 'none',
+                        'stroke-width': '10%',
+                        'shape-rendering': 'geometricPrecision',
+                        stroke: 'currentColor',
+                    }
+                }),
+            ],
+        });
+        this.#refresh();
+    }
+    setProgress(progress) {
+        this.#progress = progress;
+        if (this.#htmlSVG) {
+            this.#htmlSVG.style.cssText = `--progress: ${progress}`;
+        }
+    }
+    #refresh() {
+        if (this.#htmlSVG) {
+            this.#htmlSVG.style.cssText = `--progress: ${this.#progress}`;
+        }
+    }
+    onAttributeChanged(name, oldValue, newValue) {
+        switch (name) {
+            case 'data-label':
+                if (this.#htmlLabel) {
+                    this.#htmlLabel.innerHTML = newValue;
+                }
+                this.#htmlLabel?.classList.remove('i18n');
+                break;
+            case 'data-i18n':
+                this.#htmlLabel?.setAttribute('data-i18n', newValue);
+                if (this.#htmlLabel) {
+                    this.#htmlLabel.innerHTML = newValue;
+                }
+                this.#htmlLabel?.classList.add('i18n');
+                break;
+        }
+    }
+    static get observedAttributes() {
+        return ['data-label', 'data-i18n'];
+    }
+}
+let definedCircularProgress = false;
+function defineHarmonyCircularProgress() {
+    if (window.customElements && !definedCircularProgress) {
+        customElements.define('harmony-circular-progress', class extends HTMLHarmonyCircularProgressElement {
+        });
+        customElements.define('h-cp', class extends HTMLHarmonyCircularProgressElement {
+        });
+        definedCircularProgress = true;
+        injectGlobalCss();
+    }
+}
+
 var radioCSS = ":host {\n\t--harmony-radio-shadow-button-border-radius: var(--harmony-radio-button-border-radius, 0.5rem);\n\tdisplay: inline-flex;\n\toverflow: hidden;\n\tuser-select: none;\n}\n\n.label {\n\tmargin: auto 0;\n\tfont-weight: bold;\n\tmargin-right: 0.25rem;\n}\n\n::slotted(button) {\n\tpadding: 0.5rem;\n\tcolor: var(--harmony-ui-text-primary);\n\tflex: auto;\n\tcursor: pointer;\n\tappearance: none;\n\tborder-style: solid;\n\tborder-width: 0.0625rem;\n\tborder-color: var(--harmony-ui-border-primary);\n\tborder-right-style: none;\n\tbackground-color: var(--harmony-ui-input-background-primary);\n\ttransition: background-color 0.2s linear;\n\tfont-size: 1rem;\n\toverflow: hidden;\n}\n\n::slotted(button:hover) {\n\tbackground-color: var(--harmony-ui-input-background-secondary);\n}\n\n::slotted(button[selected]) {\n\tbackground-color: var(--harmony-ui-accent-primary);\n}\n\n::slotted(button[selected]:hover) {\n\tbackground-color: var(--harmony-ui-accent-secondary);\n}\n\n::slotted(button:first-of-type) {\n\tborder-radius: var(--harmony-radio-shadow-button-border-radius) 0 0 var(--harmony-radio-shadow-button-border-radius);\n}\n\n::slotted(button:last-child) {\n\tborder-right-style: solid;\n\tborder-radius: 0 var(--harmony-radio-shadow-button-border-radius) var(--harmony-radio-shadow-button-border-radius) 0;\n}\n";
 
 class HTMLHarmonyRadioElement extends HTMLElement {
@@ -3476,31 +3603,6 @@ function defineHarmonySelect() {
 }
 
 var sliderCSS = ":host {\n\tdisplay: flex;\n}\n\nlabel {\n\twidth: var(--h-slider-label-width, auto);\n}\n\ninput[type=range] {\n\tflex: auto;\n}\n\ninput[type=number] {\n\tflex: 0 0 var(--h-slider-input-width, 4rem);\n\tfont-size: var(--h-slider-input-font-size, 1.2rem);\n\tmin-width: 0;\n\ttext-align: center;\n}\n";
-
-class HTMLHarmonyElement extends HTMLElement {
-    initialized = false;
-    initElement() {
-        if (this.initialized) {
-            return;
-        }
-        this.initialized = true;
-        this.createElement();
-    }
-    createElement() {
-    }
-    connectedCallback() {
-        this.initElement();
-    }
-    attributeChangedCallback(name, oldValue, newValue) {
-        this.initElement();
-        this.onAttributeChanged(name, oldValue, newValue);
-    }
-    onAttributeChanged(name, oldValue, newValue) {
-    }
-    static get observedAttributes() {
-        return ['label'];
-    }
-}
 
 class HTMLHarmonySliderElement extends HTMLHarmonyElement {
     #shadowRoot;
@@ -4244,6 +4346,7 @@ var index = /*#__PURE__*/Object.freeze({
     AddI18nElement: AddI18nElement,
     HTMLHarmony2dManipulatorElement: HTMLHarmony2dManipulatorElement,
     HTMLHarmonyAccordionElement: HTMLHarmonyAccordionElement,
+    HTMLHarmonyCircularProgressElement: HTMLHarmonyCircularProgressElement,
     HTMLHarmonyColorPickerElement: HTMLHarmonyColorPickerElement,
     HTMLHarmonyCopyElement: HTMLHarmonyCopyElement,
     HTMLHarmonyFileInputElement: HTMLHarmonyFileInputElement,
@@ -4276,6 +4379,7 @@ var index = /*#__PURE__*/Object.freeze({
     createShadowRoot: createShadowRoot,
     defineHarmony2dManipulator: defineHarmony2dManipulator,
     defineHarmonyAccordion: defineHarmonyAccordion,
+    defineHarmonyCircularProgress: defineHarmonyCircularProgress,
     defineHarmonyColorPicker: defineHarmonyColorPicker,
     defineHarmonyCopy: defineHarmonyCopy,
     defineHarmonyFileInput: defineHarmonyFileInput,
@@ -4308,9 +4412,12 @@ var index = /*#__PURE__*/Object.freeze({
     visible: visible
 });
 
-var notificationsCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.notification {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tpadding: 0.1rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tflex-direction: column;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.notification-success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.notification-warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.notification-error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.notification-info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+var theme = "@media (prefers-color-scheme: light){\n\tbody{\n\t\t--theme-background-primary: #fff;\n\t\t--theme-background-secondary: #eee;\n\t\t--theme-background-tertiary: #c8c8c8;\n\t\t--theme-background-quaternary: #b1b1b1;\n\n\t\t--theme-background-primary-invert: #1b1b1b;\n\t\t--theme-background-secondary-invert: #101822;\n\t\t--theme-background-tertiary-invert: #343434;\n\t\t--theme-background-quaternary-invert: #4e4e4e;\n\n\t\t--theme-border-primary:  #cdcdcd;\n\t\t--theme-border-secondary:  #cdcdcd;\n\n\t\t--theme-text-primary: #1b1b1b;\n\t\t--theme-text-secondary: #4e4e4e;\n\t\t--theme-text-inactive: #9e9e9ea6;\n\t\t--theme-text-link: #0069c2;\n\t\t--theme-text-invert: #fff;\n\n\t\t--theme-accent-primary: #0085f2;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(0, 0, 0, 0.25);\n\n\t\t--theme-bg-color: #D7D3CB;\n\t\t--theme-popup-bg-color: #CCCCCC;\n\t\t--theme-text-color: #111111;\n\t\t--theme-text-bg-color: 238 238 238;\n\n\t\t--theme-text-color-warning:#ff6a00;\n\t\t--theme-filter-invert-light:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #D7D3CB;\n\t\t--theme-main-bg-color-dark: #DEDAD4;\n\t}\n}\n@media (prefers-color-scheme: dark){\n\tbody{\n\t\t--theme-background-primary: #1b1b1b;\n\t\t--theme-background-secondary: #101822;\n\t\t--theme-background-tertiary: #343434;\n\t\t--theme-background-quaternary: #4e4e4e;\n\n\t\t--theme-background-primary-invert: #fff;\n\t\t--theme-background-secondary-invert: #eee;\n\t\t--theme-background-tertiary-invert: #c8c8c8;\n\t\t--theme-background-quaternary-invert: #b1b1b1;\n\n\t\t--theme-border-primary:  #858585;\n\t\t--theme-border-secondary:  #696969;\n\n\t\t--theme-text-primary: #fff;\n\t\t--theme-text-secondary: #cdcdcd;\n\t\t--theme-text-inactive: #cdcdcda6;\n\t\t--theme-text-link: #8cb4ff;\n\t\t--theme-text-invert: #1b1b1b;\n\n\t\t--theme-accent-primary: #5e9eff;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(255, 255, 255, 0.25);\n\n\t\t--theme-bg-color: #21252b;\n\t\t--theme-popup-bg-color: #333333;\n\t\t--theme-text-color: #EEEEEE;\n\t\t--theme-text-bg-color: 17 17 17;\n\n\t\t--theme-text-color-warning:orange;\n\t\t--theme-filter-invert-dark:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #41454d;\n\t\t--theme-main-bg-color-dark: #21252b;\n\t}\n}\n";
 
-const NOTIFICATION_CLASSNAME = 'notification';
+var notificationsContainerCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n";
+
+var notificationsCSS = ":host {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n\r\n.type {\r\n\t/*\r\n\tpadding: 1rem;\r\n\t*/\r\n\twidth: 4rem;\r\n\theight: 4rem;\r\n\tposition: relative;\r\n}\r\n\r\n.type>* {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tposition: absolute;\r\n}\r\n\r\n.type>.svg {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n\tpadding: 0.2rem;\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+
 var NotificationsPlacement;
 (function (NotificationsPlacement) {
     NotificationsPlacement["Top"] = "top";
@@ -4338,91 +4445,124 @@ var NotificationEvents;
     NotificationEvents["Removed"] = "notificationremoved";
 })(NotificationEvents || (NotificationEvents = {}));
 class Notification {
-    #htmlElement;
-    content;
-    type;
+    #shadowRoot;
+    //#htmlElement?: HTMLElement;
+    #content;
+    #type;
     #id;
     #ttl = 0;
-    #htmlProgressBar;
+    #htmlType;
+    #htmlProgress;
     #parent;
     #start = 0;
     constructor(content, type, ttl, params) {
-        this.content = content;
-        this.type = type;
+        this.#content = content;
+        this.#type = type;
         //this.#setTtl(ttl);
         this.#ttl = ttl;
         this.#id = ++notificationId;
         this.#parent = params?.parent;
+        documentStyle(theme);
     }
     get htmlElement() {
-        if (this.#htmlElement) {
-            return this.#htmlElement;
+        if (this.#shadowRoot) {
+            return this.#shadowRoot.host;
+        }
+        defineHarmonyCircularProgress();
+        let svg = '';
+        switch (this.#type) {
+            case NotificationType.Error:
+                svg = errorSVG;
+                break;
+            case NotificationType.Info:
+                svg = infoSVG;
+                break;
+            case NotificationType.Warning:
+                svg = warningSVG;
+                break;
+            case NotificationType.Success:
+                svg = checkCircleSVG;
+                break;
         }
         let htmlElementContent;
-        this.#htmlElement = createElement('div', {
-            class: NOTIFICATION_CLASSNAME,
+        this.#shadowRoot = createShadowRoot('div', {
+            adoptStyle: notificationsCSS,
             childs: [
+                this.#htmlType = createElement('div', {
+                    class: 'type',
+                    childs: [
+                        this.#htmlProgress = createElement('h-cp', {
+                            class: 'progress',
+                        }),
+                        createElement('div', {
+                            class: 'svg',
+                            innerHTML: svg,
+                        }),
+                    ],
+                }),
+                htmlElementContent = createElement('div', {
+                    class: 'notification-content',
+                }),
+                createElement('div', {
+                    class: 'notification-copy',
+                    innerHTML: contentCopySVG,
+                    events: {
+                        click: async (event) => {
+                            try {
+                                if (navigator.clipboard) {
+                                    await navigator.clipboard.writeText(htmlElementContent.innerText);
+                                    event.target.parentElement?.classList.toggle('notification-copy-success');
+                                }
+                            }
+                            catch (e) {
+                                console.error(e);
+                            }
+                        },
+                    }
+                }),
+                createElement('div', {
+                    class: 'notification-close',
+                    innerHTML: closeSVG,
+                    events: {
+                        click: () => closeNotification(this),
+                    }
+                }),
+                /*
                 createElement('div', {
                     class: 'notification-line1',
-                    child: this.#htmlProgressBar = createElement('div', {
-                        class: 'notification-progress',
-                    }),
+                    child:
+                        this.#htmlProgressBar = createElement('div', {
+                            class: 'notification-progress',
+                        }),
                 }),
                 createElement('div', {
                     class: 'notification-line2',
                     childs: [
-                        htmlElementContent = createElement('div', {
-                            class: NOTIFICATION_CLASSNAME + '-content',
-                        }),
-                        createElement('div', {
-                            class: NOTIFICATION_CLASSNAME + '-copy',
-                            innerHTML: contentCopySVG,
-                            events: {
-                                click: async (event) => {
-                                    try {
-                                        if (this.#htmlElement && navigator.clipboard) {
-                                            await navigator.clipboard.writeText(this.#htmlElement.innerText);
-                                            event.target.parentElement?.classList.toggle(NOTIFICATION_CLASSNAME + '-copy-success');
-                                        }
-                                    }
-                                    catch (e) {
-                                        console.error(e);
-                                    }
-                                },
-                            }
-                        }),
-                        createElement('div', {
-                            class: NOTIFICATION_CLASSNAME + '-close',
-                            innerHTML: closeSVG,
-                            events: {
-                                click: () => closeNotification(this),
-                            }
-                        }),
                     ]
                 }),
+                */
             ]
         });
-        if (this.type) {
-            this.#htmlElement.classList.add(NOTIFICATION_CLASSNAME + '-' + this.type);
-        }
-        if (this.content instanceof HTMLElement) {
-            htmlElementContent.append(this.content);
+        this.#htmlType.classList.add(this.#type);
+        if (this.#content instanceof HTMLElement) {
+            htmlElementContent.append(this.#content);
         }
         else {
-            htmlElementContent.innerHTML = this.content;
+            htmlElementContent.innerHTML = this.#content;
         }
         if (this.#ttl != 0) {
             this.#start = performance.now();
             window.requestAnimationFrame(() => this.#run());
         }
-        return this.#htmlElement;
+        return this.#shadowRoot.host;
     }
     #run() {
         const now = performance.now();
         const elapsed = (now - this.#start);
-        const percent = elapsed / this.#ttl / 10;
-        if (percent < 100) {
-            this.#htmlProgressBar.style.width = `${100 - percent}%`;
+        const progress = elapsed / this.#ttl / 1000;
+        if (progress < 1) {
+            //this.#htmlProgressBar!.style.width = `${100 - percent}%`;
+            this.#htmlProgress?.setProgress(1 - progress);
             window.requestAnimationFrame(() => this.#run());
         }
         else {
@@ -4437,7 +4577,7 @@ class Notification {
 let htmlInner;
 createShadowRoot('div', {
     parent: document.body,
-    adoptStyle: notificationsCSS,
+    adoptStyle: notificationsContainerCSS,
     child: htmlInner = createElement('div'),
 });
 I18n.observeElement(htmlInner);
