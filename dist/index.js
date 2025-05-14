@@ -1,4 +1,4 @@
-import { createShadowRoot, createElement, I18n, documentStyle, defineHarmonyCircularProgress, hide, show } from 'harmony-ui';
+import { createShadowRoot, createElement, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show } from 'harmony-ui';
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
 import { vec2 } from 'gl-matrix';
 
@@ -90,6 +90,7 @@ class Notification {
                     childs: [
                         this.#htmlProgress = createElement('h-cp', {
                             class: 'progress',
+                            hidden: true,
                         }),
                         createElement('div', {
                             class: 'svg',
@@ -138,7 +139,8 @@ class Notification {
                     ]
                 }),
                 */
-            ]
+            ],
+            $click: () => this.#ttl = 0,
         });
         this.#htmlType.classList.add(this.#type);
         if (this.#content instanceof HTMLElement) {
@@ -154,6 +156,10 @@ class Notification {
         return this.#shadowRoot.host;
     }
     #run() {
+        display(this.#htmlProgress, this.#ttl > 0);
+        if (this.#ttl <= 0) {
+            return;
+        }
         const now = performance.now();
         const elapsed = (now - this.#start);
         const progress = elapsed / this.#ttl / 1000;
