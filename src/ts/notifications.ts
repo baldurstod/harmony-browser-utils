@@ -204,7 +204,7 @@ export function closeNotification(notification: Notification | number) {
 		notification = notifications.get(notification)!;
 	}
 
-	if (notification) {
+	if (notification && notifications.has(notification.id)) {
 		notifications.delete(notification.id);
 		notification.htmlElement.remove();
 

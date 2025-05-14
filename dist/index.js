@@ -158,12 +158,10 @@ class Notification {
         const elapsed = (now - this.#start);
         const progress = elapsed / this.#ttl / 1000;
         if (progress < 1) {
-            //this.#htmlProgressBar!.style.width = `${100 - percent}%`;
             this.#htmlProgress?.setProgress(1 - progress);
             window.requestAnimationFrame(() => this.#run());
         }
         else {
-            //setTimeout(() => closeNotification(this), this.#ttl * 1000);
             closeNotification(this);
         }
     }
@@ -194,7 +192,7 @@ function closeNotification(notification) {
     if (typeof notification == 'number') {
         notification = notifications.get(notification);
     }
-    if (notification) {
+    if (notification && notifications.has(notification.id)) {
         notifications.delete(notification.id);
         notification.htmlElement.remove();
         Controller.dispatchEvent(new CustomEvent(NotificationEvents.Removed, { detail: { notification: notification } }));
