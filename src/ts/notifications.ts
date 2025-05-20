@@ -46,6 +46,7 @@ export class Notification {
 	#id: number;
 	#ttl: number = 0;
 	#htmlType?: HTMLElement;
+	#htmlContent?: HTMLElement;
 	#htmlProgress?: HTMLHarmonyCircularProgressElement;
 	#parent?: HTMLElement | ShadowRoot;
 	#start: number = 0;
@@ -83,7 +84,6 @@ export class Notification {
 				break;
 		}
 
-		let htmlElementContent: HTMLElement;
 		this.#shadowRoot = createShadowRoot('div', {
 			adoptStyle: notificationsCSS,
 			childs: [
@@ -100,21 +100,17 @@ export class Notification {
 						}),
 					],
 				}),
-				htmlElementContent = createElement('div', {
+				this.#htmlContent = createElement('div', {
 					class: 'notification-content',
+					$click: () => this.#copyContent(),
 				}),
 				createElement('div', {
 					class: 'notification-copy',
 					innerHTML: contentCopySVG,
 					events: {
 						click: async (event: Event) => {
-							try {
-								if (navigator.clipboard) {
-									await navigator.clipboard.writeText(htmlElementContent.innerText);
-									(event.target as HTMLElement).parentElement?.classList.toggle('notification-copy-success');
-								}
-							} catch (e) {
-								console.error(e);
+							if (await this.#copyContent()) {
+								(event.target as HTMLElement).parentElement?.classList.toggle('notification-copy-success');
 							}
 						},
 					}
@@ -148,9 +144,9 @@ export class Notification {
 
 
 		if (this.#content instanceof HTMLElement) {
-			htmlElementContent.append(this.#content);
+			this.#htmlContent.append(this.#content);
 		} else {
-			htmlElementContent.innerHTML = this.#content;
+			this.#htmlContent.innerHTML = this.#content;
 		}
 
 		if (this.#ttl != 0) {
@@ -158,6 +154,18 @@ export class Notification {
 			window.requestAnimationFrame(() => this.#run());
 		}
 		return this.#shadowRoot.host as HTMLElement;
+	}
+
+	async #copyContent(): Promise<boolean> {
+		try {
+			if (navigator.clipboard) {
+				await navigator.clipboard.writeText(this.#htmlContent!.innerText);
+				return true;
+			}
+		} catch (e) {
+			console.error(e);
+		}
+		return false;
 	}
 
 	#run() {
