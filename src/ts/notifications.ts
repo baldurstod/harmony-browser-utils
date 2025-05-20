@@ -1,5 +1,5 @@
-import { createElement, I18n, createShadowRoot, documentStyle, defineHarmonyCircularProgress, HTMLHarmonyCircularProgressElement, hide, display } from 'harmony-ui';
-import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG } from 'harmony-svg';
+import { createElement, I18n, createShadowRoot, documentStyle, defineHarmonyCircularProgress, HTMLHarmonyCircularProgressElement, hide, display, createElementNS, show } from 'harmony-ui';
+import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, fileExportSVG, infoSVG, warningSVG } from 'harmony-svg';
 import { themeCSS } from 'harmony-css';
 import notificationsContainerCSS from '../css/notificationcontainer.css';
 import notificationsCSS from '../css/notifications.css';
@@ -102,14 +102,14 @@ export class Notification {
 				}),
 				this.#htmlContent = createElement('div', {
 					class: 'notification-content',
-					$click: () => this.#copyContent(),
+					$click: (event: Event) => this.#copyContent(event as MouseEvent),
 				}),
 				createElement('div', {
 					class: 'notification-copy',
 					innerHTML: contentCopySVG,
 					events: {
 						click: async (event: Event) => {
-							if (await this.#copyContent()) {
+							if (await this.#copyContent(event as MouseEvent)) {
 								(event.target as HTMLElement).parentElement?.classList.toggle('notification-copy-success');
 							}
 						},
@@ -156,10 +156,11 @@ export class Notification {
 		return this.#shadowRoot.host as HTMLElement;
 	}
 
-	async #copyContent(): Promise<boolean> {
+	async #copyContent(event: MouseEvent): Promise<boolean> {
 		try {
 			if (navigator.clipboard) {
 				await navigator.clipboard.writeText(this.#htmlContent!.innerText);
+				copied(event.clientX, event.clientY);
 				return true;
 			}
 		} catch (e) {
@@ -191,10 +192,18 @@ export class Notification {
 }
 
 let htmlInner: HTMLElement;
+let htmlCopy: HTMLElement;
 const shadowRoot = createShadowRoot('div', {
 	parent: document.body,
 	adoptStyle: notificationsContainerCSS,
-	child: htmlInner = createElement('div'),
+	childs: [
+		htmlInner = createElement('div'),
+		htmlCopy = createElement('div', {
+			class: 'copy',
+			hidden: true,
+			innerHTML: fileExportSVG,
+		}),
+	],
 });
 I18n.observeElement(htmlInner);
 setNotificationsPlacement(NotificationsPlacement.TopRight);
@@ -230,4 +239,29 @@ const Controller = new EventTarget();
 
 export function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void {
 	Controller.addEventListener(type, callback, options);
+}
+
+let startCopy: number;
+let startY: number;
+function copied(x: number, y: number) {
+	startCopy = performance.now();
+	window.requestAnimationFrame(() => runCopy());
+	startY = y
+	htmlCopy.style.left = `${String(x)}px`;
+}
+
+const displacement = 30;
+const delay = 1000;
+function runCopy() {
+	const now = performance.now();
+	const elapsed = (now - startCopy);
+	const progress = elapsed / delay;
+
+	display(htmlCopy, progress < 1);
+
+	htmlCopy.style.top = `${String(startY - displacement * progress)}px`;
+
+	if (progress < 1) {
+		window.requestAnimationFrame(() => runCopy());
+	}
 }

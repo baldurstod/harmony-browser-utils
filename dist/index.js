@@ -1,5 +1,5 @@
 import { createShadowRoot, createElement, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show } from 'harmony-ui';
-import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
+import { fileExportSVG, contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
 import { vec2 } from 'gl-matrix';
 
 function SaveFile(file) {
@@ -11,9 +11,9 @@ function SaveFile(file) {
 
 var theme = "@media (prefers-color-scheme: light){\n\tbody{\n\t\t--theme-background-primary: #fff;\n\t\t--theme-background-secondary: #eee;\n\t\t--theme-background-tertiary: #c8c8c8;\n\t\t--theme-background-quaternary: #b1b1b1;\n\n\t\t--theme-background-primary-invert: #1b1b1b;\n\t\t--theme-background-secondary-invert: #101822;\n\t\t--theme-background-tertiary-invert: #343434;\n\t\t--theme-background-quaternary-invert: #4e4e4e;\n\n\t\t--theme-border-primary:  #cdcdcd;\n\t\t--theme-border-secondary:  #cdcdcd;\n\n\t\t--theme-text-primary: #1b1b1b;\n\t\t--theme-text-secondary: #4e4e4e;\n\t\t--theme-text-inactive: #9e9e9ea6;\n\t\t--theme-text-link: #0069c2;\n\t\t--theme-text-invert: #fff;\n\n\t\t--theme-accent-primary: #0085f2;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(0, 0, 0, 0.25);\n\n\t\t--theme-bg-color: #D7D3CB;\n\t\t--theme-popup-bg-color: #CCCCCC;\n\t\t--theme-text-color: #111111;\n\t\t--theme-text-bg-color: 238 238 238;\n\n\t\t--theme-text-color-warning:#ff6a00;\n\t\t--theme-filter-invert-light:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #D7D3CB;\n\t\t--theme-main-bg-color-dark: #DEDAD4;\n\t}\n}\n@media (prefers-color-scheme: dark){\n\tbody{\n\t\t--theme-background-primary: #1b1b1b;\n\t\t--theme-background-secondary: #101822;\n\t\t--theme-background-tertiary: #343434;\n\t\t--theme-background-quaternary: #4e4e4e;\n\n\t\t--theme-background-primary-invert: #fff;\n\t\t--theme-background-secondary-invert: #eee;\n\t\t--theme-background-tertiary-invert: #c8c8c8;\n\t\t--theme-background-quaternary-invert: #b1b1b1;\n\n\t\t--theme-border-primary:  #858585;\n\t\t--theme-border-secondary:  #696969;\n\n\t\t--theme-text-primary: #fff;\n\t\t--theme-text-secondary: #cdcdcd;\n\t\t--theme-text-inactive: #cdcdcda6;\n\t\t--theme-text-link: #8cb4ff;\n\t\t--theme-text-invert: #1b1b1b;\n\n\t\t--theme-accent-primary: #5e9eff;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(255, 255, 255, 0.25);\n\n\t\t--theme-bg-color: #21252b;\n\t\t--theme-popup-bg-color: #333333;\n\t\t--theme-text-color: #EEEEEE;\n\t\t--theme-text-bg-color: 17 17 17;\n\n\t\t--theme-text-color-warning:orange;\n\t\t--theme-filter-invert-dark:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #41454d;\n\t\t--theme-main-bg-color-dark: #21252b;\n\t}\n}\n";
 
-var notificationsContainerCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n";
+var notificationsContainerCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow: hidden;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.copy {\r\n\tposition: absolute;\r\n}\r\n\r\n.copy svg {\r\n\tleft: 1rem;\r\n\tposition: absolute;\r\n}\r\n";
 
-var notificationsCSS = ":host {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n\r\n.type {\r\n\t/*\r\n\tpadding: 1rem;\r\n\t*/\r\n\twidth: 4rem;\r\n\theight: 4rem;\r\n\tposition: relative;\r\n}\r\n\r\n.type>* {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tposition: absolute;\r\n}\r\n\r\n.type>.svg {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n\tpadding: 0.2rem;\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+var notificationsCSS = ":host {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n\r\n.type {\r\n\t/*\r\n\tpadding: 1rem;\r\n\t*/\r\n\twidth: 4rem;\r\n\theight: 4rem;\r\n\tposition: relative;\r\n}\r\n\r\n.type>* {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tposition: absolute;\r\n}\r\n\r\n.type>.svg {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n\tpadding: 0.2rem;\r\n\tcursor: copy;\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n\tcursor: copy;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
 
 var NotificationsPlacement;
 (function (NotificationsPlacement) {
@@ -49,6 +49,7 @@ class Notification {
     #id;
     #ttl = 0;
     #htmlType;
+    #htmlContent;
     #htmlProgress;
     #parent;
     #start = 0;
@@ -81,7 +82,6 @@ class Notification {
                 svg = checkCircleSVG;
                 break;
         }
-        let htmlElementContent;
         this.#shadowRoot = createShadowRoot('div', {
             adoptStyle: notificationsCSS,
             childs: [
@@ -98,22 +98,17 @@ class Notification {
                         }),
                     ],
                 }),
-                htmlElementContent = createElement('div', {
+                this.#htmlContent = createElement('div', {
                     class: 'notification-content',
+                    $click: (event) => this.#copyContent(event),
                 }),
                 createElement('div', {
                     class: 'notification-copy',
                     innerHTML: contentCopySVG,
                     events: {
                         click: async (event) => {
-                            try {
-                                if (navigator.clipboard) {
-                                    await navigator.clipboard.writeText(htmlElementContent.innerText);
-                                    event.target.parentElement?.classList.toggle('notification-copy-success');
-                                }
-                            }
-                            catch (e) {
-                                console.error(e);
+                            if (await this.#copyContent(event)) {
+                                event.target.parentElement?.classList.toggle('notification-copy-success');
                             }
                         },
                     }
@@ -144,16 +139,29 @@ class Notification {
         });
         this.#htmlType.classList.add(this.#type);
         if (this.#content instanceof HTMLElement) {
-            htmlElementContent.append(this.#content);
+            this.#htmlContent.append(this.#content);
         }
         else {
-            htmlElementContent.innerHTML = this.#content;
+            this.#htmlContent.innerHTML = this.#content;
         }
         if (this.#ttl != 0) {
             this.#start = performance.now();
             window.requestAnimationFrame(() => this.#run());
         }
         return this.#shadowRoot.host;
+    }
+    async #copyContent(event) {
+        try {
+            if (navigator.clipboard) {
+                await navigator.clipboard.writeText(this.#htmlContent.innerText);
+                copied(event.clientX, event.clientY);
+                return true;
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+        return false;
     }
     #run() {
         display(this.#htmlProgress, this.#ttl > 0);
@@ -176,10 +184,18 @@ class Notification {
     }
 }
 let htmlInner;
+let htmlCopy;
 createShadowRoot('div', {
     parent: document.body,
     adoptStyle: notificationsContainerCSS,
-    child: htmlInner = createElement('div'),
+    childs: [
+        htmlInner = createElement('div'),
+        htmlCopy = createElement('div', {
+            class: 'copy',
+            hidden: true,
+            innerHTML: fileExportSVG,
+        }),
+    ],
 });
 I18n.observeElement(htmlInner);
 setNotificationsPlacement(NotificationsPlacement.TopRight);
@@ -207,6 +223,26 @@ function closeNotification(notification) {
 const Controller = new EventTarget();
 function addNotificationEventListener(type, callback, options) {
     Controller.addEventListener(type, callback, options);
+}
+let startCopy;
+let startY;
+function copied(x, y) {
+    startCopy = performance.now();
+    window.requestAnimationFrame(() => runCopy());
+    startY = y;
+    htmlCopy.style.left = `${String(x)}px`;
+}
+const displacement = 30;
+const delay = 1000;
+function runCopy() {
+    const now = performance.now();
+    const elapsed = (now - startCopy);
+    const progress = elapsed / delay;
+    display(htmlCopy, progress < 1);
+    htmlCopy.style.top = `${String(startY - displacement * progress)}px`;
+    if (progress < 1) {
+        window.requestAnimationFrame(() => runCopy());
+    }
 }
 
 var optionsManagerCSS = ":host{\r\n\tposition: absolute;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: auto;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\ttop:0px;\r\n\tleft: 0px;\r\n}\r\n\r\n#options-manager-inner{\r\n\tposition: relative;\r\n\t/*background-color: rgba(255, 255, 255, 1.0);*/\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--main-text-color-dark2);\r\n\tpadding:10px;\r\n\toverflow: hidden;\r\n\tmax-height: 70%;\r\n\tmax-width: 75%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\topacity: 0.9;\r\n}\r\n\r\n#options-manager-inner h1{\r\n\ttext-transform: capitalize;\r\n\ttext-align: center;\r\n}\r\n\r\n#options-manager-inner-filter{\r\n\twidth:100%;\r\n}\r\n\r\n.options-manager-button{\r\n\tcursor:pointer;\r\n\twhite-space: nowrap;\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner table{\r\n\ttext-align: left;\r\n\toverflow: hidden auto;\r\n\tdisplay: block;\r\n\theight: 100%;\r\n}\r\n\r\n#options-manager-inner thead{\r\n\tposition: sticky;\r\n\t/*display: block;*/\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner thead th{\r\n\tposition: sticky;\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner th{\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner th button, #options-manager-inner td button{\r\n\twidth: 100%;\r\n}\r\n\r\n#options-manager-title{\r\n\tcursor:move;\r\n}\r\n\r\n[draggable=true] {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] *{\r\n\tcursor: initial;\r\n}\r\n\r\n#options-manager-outer kbd{\r\n\tbackground-color: #eee;\r\n\tborder-radius: 0.25rem;\r\n\tborder: 0.1rem solid #b4b4b4;\r\n\tbox-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;\r\n\tcolor: #333;\r\n\tdisplay: inline-block;\r\n\tline-height: 1;\r\n\tpadding: 0.15rem;\r\n\twhite-space: nowrap;\r\n\tfont-weight: 1000;\r\n\tfont-size: 1.3rem;\r\n}\r\n";

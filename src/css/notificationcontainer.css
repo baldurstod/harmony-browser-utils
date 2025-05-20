@@ -2,7 +2,7 @@
 	position: fixed;
 	z-index: 10000;
 	display: flex;
-	overflow-y: auto;
+	overflow: hidden;
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
@@ -49,4 +49,13 @@
 	bottom: 0;
 	padding: 1rem;
 	flex-direction: column-reverse;
+}
+
+.copy {
+	position: absolute;
+}
+
+.copy svg {
+	left: 1rem;
+	position: absolute;
 }

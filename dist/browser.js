@@ -175,6 +175,8 @@ const contentCopySVG = '<svg height="24" viewBox="0 -960 960 960" width="24" fil
 
 const errorSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>';
 
+const fileExportSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-480ZM202-65l-56-57 118-118h-90v-80h226v226h-80v-89L202-65Zm278-15v-80h240v-440H520v-200H240v400h-80v-400q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H480Z"/></svg>';
+
 const folderOpenSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640H447l-80-80H160v480l96-320h684L837-217q-8 26-29.5 41.5T760-160H160Zm84-80h516l72-240H316l-72 240Zm0 0 72-240-72 240Zm-84-400v-80 80Z"/></svg>';
 
 const infoSVG = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>';
@@ -4414,9 +4416,9 @@ var index = /*#__PURE__*/Object.freeze({
 
 var theme = "@media (prefers-color-scheme: light){\n\tbody{\n\t\t--theme-background-primary: #fff;\n\t\t--theme-background-secondary: #eee;\n\t\t--theme-background-tertiary: #c8c8c8;\n\t\t--theme-background-quaternary: #b1b1b1;\n\n\t\t--theme-background-primary-invert: #1b1b1b;\n\t\t--theme-background-secondary-invert: #101822;\n\t\t--theme-background-tertiary-invert: #343434;\n\t\t--theme-background-quaternary-invert: #4e4e4e;\n\n\t\t--theme-border-primary:  #cdcdcd;\n\t\t--theme-border-secondary:  #cdcdcd;\n\n\t\t--theme-text-primary: #1b1b1b;\n\t\t--theme-text-secondary: #4e4e4e;\n\t\t--theme-text-inactive: #9e9e9ea6;\n\t\t--theme-text-link: #0069c2;\n\t\t--theme-text-invert: #fff;\n\n\t\t--theme-accent-primary: #0085f2;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(0, 0, 0, 0.25);\n\n\t\t--theme-bg-color: #D7D3CB;\n\t\t--theme-popup-bg-color: #CCCCCC;\n\t\t--theme-text-color: #111111;\n\t\t--theme-text-bg-color: 238 238 238;\n\n\t\t--theme-text-color-warning:#ff6a00;\n\t\t--theme-filter-invert-light:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #D7D3CB;\n\t\t--theme-main-bg-color-dark: #DEDAD4;\n\t}\n}\n@media (prefers-color-scheme: dark){\n\tbody{\n\t\t--theme-background-primary: #1b1b1b;\n\t\t--theme-background-secondary: #101822;\n\t\t--theme-background-tertiary: #343434;\n\t\t--theme-background-quaternary: #4e4e4e;\n\n\t\t--theme-background-primary-invert: #fff;\n\t\t--theme-background-secondary-invert: #eee;\n\t\t--theme-background-tertiary-invert: #c8c8c8;\n\t\t--theme-background-quaternary-invert: #b1b1b1;\n\n\t\t--theme-border-primary:  #858585;\n\t\t--theme-border-secondary:  #696969;\n\n\t\t--theme-text-primary: #fff;\n\t\t--theme-text-secondary: #cdcdcd;\n\t\t--theme-text-inactive: #cdcdcda6;\n\t\t--theme-text-link: #8cb4ff;\n\t\t--theme-text-invert: #1b1b1b;\n\n\t\t--theme-accent-primary: #5e9eff;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(255, 255, 255, 0.25);\n\n\t\t--theme-bg-color: #21252b;\n\t\t--theme-popup-bg-color: #333333;\n\t\t--theme-text-color: #EEEEEE;\n\t\t--theme-text-bg-color: 17 17 17;\n\n\t\t--theme-text-color-warning:orange;\n\t\t--theme-filter-invert-dark:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #41454d;\n\t\t--theme-main-bg-color-dark: #21252b;\n\t}\n}\n";
 
-var notificationsContainerCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow-y: auto;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n";
+var notificationsContainerCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow: hidden;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.copy {\r\n\tposition: absolute;\r\n}\r\n\r\n.copy svg {\r\n\tleft: 1rem;\r\n\tposition: absolute;\r\n}\r\n";
 
-var notificationsCSS = ":host {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n\r\n.type {\r\n\t/*\r\n\tpadding: 1rem;\r\n\t*/\r\n\twidth: 4rem;\r\n\theight: 4rem;\r\n\tposition: relative;\r\n}\r\n\r\n.type>* {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tposition: absolute;\r\n}\r\n\r\n.type>.svg {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n\tpadding: 0.2rem;\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
+var notificationsCSS = ":host {\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--theme-text-color);\r\n\tfont-size: 1.5rem;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n}\r\n\r\n.type {\r\n\t/*\r\n\tpadding: 1rem;\r\n\t*/\r\n\twidth: 4rem;\r\n\theight: 4rem;\r\n\tposition: relative;\r\n}\r\n\r\n.type>* {\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tposition: absolute;\r\n}\r\n\r\n.type>.svg {\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n}\r\n\r\n.notification-line1 {\r\n\tdisplay: flex;\r\n\twidth: 100%;\r\n\tbackground-color: black;\r\n}\r\n\r\n.notification-progress {\r\n\theight: 0.2rem;\r\n\twidth: 100%;\r\n\tbackground-color: red;\r\n}\r\n\r\n.notification-error .notification-progress {\r\n\tbackground-color: blue;\r\n}\r\n\r\n.notification-line2 {\r\n\tdisplay: flex;\r\n}\r\n\r\n.notification-content {\r\n\toverflow: auto;\r\n\tflex: 1;\r\n\tmax-width: calc(100% - 20px);\r\n\tpadding: 0.2rem;\r\n\tcursor: copy;\r\n}\r\n\r\n.notification-close {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n}\r\n\r\n.notification-copy {\r\n\tfill: currentColor;\r\n\tcursor: pointer;\r\n\ttransition: all 0.3s ease-in 0s;\r\n\tcursor: copy;\r\n}\r\n\r\n.notification-copy-success {\r\n\ttransform: rotate(1turn);\r\n}\r\n\r\n.notification-close>svg {\r\n\twidth: 20px;\r\n\tmargin: 5px;\r\n}\r\n\r\n.success {\r\n\tbackground-color: #5aa822ff;\r\n}\r\n\r\n.warning {\r\n\tbackground-color: #c78a17ff;\r\n}\r\n\r\n.error {\r\n\tbackground-color: #c71717ff;\r\n}\r\n\r\n.info {\r\n\tbackground-color: #2e88e8ff;\r\n}\r\n";
 
 var NotificationsPlacement;
 (function (NotificationsPlacement) {
@@ -4452,6 +4454,7 @@ class Notification {
     #id;
     #ttl = 0;
     #htmlType;
+    #htmlContent;
     #htmlProgress;
     #parent;
     #start = 0;
@@ -4484,7 +4487,6 @@ class Notification {
                 svg = checkCircleSVG;
                 break;
         }
-        let htmlElementContent;
         this.#shadowRoot = createShadowRoot('div', {
             adoptStyle: notificationsCSS,
             childs: [
@@ -4501,22 +4503,17 @@ class Notification {
                         }),
                     ],
                 }),
-                htmlElementContent = createElement('div', {
+                this.#htmlContent = createElement('div', {
                     class: 'notification-content',
+                    $click: (event) => this.#copyContent(event),
                 }),
                 createElement('div', {
                     class: 'notification-copy',
                     innerHTML: contentCopySVG,
                     events: {
                         click: async (event) => {
-                            try {
-                                if (navigator.clipboard) {
-                                    await navigator.clipboard.writeText(htmlElementContent.innerText);
-                                    event.target.parentElement?.classList.toggle('notification-copy-success');
-                                }
-                            }
-                            catch (e) {
-                                console.error(e);
+                            if (await this.#copyContent(event)) {
+                                event.target.parentElement?.classList.toggle('notification-copy-success');
                             }
                         },
                     }
@@ -4547,16 +4544,29 @@ class Notification {
         });
         this.#htmlType.classList.add(this.#type);
         if (this.#content instanceof HTMLElement) {
-            htmlElementContent.append(this.#content);
+            this.#htmlContent.append(this.#content);
         }
         else {
-            htmlElementContent.innerHTML = this.#content;
+            this.#htmlContent.innerHTML = this.#content;
         }
         if (this.#ttl != 0) {
             this.#start = performance.now();
             window.requestAnimationFrame(() => this.#run());
         }
         return this.#shadowRoot.host;
+    }
+    async #copyContent(event) {
+        try {
+            if (navigator.clipboard) {
+                await navigator.clipboard.writeText(this.#htmlContent.innerText);
+                copied(event.clientX, event.clientY);
+                return true;
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+        return false;
     }
     #run() {
         display(this.#htmlProgress, this.#ttl > 0);
@@ -4579,10 +4589,18 @@ class Notification {
     }
 }
 let htmlInner;
+let htmlCopy;
 createShadowRoot('div', {
     parent: document.body,
     adoptStyle: notificationsContainerCSS,
-    child: htmlInner = createElement('div'),
+    childs: [
+        htmlInner = createElement('div'),
+        htmlCopy = createElement('div', {
+            class: 'copy',
+            hidden: true,
+            innerHTML: fileExportSVG,
+        }),
+    ],
 });
 I18n.observeElement(htmlInner);
 setNotificationsPlacement(NotificationsPlacement.TopRight);
@@ -4610,6 +4628,26 @@ function closeNotification(notification) {
 const Controller = new EventTarget();
 function addNotificationEventListener(type, callback, options) {
     Controller.addEventListener(type, callback, options);
+}
+let startCopy;
+let startY;
+function copied(x, y) {
+    startCopy = performance.now();
+    window.requestAnimationFrame(() => runCopy());
+    startY = y;
+    htmlCopy.style.left = `${String(x)}px`;
+}
+const displacement = 30;
+const delay = 1000;
+function runCopy() {
+    const now = performance.now();
+    const elapsed = (now - startCopy);
+    const progress = elapsed / delay;
+    display(htmlCopy, progress < 1);
+    htmlCopy.style.top = `${String(startY - displacement * progress)}px`;
+    if (progress < 1) {
+        window.requestAnimationFrame(() => runCopy());
+    }
 }
 
 /**
