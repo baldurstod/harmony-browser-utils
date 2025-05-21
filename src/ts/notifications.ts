@@ -1,5 +1,5 @@
-import { createElement, I18n, createShadowRoot, documentStyle, defineHarmonyCircularProgress, HTMLHarmonyCircularProgressElement, hide, display, createElementNS, show } from 'harmony-ui';
-import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, fileExportSVG, infoSVG, warningSVG } from 'harmony-svg';
+import { createElement, I18n, createShadowRoot, documentStyle, defineHarmonyCircularProgress, HTMLHarmonyCircularProgressElement, display } from 'harmony-ui';
+import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG } from 'harmony-svg';
 import { themeCSS } from 'harmony-css';
 import notificationsContainerCSS from '../css/notificationcontainer.css';
 import notificationsCSS from '../css/notifications.css';
@@ -201,7 +201,7 @@ const shadowRoot = createShadowRoot('div', {
 		htmlCopy = createElement('div', {
 			class: 'copy',
 			hidden: true,
-			innerHTML: fileExportSVG,
+			innerHTML: contentCopySVG,
 		}),
 	],
 });

@@ -53,9 +53,8 @@
 
 .copy {
 	position: absolute;
-}
-
-.copy svg {
-	left: 1rem;
-	position: absolute;
+	color: white;
+	background-color: blue;
+	border-radius: 0.5rem;
+	padding: 0.2rem;
 }
