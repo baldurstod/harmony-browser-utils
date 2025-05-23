@@ -343,7 +343,7 @@ class OptionsManager extends EventTarget {
             dv.type = type;
         }
         if (defaultValue !== undefined) {
-            dv.dv = defaultValue;
+            dv.defaultValue = defaultValue;
         }
         if (datalist !== undefined) {
             dv.datalist = datalist;
@@ -474,7 +474,7 @@ class OptionsManager extends EventTarget {
             }
         }
         if (this.#defaultValues.get(name)) {
-            return this.#defaultValues.get(name)?.dv;
+            return this.#defaultValues.get(name)?.defaultValue;
         }
     }
     removeItem(name) {
@@ -494,7 +494,7 @@ class OptionsManager extends EventTarget {
     resetItem(name) {
         const item = this.#defaultValues.get(name);
         if (item) {
-            const defaultValue = item.dv;
+            const defaultValue = item.defaultValue;
             this.#currentValues.delete(name);
             this.setItem(name, defaultValue);
         }
@@ -603,7 +603,7 @@ class OptionsManager extends EventTarget {
         const htmlDefaultValueCell = createElement('td');
         const htmlUserValueCell = createElement('td');
         const myValue = this.getItem(option.name);
-        this.#fillCell(htmlDefaultValueCell, option.type, option.dv);
+        this.#fillCell(htmlDefaultValueCell, option.type, option.defaultValue);
         createElement('button', {
             class: 'options-manager-button',
             i18n: '#reset',
@@ -712,7 +712,7 @@ class OptionsManager extends EventTarget {
             return;
         }
         const showHideResetButton = () => {
-            let defaultValue = this.#defaultValues.get(optionName)?.dv;
+            let defaultValue = this.#defaultValues.get(optionName)?.defaultValue;
             defaultValue = defaultValue === undefined ? undefined : JSON.stringify(defaultValue);
             let optionValue = this.getItem(optionName);
             optionValue = optionValue === null ? null : JSON.stringify(optionValue);

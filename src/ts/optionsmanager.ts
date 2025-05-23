@@ -2,7 +2,7 @@ import { vec2 } from 'gl-matrix';
 import { createElement, hide, show, I18n, createShadowRoot } from 'harmony-ui';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
-export type Option = { name: string, editable: boolean, type: string, dv?: string, datalist?: Array<any>, context?: string, protected?: boolean };
+export type Option = { name: string, editable: boolean, type: string, defaultValue?: string, datalist?: Array<any>, context?: string, protected?: boolean };
 export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 export type OptionMap = { [key: string]: OptionValue };
 export type SubOption = { [key: string]: Option };
@@ -112,7 +112,7 @@ export class OptionsManager extends EventTarget {
 			dv.type = type;
 		}
 		if (defaultValue !== undefined) {
-			dv.dv = defaultValue;
+			dv.defaultValue = defaultValue;
 		}
 		if (datalist !== undefined) {
 			dv.datalist = datalist;
@@ -246,7 +246,7 @@ export class OptionsManager extends EventTarget {
 			}
 		}
 		if (this.#defaultValues.get(name)) {
-			return this.#defaultValues.get(name)?.dv;
+			return this.#defaultValues.get(name)?.defaultValue;
 		}
 	}
 
@@ -267,7 +267,7 @@ export class OptionsManager extends EventTarget {
 	resetItem(name: string) {
 		const item = this.#defaultValues.get(name);
 		if (item) {
-			const defaultValue = item.dv;
+			const defaultValue = item.defaultValue;
 			this.#currentValues.delete(name);
 			this.setItem(name, defaultValue);
 		}
@@ -396,7 +396,7 @@ export class OptionsManager extends EventTarget {
 
 		const myValue = this.getItem(option.name);
 
-		this.#fillCell(htmlDefaultValueCell, option.type, option.dv);
+		this.#fillCell(htmlDefaultValueCell, option.type, option.defaultValue);
 
 		const resetButton = createElement('button', {
 			class: 'options-manager-button',
@@ -525,7 +525,7 @@ export class OptionsManager extends EventTarget {
 			return;
 		}
 		const showHideResetButton = () => {
-			let defaultValue = this.#defaultValues.get(optionName)?.dv;
+			let defaultValue = this.#defaultValues.get(optionName)?.defaultValue;
 			defaultValue = defaultValue === undefined ? undefined : JSON.stringify(defaultValue);
 			let optionValue = this.getItem(optionName);
 			optionValue = optionValue === null ? null : JSON.stringify(optionValue);

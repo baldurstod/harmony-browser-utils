@@ -56,7 +56,7 @@ declare type Option_2 = {
     name: string;
     editable: boolean;
     type: string;
-    dv?: string;
+    defaultValue?: string;
     datalist?: Array<any>;
     context?: string;
     protected?: boolean;
