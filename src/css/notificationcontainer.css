@@ -11,6 +11,9 @@
 .inner {
 	position: absolute;
 	display: flex;
+}
+
+.inner>* {
 	pointer-events: all;
 }
 
