@@ -169,6 +169,10 @@ export class Notification {
 		return false;
 	}
 
+	close() {
+		closeNotification(this);
+	}
+
 	#run() {
 		display(this.#htmlProgress, this.#ttl > 0);
 		if (this.#ttl <= 0) {

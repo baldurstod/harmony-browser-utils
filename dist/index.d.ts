@@ -12,6 +12,7 @@ declare class Notification_2 {
     #private;
     constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams);
     get htmlElement(): HTMLElement;
+    close(): void;
     get id(): number;
 }
 export { Notification_2 as Notification }
