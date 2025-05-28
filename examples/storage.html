@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Test</title>
+	<style>
+		html {
+			width: 100%;
+			height: 100%;
+		}
+
+		body {
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			background-color: black;
+		}
+	</style>
+</head>
+
+<body>
+	<script type="module">
+		import { PersistentStorage } from '../dist/browser.js';
+
+		//const storage = getStorage();
+
+		//const directory = await navigator.storage.getDirectory('/test');
+		//console.info(directory);
+		PersistentStorage.removeDirectory('/test1', true);
+		PersistentStorage.createDirectory('/');
+		const dir = await PersistentStorage.createDirectory('/test1/test2/test3/');
+		const file = await PersistentStorage.createFile('/test1/test2/test3/test4.ext');
+		const f = await PersistentStorage.readFile('/test1/test2/test3/test4.ext');
+		console.info(dir, file, f);
+
+		PersistentStorage.showPanel();
+
+	</script>
+</body>
+
+</html>
