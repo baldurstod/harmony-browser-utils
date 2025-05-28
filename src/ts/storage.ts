@@ -1,4 +1,4 @@
-import { createElement, createShadowRoot, defineHarmonyTree, hide, HTMLHarmonyTreeElement, TreeElement } from 'harmony-ui';
+import { createElement, createShadowRoot, defineHarmonyTree, hide, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeElement } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
 export const SEPARATOR = '/';
@@ -26,8 +26,23 @@ export class PersistentStorage {
 		this.#shadowRoot = createShadowRoot('persistent-storage', {
 			parent: document.body,
 			adoptStyle: storageCSS,
-			child: this.#htmlTree = createElement('harmony-tree') as HTMLHarmonyTreeElement,
-			//$click: () => hide(this.#shadowRoot?.host as HTMLElement),
+			child: this.#htmlTree = createElement('harmony-tree', {
+				$contextmenu: (event: CustomEvent<TreeContextMenuEventData>) => {
+					console.info(event, event.detail.item);
+					event.detail.buildContextMenu(
+						{
+							path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
+							delete: {
+								i18n: '#delete', f: () => {
+									if (event.detail.item) {
+										//this.#deleteItem(event.detail.item);
+									}
+								}
+							},
+						}
+					)
+				}
+			}) as HTMLHarmonyTreeElement,
 		});
 	}
 
@@ -78,11 +93,11 @@ export class PersistentStorage {
 		return false;
 	}
 
-	static async removeFile(path: string): Promise<boolean> {
+	static async deleteFile(path: string): Promise<boolean> {
 		return await this.#removeEntry(path, 'file', false);
 	}
 
-	static async removeDirectory(path: string, recursive: boolean): Promise<boolean> {
+	static async deleteDirectory(path: string, recursive: boolean): Promise<boolean> {
 		return await this.#removeEntry(path, 'directory', recursive);
 	}
 
@@ -135,16 +150,16 @@ export class PersistentStorage {
 		return root;
 	}
 
-	static async #getElement(entry: FileSystemHandle): Promise<TreeElement> {
+	static async #getElement(entry: FileSystemHandle, parent?: TreeElement): Promise<TreeElement> {
 		const childs: Array<TreeElement> | undefined = [];
+		const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
 		if (entry.kind == 'directory') {
 			for await (const [key, value] of (entry as FileSystemDirectoryHandle).entries()) {
-				console.info(key, value);
-				childs.push(await this.#getElement(value));
+				//console.info(key, value);
+				childs.push(await this.#getElement(value, tree));
 			}
-
 		}
-		return { name: entry.name, childs: childs };
+		return tree;
 	}
 }
 
