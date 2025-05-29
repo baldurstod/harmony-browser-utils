@@ -9,6 +9,11 @@ export enum EntryType {
 }
 
 
+export type StorageFilter = {
+
+}
+
+// TODO: use FileSystemObserver?
 export class PersistentStorage {
 	static #shadowRoot?: ShadowRoot;
 	static #htmlTree?: HTMLHarmonyTreeElement;
@@ -46,29 +51,75 @@ export class PersistentStorage {
 		});
 	}
 
-	static async createDirectory(path: string): Promise<FileSystemDirectoryHandle> {
-		path = cleanPath(path);
+	static async createFile(path: string): Promise<FileSystemFileHandle | null> {
+		return this.#getHandle(path, 'file', true) as Promise<FileSystemFileHandle | null>;
+	}
 
-		const splittedPath = path.split(SEPARATOR);
-		console.info(splittedPath);
+	static async createDirectory(path: string): Promise<FileSystemDirectoryHandle | null> {
+		return this.#getHandle(path, 'directory', true) as Promise<FileSystemDirectoryHandle | null>;
+	}
 
-		let current = await navigator.storage.getDirectory();
-		for (const subPath of path.split(SEPARATOR)) {
-			if (subPath == '') {
-				continue;
+	static async deleteFile(path: string): Promise<boolean> {
+		return await this.#removeEntry(path, 'file', false);
+	}
+
+	static async deleteDirectory(path: string, recursive: boolean): Promise<boolean> {
+		return await this.#removeEntry(path, 'directory', recursive);
+	}
+
+	static async clear(): Promise<boolean> {
+		try {
+			// TODO: use remove() if it is ever standardized
+			const root = await navigator.storage.getDirectory();
+			for await (const key of root.keys()) {
+				await root.removeEntry(key, { recursive: true });
 			}
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
 
-			current = await current.getDirectoryHandle(subPath, { create: true });
+	static async *listEntries(path: string, options: { recursive?: boolean, absolutePath?: boolean, directories: boolean, files: boolean } = { directories: true, files: true })/*: AsyncGenerator<never, number, unknown>*/ {
+		const entry = await this.#getHandle(path, 'directory', true);
+		if (!entry || entry.kind == 'file') {
+			return null;
 		}
 
-		return current;
+		//let curent =
+		const stack: Array<FileSystemHandle> = [entry];
+		let current: FileSystemHandle | undefined;
+		do {
+			current = stack.pop();
+			if (current) {
+				/*
+				if ((filter === undefined) || current.#matchFilter(filter)) {
+					childs.add(current);
+				}
+					*/
+				/*
+			for (const [_, child] of current.#childs) {
+				}
+				*/
+
+				if (options.recursive && current.kind == 'directory') {
+					for await (const handle of (current as FileSystemDirectoryHandle).values()) {
+						stack.push(handle);
+						yield handle;
+					}
+				}
+			}
+		} while (current);
+
+		//return await this.#removeEntry(path, 'directory', recursive);
+		return null;
 	}
 
 	static async #removeEntry(path: string, kind: FileSystemHandleKind, recursive: boolean): Promise<boolean> {
 		path = cleanPath(path);
 
 		const splittedPath = path.split(SEPARATOR);
-		console.info(splittedPath);
+		//console.info(splittedPath);
 
 		let current = await navigator.storage.getDirectory();
 		const pathElements = path.split(SEPARATOR);
@@ -93,19 +144,11 @@ export class PersistentStorage {
 		return false;
 	}
 
-	static async deleteFile(path: string): Promise<boolean> {
-		return await this.#removeEntry(path, 'file', false);
-	}
-
-	static async deleteDirectory(path: string, recursive: boolean): Promise<boolean> {
-		return await this.#removeEntry(path, 'directory', recursive);
-	}
-
-	static async #getFileHandle(path: string, create: boolean): Promise<FileSystemFileHandle> {
+	static async #getHandle(path: string, kind: FileSystemHandleKind, create: boolean): Promise<FileSystemHandle | null> {
 		path = cleanPath(path);
 
 		const splittedPath = path.split(SEPARATOR);
-		console.info(splittedPath);
+		//console.info(splittedPath);
 
 		let current = await navigator.storage.getDirectory();
 		const pathElements = path.split(SEPARATOR);
@@ -118,16 +161,20 @@ export class PersistentStorage {
 			current = await current.getDirectoryHandle(subPath, { create: create });
 		}
 
-		return await current.getFileHandle(pathElements[pathElements.length - 1], { create: create });
-	}
-
-	static async createFile(path: string): Promise<FileSystemFileHandle> {
-		return this.#getFileHandle(path, true);
+		const name = pathElements[pathElements.length - 1];
+		if (name == '') {
+			return current;
+		}
+		if (kind == 'file') {
+			return await current.getFileHandle(name, { create: create });
+		} else {
+			return await current.getDirectoryHandle(name, { create: create });
+		}
 	}
 
 	static async readFile(path: string): Promise<File | null> {
 		try {
-			const fileHandle = await this.#getFileHandle(path, false);
+			const fileHandle = await this.#getHandle(path, 'file', false) as FileSystemFileHandle;
 			if (fileHandle) {
 				return await fileHandle.getFile();
 			}
