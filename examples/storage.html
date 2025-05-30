@@ -27,14 +27,27 @@
 
 		//const directory = await navigator.storage.getDirectory('/test');
 		//console.info(directory);
-		PersistentStorage.removeDirectory('/test1', true);
-		PersistentStorage.createDirectory('/');
-		const dir = await PersistentStorage.createDirectory('/test1/test2/test3/');
-		const file = await PersistentStorage.createFile('/test1/test2/test3/test4.ext');
+		await PersistentStorage.deleteDirectory('/a0', true);
+		//await PersistentStorage.clear();
+		//await PersistentStorage.createDirectory('/');
+		//const dir = await PersistentStorage.createDirectory('/test2/test2/test3/');
+		await PersistentStorage.createFile('/a0/a1/a2/a3.ext');
+		await PersistentStorage.createFile('/b0/b1/b2/b3.ext');
+		await PersistentStorage.createFile('/c0/c1/c2/c3.ext');
+		await PersistentStorage.createFile('/d0/d1/d2/d3.ext');
+		await PersistentStorage.createFile('/e0/e1/e2/e3.ext');
+		/*
 		const f = await PersistentStorage.readFile('/test1/test2/test3/test4.ext');
-		console.info(dir, file, f);
+		console.info(file, f);
+		*/
 
 		PersistentStorage.showPanel();
+
+		//PersistentStorage.resolve(await navigator.storage.getDirectory(), file);
+
+		for await (const fileHandle of PersistentStorage.listEntries('/', { recursive: true })) {
+			console.log(fileHandle);
+		}
 
 	</script>
 </body>

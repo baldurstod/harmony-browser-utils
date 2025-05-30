@@ -1,6 +1,30 @@
-import { createShadowRoot, createElement, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show } from 'harmony-ui';
+import { createElement, createShadowRoot, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show, defineHarmonyTree, TreeElement } from 'harmony-ui';
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
 import { vec2 } from 'gl-matrix';
+
+function loadScript(script) {
+    return new Promise((resolve) => {
+        createElement('script', {
+            src: script,
+            parent: document.body,
+            events: {
+                load: () => resolve(true),
+            }
+        });
+    });
+}
+async function loadScripts(scripts) {
+    const promises = [];
+    for (const script of scripts) {
+        promises.push(loadScript(script));
+    }
+    await Promise.all(promises);
+    return true;
+}
+
+function supportsPopover() {
+    return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
+}
 
 function SaveFile(file) {
     const link = document.createElement('a');
@@ -996,28 +1020,204 @@ class ShortcutHandler {
     }
 }
 
-function loadScript(script) {
-    return new Promise((resolve) => {
-        createElement('script', {
-            src: script,
-            parent: document.body,
-            events: {
-                load: () => resolve(true),
-            }
-        });
-    });
-}
-async function loadScripts(scripts) {
-    const promises = [];
-    for (const script of scripts) {
-        promises.push(loadScript(script));
+var storageCSS = ":host{\n\tdisplay: block;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-color: black;\n}\n";
+
+const SEPARATOR = '/';
+var EntryType;
+(function (EntryType) {
+    EntryType["File"] = "file";
+    EntryType["Directory"] = "directory";
+})(EntryType || (EntryType = {}));
+// TODO: use FileSystemObserver?
+class PersistentStorage {
+    static #shadowRoot;
+    static #htmlFilter;
+    static #htmlTree;
+    static #dirty = true;
+    static #filter = { name: '' };
+    static async estimate() {
+        return navigator.storage.estimate();
     }
-    await Promise.all(promises);
-    return true;
+    static #initPanel() {
+        if (this.#shadowRoot) {
+            return;
+        }
+        defineHarmonyTree();
+        this.#shadowRoot = createShadowRoot('persistent-storage', {
+            parent: document.body,
+            adoptStyle: storageCSS,
+            childs: [
+                this.#htmlFilter = createElement('input', {
+                    $input: (event) => this.#setFilter(event.target.value),
+                }),
+                this.#htmlTree = createElement('harmony-tree', {
+                    $contextmenu: (event) => {
+                        console.info(event, event.detail.item);
+                        event.detail.buildContextMenu({
+                            path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
+                            delete: {
+                                i18n: '#delete', f: () => {
+                                    if (event.detail.item) ;
+                                }
+                            },
+                        });
+                    }
+                }),
+            ],
+        });
+    }
+    static async createFile(path) {
+        return this.#getHandle(path, 'file', true);
+    }
+    static async createDirectory(path) {
+        return this.#getHandle(path, 'directory', true);
+    }
+    static async deleteFile(path) {
+        return await this.#removeEntry(path, 'file', false);
+    }
+    static async deleteDirectory(path, recursive) {
+        return await this.#removeEntry(path, 'directory', recursive);
+    }
+    static async clear() {
+        try {
+            // TODO: use remove() if it is ever standardized
+            const root = await navigator.storage.getDirectory();
+            for await (const key of root.keys()) {
+                await root.removeEntry(key, { recursive: true });
+            }
+        }
+        catch (e) {
+            return false;
+        }
+        return true;
+    }
+    static async *listEntries(path, options = {}) {
+        const entry = await this.#getHandle(path, 'directory', true);
+        if (!entry || entry.kind == 'file') {
+            return null;
+        }
+        const stack = [entry];
+        let current;
+        do {
+            current = stack.pop();
+            if (current) {
+                /*
+                if ((filter === undefined) || current.#matchFilter(filter)) {
+                    childs.add(current);
+                }
+                    */
+                if (options.recursive && current.kind == 'directory') {
+                    for await (const handle of current.values()) {
+                        stack.push(handle);
+                        yield handle;
+                    }
+                }
+            }
+        } while (current);
+        //return await this.#removeEntry(path, 'directory', recursive);
+        return null;
+    }
+    static async #removeEntry(path, kind, recursive) {
+        path = cleanPath(path);
+        path.split(SEPARATOR);
+        //console.info(splittedPath);
+        let current = await navigator.storage.getDirectory();
+        const pathElements = path.split(SEPARATOR);
+        for (let i = 0; i < pathElements.length - 1; i++) {
+            const subPath = pathElements[i];
+            if (subPath == '') {
+                continue;
+            }
+            current = await current.getDirectoryHandle(subPath, { create: false });
+        }
+        if (current.kind == kind) {
+            try {
+                await current.removeEntry(pathElements[pathElements.length - 1], { recursive: recursive });
+                return true;
+            }
+            catch (e) {
+                console.info(e);
+            }
+        }
+        return false;
+    }
+    static async #getHandle(path, kind, create) {
+        path = cleanPath(path);
+        path.split(SEPARATOR);
+        //console.info(splittedPath);
+        let current = await navigator.storage.getDirectory();
+        const pathElements = path.split(SEPARATOR);
+        for (let i = 0; i < pathElements.length - 1; i++) {
+            const subPath = pathElements[i];
+            if (subPath == '') {
+                continue;
+            }
+            current = await current.getDirectoryHandle(subPath, { create: create });
+        }
+        const name = pathElements[pathElements.length - 1];
+        if (name == '') {
+            return current;
+        }
+        if (kind == 'file') {
+            return await current.getFileHandle(name, { create: create });
+        }
+        else {
+            return await current.getDirectoryHandle(name, { create: create });
+        }
+    }
+    static async readFile(path) {
+        try {
+            const fileHandle = await this.#getHandle(path, 'file', false);
+            if (fileHandle) {
+                return await fileHandle.getFile();
+            }
+        }
+        catch (e) { }
+        return null;
+    }
+    static async showPanel() {
+        this.#initPanel();
+        this.#refresh();
+    }
+    static async #refresh() {
+        if (this.#dirty) {
+            this.#htmlTree?.setRoot(await this.#getRoot(await navigator.storage.getDirectory()));
+            this.#dirty = false;
+        }
+    }
+    static async #getRoot(entry) {
+        const root = await this.#getElement(entry);
+        root.isRoot = true;
+        return root;
+    }
+    static async #getElement(entry, parent) {
+        const childs = [];
+        const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
+        if (entry.kind == 'directory') {
+            for await (const [key, value] of entry.entries()) {
+                if (this.#matchFilter(value)) {
+                    childs.push(await this.#getElement(value, tree));
+                }
+            }
+        }
+        return tree;
+    }
+    static #setFilter(name) {
+        this.#filter.name = name;
+        this.#dirty = true;
+        this.#refresh();
+    }
+    static #matchFilter(entry) {
+        return entry.name.includes(this.#filter.name);
+    }
+}
+function cleanPath(path) {
+    if (!path.startsWith(SEPARATOR)) {
+        path = SEPARATOR + path;
+    }
+    path.replace(/\\/g, '/');
+    path.replace(/\/(\/)+/g, '/');
+    return path;
 }
 
-function supportsPopover() {
-    return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
-}
-
-export { Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, SaveFile, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, setNotificationsPlacement, supportsPopover };
+export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, PersistentStorage, SEPARATOR, SaveFile, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, setNotificationsPlacement, supportsPopover };

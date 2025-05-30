@@ -1,10 +1,3 @@
-function SaveFile(file) {
-    const link = document.createElement('a');
-    link.setAttribute('href', URL.createObjectURL(file));
-    link.setAttribute('download', file.name);
-    link.click();
-}
-
 function setTimeoutPromise(timeout, signal) {
     return new Promise((resolve, reject) => {
         const timeoutID = setTimeout(resolve, timeout);
@@ -660,7 +653,7 @@ function toBool(s) {
     return s === '1' || s === 'true';
 }
 
-var uiCSS = "@media (prefers-color-scheme: light) {\n\t:root:not(.light):not(.dark) {\n\t\t--harmony-ui-background-primary: #ccc;\n\t\t--harmony-ui-background-secondary: #f9f9fb;\n\t\t--harmony-ui-background-tertiary: #fff;\n\n\t\t--harmony-ui-input-background-primary: #aaa;\n\t\t--harmony-ui-input-background-secondary: #ccc;\n\t\t--harmony-ui-input-background-tertiary: #4e4e4e;\n\n\t\t--harmony-ui-border-primary: #222;\n\t\t--harmony-ui-border-secondary: #222;\n\n\t\t--harmony-ui-input-border-primary: #222;\n\t\t--harmony-ui-input-border-secondary: #222;\n\n\t\t--harmony-ui-text-primary: #222;\n\t\t--harmony-ui-text-secondary: #222;\n\t\t--harmony-ui-text-inactive: #9e9e9ea6;\n\t\t--harmony-ui-text-link: #0069c2;\n\t\t--harmony-ui-text-invert: #fff;\n\n\t\t--harmony-ui-accent-primary: #1072eb;\n\t\t--harmony-ui-accent-secondary: #1040c1;\n\n\t\t--harmony-ui-scrollbar-bg: transparent;\n\t\t--harmony-ui-scrollbar-color: rgba(0, 0, 0, 0.25);\n\t}\n}\n\n@media (prefers-color-scheme: dark) {\n\t:root:not(.light):not(.dark) {\n\t\t--harmony-ui-background-primary: #1b1b1b;\n\t\t--harmony-ui-background-secondary: #464747;\n\t\t--harmony-ui-background-tertiary: #4e4e4e;\n\n\t\t--harmony-ui-input-background-primary: #555;\n\t\t--harmony-ui-input-background-secondary: #333;\n\t\t--harmony-ui-input-background-tertiary: #fff;\n\n\t\t--harmony-ui-border-primary: #858585;\n\t\t--harmony-ui-border-secondary: #696969;\n\n\t\t--harmony-ui-input-border-primary: #aaa;\n\t\t--harmony-ui-input-border-secondary: #696969;\n\n\t\t--harmony-ui-text-primary: #fff;\n\t\t--harmony-ui-text-secondary: #cdcdcd;\n\t\t--harmony-ui-text-inactive: #cdcdcda6;\n\t\t--harmony-ui-text-link: #8cb4ff;\n\t\t--harmony-ui-text-invert: #1b1b1b;\n\n\t\t--harmony-ui-accent-primary: #1072eb;\n\t\t--harmony-ui-accent-secondary: #1040c1;\n\n\t\t--harmony-ui-scrollbar-bg: transparent;\n\t\t--harmony-ui-scrollbar-color: rgba(255, 255, 255, 0.25);\n\t}\n}\n\n:root.light {\n\t--harmony-ui-background-primary: #ccc;\n\t--harmony-ui-background-secondary: #f9f9fb;\n\t--harmony-ui-background-tertiary: #fff;\n\n\t--harmony-ui-input-background-primary: #aaa;\n\t--harmony-ui-input-background-secondary: #ccc;\n\t--harmony-ui-input-background-tertiary: #4e4e4e;\n\n\t--harmony-ui-border-primary: #222;\n\t--harmony-ui-border-secondary: #222;\n\n\t--harmony-ui-input-border-primary: #222;\n\t--harmony-ui-input-border-secondary: #222;\n\n\t--harmony-ui-text-primary: #222;\n\t--harmony-ui-text-secondary: #222;\n\t--harmony-ui-text-inactive: #9e9e9ea6;\n\t--harmony-ui-text-link: #0069c2;\n\t--harmony-ui-text-invert: #fff;\n\n\t--harmony-ui-accent-primary: #1072eb;\n\t--harmony-ui-accent-secondary: #1040c1;\n\n\t--harmony-ui-scrollbar-bg: transparent;\n\t--harmony-ui-scrollbar-color: rgba(0, 0, 0, 0.25);\n}\n\n:root.dark {\n\t--harmony-ui-background-primary: #1b1b1b;\n\t--harmony-ui-background-secondary: #464747;\n\t--harmony-ui-background-tertiary: #4e4e4e;\n\n\t--harmony-ui-input-background-primary: #555;\n\t--harmony-ui-input-background-secondary: #333;\n\t--harmony-ui-input-background-tertiary: #fff;\n\n\t--harmony-ui-border-primary: #858585;\n\t--harmony-ui-border-secondary: #696969;\n\n\t--harmony-ui-input-border-primary: #aaa;\n\t--harmony-ui-input-border-secondary: #696969;\n\n\t--harmony-ui-text-primary: #fff;\n\t--harmony-ui-text-secondary: #cdcdcd;\n\t--harmony-ui-text-inactive: #cdcdcda6;\n\t--harmony-ui-text-link: #8cb4ff;\n\t--harmony-ui-text-invert: #1b1b1b;\n\n\t--harmony-ui-accent-primary: #1072eb;\n\t--harmony-ui-accent-secondary: #1040c1;\n\n\t--harmony-ui-scrollbar-bg: transparent;\n\t--harmony-ui-scrollbar-color: rgba(255, 255, 255, 0.25);\n}\n";
+var uiCSS = "@media (prefers-color-scheme: light) {\n\t:root:not(.light):not(.dark) {\n\t\t--harmony-ui-background-primary: #ccc;\n\t\t--harmony-ui-background-secondary: #f9f9fb;\n\t\t--harmony-ui-background-tertiary: #fff;\n\n\t\t--harmony-ui-input-background-primary: #aaa;\n\t\t--harmony-ui-input-background-secondary: #ccc;\n\t\t--harmony-ui-input-background-tertiary: #4e4e4e;\n\n\t\t--harmony-ui-border-primary: #222;\n\t\t--harmony-ui-border-secondary: #222;\n\n\t\t--harmony-ui-input-border-primary: #222;\n\t\t--harmony-ui-input-border-secondary: #222;\n\n\t\t--harmony-ui-text-primary: #222;\n\t\t--harmony-ui-text-secondary: #222;\n\t\t--harmony-ui-text-inactive: #9e9e9ea6;\n\t\t--harmony-ui-text-link: #0069c2;\n\t\t--harmony-ui-text-invert: #fff;\n\n\t\t--harmony-ui-accent-primary: #1072eb;\n\t\t--harmony-ui-accent-secondary: #1040c1;\n\n\t\t--harmony-ui-scrollbar-bg: transparent;\n\t\t--harmony-ui-scrollbar-color: rgba(0, 0, 0, 0.25);\n\n\t\t--harmony-ui-menu-bg-color: #ccc;\n\t\t--harmony-ui-menu-item-bg-color: #ccc;\n\t\t--harmony-ui-menu-item-selected-bg-color: #ccc;\n\t\t--harmony-ui-menu-submenu-bg-color: #ccc;\n\t\t--harmony-ui-menu-submenu-fg-color: #777;\n\t\t--harmony-ui-menu-item-hover-bg-color: #fff;\n\t}\n}\n\n@media (prefers-color-scheme: dark) {\n\t:root:not(.light):not(.dark) {\n\t\t--harmony-ui-background-primary: #1b1b1b;\n\t\t--harmony-ui-background-secondary: #464747;\n\t\t--harmony-ui-background-tertiary: #4e4e4e;\n\n\t\t--harmony-ui-input-background-primary: #555;\n\t\t--harmony-ui-input-background-secondary: #333;\n\t\t--harmony-ui-input-background-tertiary: #fff;\n\n\t\t--harmony-ui-border-primary: #858585;\n\t\t--harmony-ui-border-secondary: #696969;\n\n\t\t--harmony-ui-input-border-primary: #aaa;\n\t\t--harmony-ui-input-border-secondary: #696969;\n\n\t\t--harmony-ui-text-primary: #fff;\n\t\t--harmony-ui-text-secondary: #cdcdcd;\n\t\t--harmony-ui-text-inactive: #cdcdcda6;\n\t\t--harmony-ui-text-link: #8cb4ff;\n\t\t--harmony-ui-text-invert: #1b1b1b;\n\n\t\t--harmony-ui-accent-primary: #1072eb;\n\t\t--harmony-ui-accent-secondary: #1040c1;\n\n\t\t--harmony-ui-scrollbar-bg: transparent;\n\t\t--harmony-ui-scrollbar-color: rgba(255, 255, 255, 0.25);\n\n\t\t--harmony-ui-menu-bg-color: #333333;\n\t\t--harmony-ui-menu-item-bg-color: #333333;\n\t\t--harmony-ui-menu-item-selected-bg-color: #333333;\n\t\t--harmony-ui-menu-submenu-bg-color: #333333;\n\t\t--harmony-ui-menu-submenu-fg-color: #888888;\n\t\t--harmony-ui-menu-item-hover-bg-color: #000000;\n\t}\n}\n\n:root.light {\n\t--harmony-ui-background-primary: #ccc;\n\t--harmony-ui-background-secondary: #f9f9fb;\n\t--harmony-ui-background-tertiary: #fff;\n\n\t--harmony-ui-input-background-primary: #aaa;\n\t--harmony-ui-input-background-secondary: #ccc;\n\t--harmony-ui-input-background-tertiary: #4e4e4e;\n\n\t--harmony-ui-border-primary: #222;\n\t--harmony-ui-border-secondary: #222;\n\n\t--harmony-ui-input-border-primary: #222;\n\t--harmony-ui-input-border-secondary: #222;\n\n\t--harmony-ui-text-primary: #222;\n\t--harmony-ui-text-secondary: #222;\n\t--harmony-ui-text-inactive: #9e9e9ea6;\n\t--harmony-ui-text-link: #0069c2;\n\t--harmony-ui-text-invert: #fff;\n\n\t--harmony-ui-accent-primary: #1072eb;\n\t--harmony-ui-accent-secondary: #1040c1;\n\n\t--harmony-ui-scrollbar-bg: transparent;\n\t--harmony-ui-scrollbar-color: rgba(0, 0, 0, 0.25);\n}\n\n:root.dark {\n\t--harmony-ui-background-primary: #1b1b1b;\n\t--harmony-ui-background-secondary: #464747;\n\t--harmony-ui-background-tertiary: #4e4e4e;\n\n\t--harmony-ui-input-background-primary: #555;\n\t--harmony-ui-input-background-secondary: #333;\n\t--harmony-ui-input-background-tertiary: #fff;\n\n\t--harmony-ui-border-primary: #858585;\n\t--harmony-ui-border-secondary: #696969;\n\n\t--harmony-ui-input-border-primary: #aaa;\n\t--harmony-ui-input-border-secondary: #696969;\n\n\t--harmony-ui-text-primary: #fff;\n\t--harmony-ui-text-secondary: #cdcdcd;\n\t--harmony-ui-text-inactive: #cdcdcda6;\n\t--harmony-ui-text-link: #8cb4ff;\n\t--harmony-ui-text-invert: #1b1b1b;\n\n\t--harmony-ui-accent-primary: #1072eb;\n\t--harmony-ui-accent-secondary: #1040c1;\n\n\t--harmony-ui-scrollbar-bg: transparent;\n\t--harmony-ui-scrollbar-color: rgba(255, 255, 255, 0.25);\n}\n";
 
 let injected = false;
 function injectGlobalCss() {
@@ -1860,7 +1853,7 @@ function defineHarmonyColorPicker() {
     }
 }
 
-var menuCSS = ":host {\n\tfont-size: 1.5em;\n\tcursor: not-allowed;\n\tbackground-color: green;\n\tbackground-color: var(--theme-menu-bg-color);\n\toverflow: auto;\n\tz-index: 100000;\n}\n\n.harmony-menu-item {\n\tbackground-color: green;\n\tcursor: pointer;\n\tbackground-color: var(--theme-menu-item-bg-color);\n}\n\n.harmony-menu-item.disabled {\n\tpointer-events: none;\n}\n\n.harmony-menu-item.selected {\n\tbackground-color: blue;\n\tbackground-color: var(--theme-menu-item-selected-bg-color);\n}\n\n\n.harmony-menu-item.separator {\n\theight: 5px;\n\tbackground-color: black;\n}\n\n.harmony-menu-item>.harmony-menu-item-title:hover {\n\tbackground-color: var(--theme-menu-item-hover-bg-color);\n}\n\n.harmony-menu-item.selected>.harmony-menu-item-title::after {\n\tcontent: \"✔\";\n\tright: 0px;\n\tposition: absolute;\n}\n\n.harmony-menu-item>.harmony-menu-item-title::after {\n\ttransition: all 0.2s ease 0s;\n\twidth: 32px;\n\theight: 32px;\n}\n\n.harmony-menu-item.closed>.harmony-menu-item-title,\n.harmony-menu-item.opened>.harmony-menu-item-title {\n\tpadding-right: 32px;\n}\n\n.harmony-menu-item.closed>.harmony-menu-item-title::after {\n\tcontent: \"➤\";\n\tright: 0px;\n\tposition: absolute;\n}\n\n.harmony-menu-item.opened>.harmony-menu-item-title::after {\n\tcontent: \"➤\";\n\tright: 0px;\n\tposition: absolute;\n\t/*writing-mode: vertical-rl; */\n\ttransform: rotate(90deg);\n}\n\n.harmony-menu-item .submenu {\n\tbackground-color: var(--theme-menu-submenu-bg-color);\n\tpadding-left: 10px;\n\tmargin-left: 2px;\n\tdisplay: none;\n\toverflow: hidden;\n\tposition: relative;\n\tbackground-color: var(--theme-menu-submenu-fg-color);\n}\n\n.harmony-menu-item.opened>.submenu {\n\tdisplay: block;\n}\n";
+var menuCSS = ":host {\n\tfont-size: 1.5em;\n\tcursor: not-allowed;\n\tcolor: var(--harmony-ui-text-primary);\n\tbackground-color: green;\n\tbackground-color: var(--harmony-ui-menu-bg-color);\n\toverflow: auto;\n\tz-index: 100000;\n}\n\n.harmony-menu-item {\n\tbackground-color: green;\n\tcursor: pointer;\n\tbackground-color: var(--harmony-ui-menu-item-bg-color);\n}\n\n.harmony-menu-item.disabled {\n\tpointer-events: none;\n}\n\n.harmony-menu-item.selected {\n\tbackground-color: blue;\n\tbackground-color: var(--harmony-ui-menu-item-selected-bg-color);\n}\n\n\n.harmony-menu-item.separator {\n\theight: 5px;\n\tbackground-color: black;\n}\n\n.harmony-menu-item>.harmony-menu-item-title:hover {\n\tbackground-color: var(--harmony-ui-menu-item-hover-bg-color);\n}\n\n.harmony-menu-item.selected>.harmony-menu-item-title::after {\n\tcontent: \"✔\";\n}\n\n.harmony-menu-item>.harmony-menu-item-title::after {\n\ttransition: all 0.2s ease 0s;\n\twidth: 32px;\n\theight: 32px;\n}\n\n.harmony-menu-item.closed>.harmony-menu-item-title,\n.harmony-menu-item.opened>.harmony-menu-item-title {\n\tpadding-right: 32px;\n}\n\n.harmony-menu-item.closed>.harmony-menu-item-title::after {\n\tcontent: \"➤\";\n}\n\n.harmony-menu-item.opened>.harmony-menu-item-title::after {\n\tcontent: \"➤\";\n\ttransform: rotate(90deg);\n}\n\n.harmony-menu-item .submenu {\n\tbackground-color: var(--harmony-ui-menu-submenu-bg-color);\n\tpadding-left: 10px;\n\tmargin-left: 2px;\n\tdisplay: none;\n\toverflow: hidden;\n\tposition: relative;\n\tbackground-color: var(--harmony-ui-menu-submenu-fg-color);\n}\n\n.harmony-menu-item.opened>.submenu {\n\tdisplay: block;\n}\n";
 
 class HTMLHarmonyMenuElement extends HTMLElement {
     #doOnce = true;
@@ -4341,6 +4334,159 @@ function defineHarmonyToggleButton() {
     }
 }
 
+var treeCSS = ":host {\n\t--child-margin: var(--harmony-tree-child-margin, 1rem);\n\t--header-bg-color: var(--harmony-tree-header-bg-color, var(--main-bg-color-dark, black));\n\tcolor: var(--main-text-color-dark2, white);\n}\n\n.item {\n\twidth: 100%;\n}\n\n.header {\n\twidth: 100%;\n\theight: 1rem;\n\tbackground-color: var(--header-bg-color);\n\tcursor: pointer;\n}\n\n.childs {\n\tmargin-left: var(--child-margin);\n}\n\n.root>.header {\n\tdisplay: none;\n}\n\n.root>.childs {\n\tmargin-left: unset;\n}\n";
+
+class TreeElement {
+    name;
+    isRoot;
+    icon;
+    type;
+    parent;
+    childs;
+    userData;
+    constructor(name, options = {}) {
+        this.name = name;
+        this.isRoot = options.isRoot;
+        this.icon = options.icon;
+        this.type = options.type;
+        this.parent = options.parent;
+        this.childs = options.childs ?? [];
+        this.userData = options.userData;
+        this.#sortByName();
+    }
+    #sortByName() {
+        this.childs[Symbol.iterator] = function* () {
+            yield* [...this.values()].sort((a, b) => {
+                return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+            });
+        };
+    }
+    getPath(separator = '') {
+        let path = '';
+        if (this.parent) {
+            path = this.parent.getPath(separator) + separator;
+        }
+        path += this.name;
+        return path;
+    }
+}
+class HTMLHarmonyTreeElement extends HTMLHarmonyElement {
+    #shadowRoot;
+    #root;
+    #htmlContextMenu;
+    #isInitialized = new Set();
+    #isExpanded = new Map();
+    createElement() {
+        this.#shadowRoot = this.attachShadow({ mode: 'closed' });
+        shadowRootStyle(this.#shadowRoot, treeCSS);
+        I18n.observeElement(this.#shadowRoot);
+        this.#refresh();
+    }
+    #refresh() {
+        if (!this.#shadowRoot) {
+            return;
+        }
+        this.#shadowRoot.replaceChildren();
+        if (!this.#root) {
+            return;
+        }
+        this.#createItem(this.#root, this.#shadowRoot, true);
+    }
+    setRoot(root) {
+        this.#root = root;
+        if (this.#root) {
+            this.#root.isRoot = true;
+        }
+        this.#refresh();
+    }
+    #buildContextMenu(contextMenu, x, y) {
+        if (!this.#htmlContextMenu) {
+            defineHarmonyMenu();
+            this.#htmlContextMenu = createElement('harmony-menu');
+        }
+        this.#htmlContextMenu.showContextual(contextMenu, x, y);
+    }
+    #contextMenuHandler(event, item) {
+        if (!event.shiftKey) {
+            this.dispatchEvent(new CustomEvent('contextmenu', {
+                detail: {
+                    item: item,
+                    buildContextMenu: (menu) => this.#buildContextMenu(menu, event.clientX, event.clientY),
+                },
+            }));
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+    #createItem(item, parent, createExpanded) {
+        let childs;
+        const element = createElement('div', {
+            class: 'item',
+            parent: parent,
+            childs: [
+                createElement('div', {
+                    class: 'header',
+                    innerText: item.name,
+                    $click: () => this.#expandItem(item, childs),
+                    $contextmenu: (event) => this.#contextMenuHandler(event, item),
+                }),
+                childs = createElement('div', {
+                    class: 'childs',
+                }),
+            ]
+        });
+        if (item.isRoot && item.name == '') {
+            element.classList.add('root');
+        }
+        if (createExpanded) {
+            this.#expandItem(item, childs);
+        }
+        return element;
+    }
+    #expandItem(item, parent) {
+        if (this.#isExpanded.get(item)) {
+            hide(parent);
+            this.#isExpanded.set(item, false);
+            return;
+        }
+        else {
+            show(parent);
+        }
+        this.#isExpanded.set(item, true);
+        if (!item.childs) {
+            return;
+        }
+        if (!this.#isInitialized.has(item)) {
+            for (const child of item.childs) {
+                this.#createItem(child, parent, false);
+            }
+            this.#isInitialized.add(item);
+        }
+    }
+    onAttributeChanged(name, oldValue, newValue) {
+        switch (name) {
+            case 'data-root':
+                const root = JSON.parse(newValue);
+                this.setRoot(root);
+                break;
+        }
+    }
+    static get observedAttributes() {
+        return ['data-root'];
+    }
+}
+let definedTree = false;
+function defineHarmonyTree() {
+    if (window.customElements && !definedTree) {
+        customElements.define('harmony-tree', class extends HTMLHarmonyTreeElement {
+        });
+        customElements.define('h-tree', class extends HTMLHarmonyTreeElement {
+        });
+        definedTree = true;
+        injectGlobalCss();
+    }
+}
+
 var index = /*#__PURE__*/Object.freeze({
     __proto__: null,
     AddI18nElement: AddI18nElement,
@@ -4365,6 +4511,7 @@ var index = /*#__PURE__*/Object.freeze({
     HTMLHarmonyTabGroupElement: HTMLHarmonyTabGroupElement,
     HTMLHarmonyToggleButtonElement: HTMLHarmonyToggleButtonElement,
     HTMLHarmonyTooltipElement: HTMLHarmonyTooltipElement,
+    HTMLHarmonyTreeElement: HTMLHarmonyTreeElement,
     I18n: I18n,
     I18nElements: I18nElements,
     get I18nEvents () { return I18nEvents; },
@@ -4373,6 +4520,7 @@ var index = /*#__PURE__*/Object.freeze({
     get ManipulatorResizeOrigin () { return ManipulatorResizeOrigin; },
     get ManipulatorSide () { return ManipulatorSide; },
     get ManipulatorUpdatedEventType () { return ManipulatorUpdatedEventType; },
+    TreeElement: TreeElement,
     cloneEvent: cloneEvent,
     createElement: createElement,
     createElementNS: createElementNS,
@@ -4398,6 +4546,7 @@ var index = /*#__PURE__*/Object.freeze({
     defineHarmonyTabGroup: defineHarmonyTabGroup,
     defineHarmonyToggleButton: defineHarmonyToggleButton,
     defineHarmonyTooltip: defineHarmonyTooltip,
+    defineHarmonyTree: defineHarmonyTree,
     display: display,
     documentStyle: documentStyle,
     documentStyleSync: documentStyleSync,
@@ -4411,6 +4560,37 @@ var index = /*#__PURE__*/Object.freeze({
     updateElement: updateElement,
     visible: visible
 });
+
+function loadScript(script) {
+    return new Promise((resolve) => {
+        createElement('script', {
+            src: script,
+            parent: document.body,
+            events: {
+                load: () => resolve(true),
+            }
+        });
+    });
+}
+async function loadScripts(scripts) {
+    const promises = [];
+    for (const script of scripts) {
+        promises.push(loadScript(script));
+    }
+    await Promise.all(promises);
+    return true;
+}
+
+function supportsPopover() {
+    return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
+}
+
+function SaveFile(file) {
+    const link = document.createElement('a');
+    link.setAttribute('href', URL.createObjectURL(file));
+    link.setAttribute('download', file.name);
+    link.click();
+}
 
 var theme = "@media (prefers-color-scheme: light){\n\tbody{\n\t\t--theme-background-primary: #fff;\n\t\t--theme-background-secondary: #eee;\n\t\t--theme-background-tertiary: #c8c8c8;\n\t\t--theme-background-quaternary: #b1b1b1;\n\n\t\t--theme-background-primary-invert: #1b1b1b;\n\t\t--theme-background-secondary-invert: #101822;\n\t\t--theme-background-tertiary-invert: #343434;\n\t\t--theme-background-quaternary-invert: #4e4e4e;\n\n\t\t--theme-border-primary:  #cdcdcd;\n\t\t--theme-border-secondary:  #cdcdcd;\n\n\t\t--theme-text-primary: #1b1b1b;\n\t\t--theme-text-secondary: #4e4e4e;\n\t\t--theme-text-inactive: #9e9e9ea6;\n\t\t--theme-text-link: #0069c2;\n\t\t--theme-text-invert: #fff;\n\n\t\t--theme-accent-primary: #0085f2;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(0, 0, 0, 0.25);\n\n\t\t--theme-bg-color: #D7D3CB;\n\t\t--theme-popup-bg-color: #CCCCCC;\n\t\t--theme-text-color: #111111;\n\t\t--theme-text-bg-color: 238 238 238;\n\n\t\t--theme-text-color-warning:#ff6a00;\n\t\t--theme-filter-invert-light:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #D7D3CB;\n\t\t--theme-main-bg-color-dark: #DEDAD4;\n\t}\n}\n@media (prefers-color-scheme: dark){\n\tbody{\n\t\t--theme-background-primary: #1b1b1b;\n\t\t--theme-background-secondary: #101822;\n\t\t--theme-background-tertiary: #343434;\n\t\t--theme-background-quaternary: #4e4e4e;\n\n\t\t--theme-background-primary-invert: #fff;\n\t\t--theme-background-secondary-invert: #eee;\n\t\t--theme-background-tertiary-invert: #c8c8c8;\n\t\t--theme-background-quaternary-invert: #b1b1b1;\n\n\t\t--theme-border-primary:  #858585;\n\t\t--theme-border-secondary:  #696969;\n\n\t\t--theme-text-primary: #fff;\n\t\t--theme-text-secondary: #cdcdcd;\n\t\t--theme-text-inactive: #cdcdcda6;\n\t\t--theme-text-link: #8cb4ff;\n\t\t--theme-text-invert: #1b1b1b;\n\n\t\t--theme-accent-primary: #5e9eff;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(255, 255, 255, 0.25);\n\n\t\t--theme-bg-color: #21252b;\n\t\t--theme-popup-bg-color: #333333;\n\t\t--theme-text-color: #EEEEEE;\n\t\t--theme-text-bg-color: 17 17 17;\n\n\t\t--theme-text-color-warning:orange;\n\t\t--theme-filter-invert-dark:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #41454d;\n\t\t--theme-main-bg-color-dark: #21252b;\n\t}\n}\n";
 
@@ -5495,28 +5675,204 @@ class ShortcutHandler {
     }
 }
 
-function loadScript(script) {
-    return new Promise((resolve) => {
-        createElement('script', {
-            src: script,
-            parent: document.body,
-            events: {
-                load: () => resolve(true),
-            }
-        });
-    });
-}
-async function loadScripts(scripts) {
-    const promises = [];
-    for (const script of scripts) {
-        promises.push(loadScript(script));
+var storageCSS = ":host{\n\tdisplay: block;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-color: black;\n}\n";
+
+const SEPARATOR = '/';
+var EntryType;
+(function (EntryType) {
+    EntryType["File"] = "file";
+    EntryType["Directory"] = "directory";
+})(EntryType || (EntryType = {}));
+// TODO: use FileSystemObserver?
+class PersistentStorage {
+    static #shadowRoot;
+    static #htmlFilter;
+    static #htmlTree;
+    static #dirty = true;
+    static #filter = { name: '' };
+    static async estimate() {
+        return navigator.storage.estimate();
     }
-    await Promise.all(promises);
-    return true;
+    static #initPanel() {
+        if (this.#shadowRoot) {
+            return;
+        }
+        defineHarmonyTree();
+        this.#shadowRoot = createShadowRoot('persistent-storage', {
+            parent: document.body,
+            adoptStyle: storageCSS,
+            childs: [
+                this.#htmlFilter = createElement('input', {
+                    $input: (event) => this.#setFilter(event.target.value),
+                }),
+                this.#htmlTree = createElement('harmony-tree', {
+                    $contextmenu: (event) => {
+                        console.info(event, event.detail.item);
+                        event.detail.buildContextMenu({
+                            path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
+                            delete: {
+                                i18n: '#delete', f: () => {
+                                    if (event.detail.item) ;
+                                }
+                            },
+                        });
+                    }
+                }),
+            ],
+        });
+    }
+    static async createFile(path) {
+        return this.#getHandle(path, 'file', true);
+    }
+    static async createDirectory(path) {
+        return this.#getHandle(path, 'directory', true);
+    }
+    static async deleteFile(path) {
+        return await this.#removeEntry(path, 'file', false);
+    }
+    static async deleteDirectory(path, recursive) {
+        return await this.#removeEntry(path, 'directory', recursive);
+    }
+    static async clear() {
+        try {
+            // TODO: use remove() if it is ever standardized
+            const root = await navigator.storage.getDirectory();
+            for await (const key of root.keys()) {
+                await root.removeEntry(key, { recursive: true });
+            }
+        }
+        catch (e) {
+            return false;
+        }
+        return true;
+    }
+    static async *listEntries(path, options = {}) {
+        const entry = await this.#getHandle(path, 'directory', true);
+        if (!entry || entry.kind == 'file') {
+            return null;
+        }
+        const stack = [entry];
+        let current;
+        do {
+            current = stack.pop();
+            if (current) {
+                /*
+                if ((filter === undefined) || current.#matchFilter(filter)) {
+                    childs.add(current);
+                }
+                    */
+                if (options.recursive && current.kind == 'directory') {
+                    for await (const handle of current.values()) {
+                        stack.push(handle);
+                        yield handle;
+                    }
+                }
+            }
+        } while (current);
+        //return await this.#removeEntry(path, 'directory', recursive);
+        return null;
+    }
+    static async #removeEntry(path, kind, recursive) {
+        path = cleanPath(path);
+        path.split(SEPARATOR);
+        //console.info(splittedPath);
+        let current = await navigator.storage.getDirectory();
+        const pathElements = path.split(SEPARATOR);
+        for (let i = 0; i < pathElements.length - 1; i++) {
+            const subPath = pathElements[i];
+            if (subPath == '') {
+                continue;
+            }
+            current = await current.getDirectoryHandle(subPath, { create: false });
+        }
+        if (current.kind == kind) {
+            try {
+                await current.removeEntry(pathElements[pathElements.length - 1], { recursive: recursive });
+                return true;
+            }
+            catch (e) {
+                console.info(e);
+            }
+        }
+        return false;
+    }
+    static async #getHandle(path, kind, create) {
+        path = cleanPath(path);
+        path.split(SEPARATOR);
+        //console.info(splittedPath);
+        let current = await navigator.storage.getDirectory();
+        const pathElements = path.split(SEPARATOR);
+        for (let i = 0; i < pathElements.length - 1; i++) {
+            const subPath = pathElements[i];
+            if (subPath == '') {
+                continue;
+            }
+            current = await current.getDirectoryHandle(subPath, { create: create });
+        }
+        const name = pathElements[pathElements.length - 1];
+        if (name == '') {
+            return current;
+        }
+        if (kind == 'file') {
+            return await current.getFileHandle(name, { create: create });
+        }
+        else {
+            return await current.getDirectoryHandle(name, { create: create });
+        }
+    }
+    static async readFile(path) {
+        try {
+            const fileHandle = await this.#getHandle(path, 'file', false);
+            if (fileHandle) {
+                return await fileHandle.getFile();
+            }
+        }
+        catch (e) { }
+        return null;
+    }
+    static async showPanel() {
+        this.#initPanel();
+        this.#refresh();
+    }
+    static async #refresh() {
+        if (this.#dirty) {
+            this.#htmlTree?.setRoot(await this.#getRoot(await navigator.storage.getDirectory()));
+            this.#dirty = false;
+        }
+    }
+    static async #getRoot(entry) {
+        const root = await this.#getElement(entry);
+        root.isRoot = true;
+        return root;
+    }
+    static async #getElement(entry, parent) {
+        const childs = [];
+        const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
+        if (entry.kind == 'directory') {
+            for await (const [key, value] of entry.entries()) {
+                if (this.#matchFilter(value)) {
+                    childs.push(await this.#getElement(value, tree));
+                }
+            }
+        }
+        return tree;
+    }
+    static #setFilter(name) {
+        this.#filter.name = name;
+        this.#dirty = true;
+        this.#refresh();
+    }
+    static #matchFilter(entry) {
+        return entry.name.includes(this.#filter.name);
+    }
+}
+function cleanPath(path) {
+    if (!path.startsWith(SEPARATOR)) {
+        path = SEPARATOR + path;
+    }
+    path.replace(/\\/g, '/');
+    path.replace(/\/(\/)+/g, '/');
+    return path;
 }
 
-function supportsPopover() {
-    return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
-}
-
-export { index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, SaveFile, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, setNotificationsPlacement, supportsPopover };
+export { EntryType, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, PersistentStorage, SEPARATOR, SaveFile, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, setNotificationsPlacement, supportsPopover };

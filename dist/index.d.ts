@@ -4,6 +4,11 @@ export declare function addNotificationEventListener(type: string, callback: Eve
 
 export declare function closeNotification(notification: Notification_2 | number): void;
 
+export declare enum EntryType {
+    File = "file",
+    Directory = "directory"
+}
+
 export declare function loadScript(script: string): Promise<boolean>;
 
 export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
@@ -95,7 +100,26 @@ export declare class OptionsManager extends EventTarget {
 
 export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 
+export declare class PersistentStorage {
+    #private;
+    static estimate(): Promise<StorageEstimate>;
+    static createFile(path: string): Promise<FileSystemFileHandle | null>;
+    static createDirectory(path: string): Promise<FileSystemDirectoryHandle | null>;
+    static deleteFile(path: string): Promise<boolean>;
+    static deleteDirectory(path: string, recursive: boolean): Promise<boolean>;
+    static clear(): Promise<boolean>;
+    static listEntries(path: string, options?: {
+        recursive?: boolean;
+        absolutePath?: boolean;
+        filter?: StorageFilter;
+    }): AsyncGenerator<FileSystemHandle, null, unknown>;
+    static readFile(path: string): Promise<File | null>;
+    static showPanel(): Promise<void>;
+}
+
 export declare function SaveFile(file: File): void;
+
+export declare const SEPARATOR = "/";
 
 export declare function setNotificationsPlacement(placement: NotificationsPlacement): void;
 
@@ -107,6 +131,12 @@ export declare class ShortcutHandler {
     static addShortcut(contextName: string, name: string, shortcut: string): void;
     static addEventListener(type: string, callback: (evt: CustomEvent<KeyboardEvent>) => void, options?: AddEventListenerOptions | boolean): void;
 }
+
+export declare type StorageFilter = {
+    directories?: boolean;
+    files?: boolean;
+    name?: string;
+};
 
 export declare type SubOption = {
     [key: string]: Option_2;

@@ -8,16 +8,19 @@ export enum EntryType {
 	Directory = 'directory',
 }
 
-
 export type StorageFilter = {
-
+	directories?: boolean,
+	files?: boolean,
+	name?: string,
 }
 
 // TODO: use FileSystemObserver?
 export class PersistentStorage {
 	static #shadowRoot?: ShadowRoot;
+	static #htmlFilter?: HTMLInputElement;
 	static #htmlTree?: HTMLHarmonyTreeElement;
 	static #dirty: boolean = true;
+	static #filter: { name: string } = { name: '' };
 
 	static async estimate(): Promise<StorageEstimate> {
 		return navigator.storage.estimate();
@@ -31,23 +34,28 @@ export class PersistentStorage {
 		this.#shadowRoot = createShadowRoot('persistent-storage', {
 			parent: document.body,
 			adoptStyle: storageCSS,
-			child: this.#htmlTree = createElement('harmony-tree', {
-				$contextmenu: (event: CustomEvent<TreeContextMenuEventData>) => {
-					console.info(event, event.detail.item);
-					event.detail.buildContextMenu(
-						{
-							path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
-							delete: {
-								i18n: '#delete', f: () => {
-									if (event.detail.item) {
-										//this.#deleteItem(event.detail.item);
+			childs: [
+				this.#htmlFilter = createElement('input', {
+					$input: (event: Event) => this.#setFilter((event.target as HTMLInputElement).value),
+				}) as HTMLInputElement,
+				this.#htmlTree = createElement('harmony-tree', {
+					$contextmenu: (event: CustomEvent<TreeContextMenuEventData>) => {
+						console.info(event, event.detail.item);
+						event.detail.buildContextMenu(
+							{
+								path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
+								delete: {
+									i18n: '#delete', f: () => {
+										if (event.detail.item) {
+											//this.#deleteItem(event.detail.item);
+										}
 									}
-								}
-							},
-						}
-					)
-				}
-			}) as HTMLHarmonyTreeElement,
+								},
+							}
+						)
+					}
+				}) as HTMLHarmonyTreeElement,
+			],
 		});
 	}
 
@@ -80,13 +88,12 @@ export class PersistentStorage {
 		return true;
 	}
 
-	static async *listEntries(path: string, options: { recursive?: boolean, absolutePath?: boolean, directories: boolean, files: boolean } = { directories: true, files: true })/*: AsyncGenerator<never, number, unknown>*/ {
+	static async *listEntries(path: string, options: { recursive?: boolean, absolutePath?: boolean, filter?: StorageFilter } = {})/*: AsyncGenerator<never, number, unknown>*/ {
 		const entry = await this.#getHandle(path, 'directory', true);
 		if (!entry || entry.kind == 'file') {
 			return null;
 		}
 
-		//let curent =
 		const stack: Array<FileSystemHandle> = [entry];
 		let current: FileSystemHandle | undefined;
 		do {
@@ -97,10 +104,6 @@ export class PersistentStorage {
 					childs.add(current);
 				}
 					*/
-				/*
-			for (const [_, child] of current.#childs) {
-				}
-				*/
 
 				if (options.recursive && current.kind == 'directory') {
 					for await (const handle of (current as FileSystemDirectoryHandle).values()) {
@@ -184,10 +187,13 @@ export class PersistentStorage {
 
 	static async showPanel() {
 		this.#initPanel();
+		this.#refresh();
+	}
 
+	static async #refresh() {
 		if (this.#dirty) {
 			this.#htmlTree?.setRoot(await this.#getRoot(await navigator.storage.getDirectory()));
-			this.#dirty = true;
+			this.#dirty = false;
 		}
 	}
 
@@ -202,11 +208,22 @@ export class PersistentStorage {
 		const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
 		if (entry.kind == 'directory') {
 			for await (const [key, value] of (entry as FileSystemDirectoryHandle).entries()) {
-				//console.info(key, value);
-				childs.push(await this.#getElement(value, tree));
+				if (this.#matchFilter(value)) {
+					childs.push(await this.#getElement(value, tree));
+				}
 			}
 		}
 		return tree;
+	}
+
+	static #setFilter(name: string) {
+		this.#filter.name = name;
+		this.#dirty = true;
+		this.#refresh();
+	}
+
+	static #matchFilter(entry: FileSystemHandle): boolean {
+		return entry.name.includes(this.#filter.name);
 	}
 }
 
