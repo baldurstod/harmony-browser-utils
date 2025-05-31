@@ -175,7 +175,7 @@ export class PersistentStorage {
 		}
 	}
 
-	static async readFile(path: string): Promise<File | null> {
+	static async #readFile(path: string): Promise<File | null> {
 		try {
 			const fileHandle = await this.#getHandle(path, 'file', false) as FileSystemFileHandle;
 			if (fileHandle) {
@@ -183,6 +183,32 @@ export class PersistentStorage {
 			}
 		} catch (e) { }
 		return null;
+	}
+
+	static async readFile(path: string): Promise<File | null> {
+		return this.#readFile(path);
+	}
+
+	static async readFileAsString(path: string): Promise<string | null> {
+		const file = await this.#readFile(path);
+		if (!file) {
+			return null;
+		}
+
+		return file.text();
+	}
+
+	static async writeFile(path: string, file: ArrayBuffer | ArrayBufferView | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean> {
+		try {
+			const fileHandle = await this.#getHandle(path, 'file', false) as FileSystemFileHandle;
+			if (fileHandle) {
+				const writable = await fileHandle.createWritable(options);
+				await writable.write(file);
+				await writable.close();
+				return true;
+			}
+		} catch (e) { }
+		return false;
 	}
 
 	static async showPanel() {

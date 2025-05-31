@@ -49,6 +49,12 @@
 			console.log(fileHandle);
 		}
 
+		const writeSucess = await PersistentStorage.writeFile('/a0/a1/a2/a3.ext', 'test');
+		if (writeSucess) {
+			console.info(await PersistentStorage.readFileAsString('/a0/a1/a2/a3.ext'));
+
+		}
+
 	</script>
 </body>
 
