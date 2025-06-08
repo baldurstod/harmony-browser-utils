@@ -114,6 +114,8 @@ export declare class PersistentStorage {
         filter?: StorageFilter;
     }): AsyncGenerator<FileSystemHandle, null, unknown>;
     static readFile(path: string): Promise<File | null>;
+    static readFileAsString(path: string): Promise<string | null>;
+    static writeFile(path: string, file: ArrayBuffer | ArrayBufferView | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean>;
     static showPanel(): Promise<void>;
 }
 

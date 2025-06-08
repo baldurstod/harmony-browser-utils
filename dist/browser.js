@@ -5820,7 +5820,7 @@ class PersistentStorage {
             return await current.getDirectoryHandle(name, { create: create });
         }
     }
-    static async readFile(path) {
+    static async #readFile(path) {
         try {
             const fileHandle = await this.#getHandle(path, 'file', false);
             if (fileHandle) {
@@ -5829,6 +5829,29 @@ class PersistentStorage {
         }
         catch (e) { }
         return null;
+    }
+    static async readFile(path) {
+        return this.#readFile(path);
+    }
+    static async readFileAsString(path) {
+        const file = await this.#readFile(path);
+        if (!file) {
+            return null;
+        }
+        return file.text();
+    }
+    static async writeFile(path, file, options) {
+        try {
+            const fileHandle = await this.#getHandle(path, 'file', false);
+            if (fileHandle) {
+                const writable = await fileHandle.createWritable(options);
+                await writable.write(file);
+                await writable.close();
+                return true;
+            }
+        }
+        catch (e) { }
+        return false;
     }
     static async showPanel() {
         this.#initPanel();
