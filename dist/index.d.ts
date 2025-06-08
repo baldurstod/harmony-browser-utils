@@ -119,7 +119,7 @@ export declare class PersistentStorage {
     static showPanel(): Promise<void>;
 }
 
-export declare function SaveFile(file: File): void;
+export declare function saveFile(file: File): void;
 
 export declare const SEPARATOR = "/";
 

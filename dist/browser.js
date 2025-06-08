@@ -4585,7 +4585,7 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-function SaveFile(file) {
+function saveFile(file) {
     const link = document.createElement('a');
     link.setAttribute('href', URL.createObjectURL(file));
     link.setAttribute('download', file.name);
@@ -5898,4 +5898,4 @@ function cleanPath(path) {
     return path;
 }
 
-export { EntryType, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, PersistentStorage, SEPARATOR, SaveFile, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, setNotificationsPlacement, supportsPopover };
+export { EntryType, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, saveFile, setNotificationsPlacement, supportsPopover };
