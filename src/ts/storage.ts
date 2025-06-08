@@ -1,4 +1,4 @@
-import { createElement, createShadowRoot, defineHarmonyTree, hide, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeElement } from 'harmony-ui';
+import { createElement, createShadowRoot, defineHarmonyTree, hide, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
 export const SEPARATOR = '/';
@@ -223,15 +223,15 @@ export class PersistentStorage {
 		}
 	}
 
-	static async #getRoot(entry: FileSystemDirectoryHandle): Promise<TreeElement> {
+	static async #getRoot(entry: FileSystemDirectoryHandle): Promise<TreeItem> {
 		const root = await this.#getElement(entry);
 		root.isRoot = true;
 		return root;
 	}
 
-	static async #getElement(entry: FileSystemHandle, parent?: TreeElement): Promise<TreeElement> {
-		const childs: Array<TreeElement> | undefined = [];
-		const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
+	static async #getElement(entry: FileSystemHandle, parent?: TreeItem): Promise<TreeItem> {
+		const childs: Array<TreeItem> | undefined = [];
+		const tree = new TreeItem(entry.name, { childs: childs, parent: parent, userData: entry });
 		if (entry.kind == 'directory') {
 			for await (const [key, value] of (entry as FileSystemDirectoryHandle).entries()) {
 				if (this.#matchFilter(value)) {
