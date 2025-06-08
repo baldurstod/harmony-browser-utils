@@ -1,4 +1,4 @@
-import { createElement, createShadowRoot, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show, defineHarmonyTree, TreeElement } from 'harmony-ui';
+import { createElement, createShadowRoot, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show, defineHarmonyTree, TreeItem } from 'harmony-ui';
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
 import { vec2 } from 'gl-matrix';
 
@@ -1215,7 +1215,7 @@ class PersistentStorage {
     }
     static async #getElement(entry, parent) {
         const childs = [];
-        const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
+        const tree = new TreeItem(entry.name, { childs: childs, parent: parent, userData: entry });
         if (entry.kind == 'directory') {
             for await (const [key, value] of entry.entries()) {
                 if (this.#matchFilter(value)) {

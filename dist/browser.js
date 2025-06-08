@@ -4054,16 +4054,26 @@ class HTMLHarmonyTabElement extends HTMLElement {
     #disabled = false;
     #active = false;
     #header;
+    #htmlTitle;
+    #htmlClose;
     #group;
+    #closed = false;
     constructor() {
         super();
         this.#header = createElement('div', {
             class: 'harmony-tab-label',
-            ...(this.getAttribute('data-i18n')) && { i18n: this.getAttribute('data-i18n') },
-            ...(this.getAttribute('data-text')) && { innerText: this.getAttribute('data-text') },
-            events: {
-                click: (event) => this.#click(),
-            },
+            childs: [
+                this.#htmlTitle = createElement('span', {
+                    ...(this.getAttribute('data-i18n')) && { i18n: this.getAttribute('data-i18n') },
+                    ...(this.getAttribute('data-text')) && { innerText: this.getAttribute('data-text') },
+                }),
+                this.#htmlClose = createElement('span', {
+                    innerHTML: closeSVG,
+                    hidden: !toBool(this.getAttribute('data-closable') ?? ''),
+                    $click: (event) => { event.stopPropagation(); this.close(); },
+                }),
+            ],
+            $click: () => this.#click(),
         });
     }
     get htmlHeader() {
@@ -4079,15 +4089,17 @@ class HTMLHarmonyTabElement extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         switch (name) {
             case 'data-i18n':
-                this.#header.setAttribute('data-i18n', newValue);
-                this.#header.innerText = newValue;
-                this.#header.classList.add('i18n');
+                this.#htmlTitle.setAttribute('data-i18n', newValue);
+                this.#htmlTitle.innerText = newValue;
+                this.#htmlTitle.classList.add('i18n');
                 break;
             case 'data-text':
-                this.#header.innerText = newValue;
+                this.#htmlTitle.innerText = newValue;
                 break;
             case 'disabled':
                 this.disabled = toBool(newValue);
+            case 'data-closable':
+                display(this.#htmlClose, toBool(newValue));
                 break;
         }
     }
@@ -4101,6 +4113,16 @@ class HTMLHarmonyTabElement extends HTMLElement {
     activate() {
         this.setActive(true);
     }
+    close() {
+        if (this.#closed) {
+            return false;
+        }
+        if (!this.dispatchEvent(new CustomEvent('close', { cancelable: true, detail: { tab: this } }))) {
+            return false;
+        }
+        this.#group?.closeTab(this);
+        return true;
+    }
     /**
      * @deprecated use setActive() instead
      */
@@ -4112,10 +4134,10 @@ class HTMLHarmonyTabElement extends HTMLElement {
         if (this.#active != active) {
             this.#active = active;
             if (active) {
-                this.dispatchEvent(new CustomEvent('activated'));
+                this.dispatchEvent(new CustomEvent('activated', { detail: { tab: this } }));
             }
             else {
-                this.dispatchEvent(new CustomEvent('deactivated'));
+                this.dispatchEvent(new CustomEvent('deactivated', { detail: { tab: this } }));
             }
         }
         display(this, active);
@@ -4139,8 +4161,11 @@ class HTMLHarmonyTabElement extends HTMLElement {
     isActive() {
         return this.#active;
     }
+    isClosed() {
+        return this.#closed;
+    }
     #click() {
-        if (!this.dispatchEvent(new CustomEvent('click', { cancelable: true }))) {
+        if (!this.dispatchEvent(new CustomEvent('click', { cancelable: true, detail: { tab: this } }))) {
             return;
         }
         if (!this.#disabled) {
@@ -4148,7 +4173,7 @@ class HTMLHarmonyTabElement extends HTMLElement {
         }
     }
     static get observedAttributes() {
-        return ['data-i18n', 'data-text', 'disabled'];
+        return ['data-i18n', 'data-text', 'disabled', 'data-closable'];
     }
 }
 let definedTab = false;
@@ -4201,6 +4226,8 @@ class HTMLHarmonyTabGroupElement extends HTMLElement {
         this.#refresh();
     }
     #refresh() {
+        this.#header.replaceChildren();
+        this.#content.replaceChildren();
         for (const tab of this.#tabs) {
             this.#header.append(tab.htmlHeader);
             this.#content.append(tab);
@@ -4222,6 +4249,13 @@ class HTMLHarmonyTabGroupElement extends HTMLElement {
             this.#activeTab = tab;
             this.#refresh();
         }
+    }
+    closeTab(tab) {
+        this.#tabs.delete(tab);
+        if (this.#activeTab == tab) {
+            this.#activeTab = this.#tabs.values().next().value;
+        }
+        this.#refresh();
     }
     clear() {
         this.#tabs.clear();
@@ -4334,25 +4368,36 @@ function defineHarmonyToggleButton() {
     }
 }
 
-var treeCSS = ":host {\n\t--child-margin: var(--harmony-tree-child-margin, 1rem);\n\t--header-bg-color: var(--harmony-tree-header-bg-color, var(--main-bg-color-dark, black));\n\tcolor: var(--main-text-color-dark2, white);\n}\n\n.item {\n\twidth: 100%;\n}\n\n.header {\n\twidth: 100%;\n\theight: 1rem;\n\tbackground-color: var(--header-bg-color);\n\tcursor: pointer;\n}\n\n.childs {\n\tmargin-left: var(--child-margin);\n}\n\n.root>.header {\n\tdisplay: none;\n}\n\n.root>.childs {\n\tmargin-left: unset;\n}\n";
+var treeCSS = ":host {\n\t--child-margin: var(--harmony-tree-child-margin, 1rem);\n\t--header-bg-color: var(--harmony-tree-header-bg-color, var(--main-bg-color-dark, black));\n\tcolor: var(--main-text-color-dark2, white);\n}\n\n.item {\n\twidth: 100%;\n}\n\n.header {\n\twidth: 100%;\n\theight: 1rem;\n\tbackground-color: var(--header-bg-color);\n\tcursor: pointer;\n\tdisplay: flex;\n\tgap: 0.2rem;\n\talign-items: center;\n}\n\n.childs {\n\tmargin-left: var(--child-margin);\n}\n\n.root>.header {\n\tdisplay: none;\n}\n\n.root>.childs {\n\tmargin-left: unset;\n}\n\n.actions{\n\tdisplay: flex;\n}\n";
 
-class TreeElement {
+class TreeItem {
     name;
     isRoot;
     icon;
     type;
     parent;
-    childs;
+    childs = new Set;
+    actions = new Set();
     userData;
     constructor(name, options = {}) {
         this.name = name;
         this.isRoot = options.isRoot;
         this.icon = options.icon;
-        this.type = options.type;
+        this.type = options.type ?? '';
         this.parent = options.parent;
-        this.childs = options.childs ?? [];
         this.userData = options.userData;
+        if (options.parent) {
+            options.parent.addChild(this);
+        }
+        if (options.childs) {
+            for (const child of options.childs) {
+                this.addChild(child);
+            }
+        }
         this.#sortByName();
+    }
+    addChild(child) {
+        this.childs.add(child);
     }
     #sortByName() {
         this.childs[Symbol.iterator] = function* () {
@@ -4361,13 +4406,99 @@ class TreeElement {
             });
         };
     }
-    getPath(separator = '') {
+    getPath(separator = '/') {
         let path = '';
         if (this.parent) {
-            path = this.parent.getPath(separator) + separator;
+            const parentPath = this.parent.getPath(separator);
+            if (parentPath) {
+                path = parentPath + separator;
+            }
         }
         path += this.name;
         return path;
+    }
+    getLevel() {
+        if (this.parent) {
+            return 1 + this.parent.getLevel();
+        }
+        return 0;
+    }
+    addAction(action) {
+        this.actions.add(action);
+    }
+    removeAction(action) {
+        this.actions.delete(action);
+    }
+    static createFromPathList(paths, options = {}) {
+        class element {
+            tree;
+            childs = new Map();
+            constructor(tree) {
+                this.tree = tree;
+            }
+        }
+        if (!paths) {
+            return null;
+        }
+        const root = new TreeItem('', { userData: options.userData, type: 'root' });
+        const top = new element(root);
+        for (const path of paths) {
+            const segments = path.split(options.pathSeparator ?? '/');
+            let current = top;
+            let parent = root;
+            for (let i = 0, l = segments.length; i < l; i++) {
+                const s = segments[i];
+                if (s == '') {
+                    continue;
+                }
+                let type = 'directory';
+                if (i == l - 1) {
+                    type = 'file';
+                }
+                if (!current.childs.has(s)) {
+                    current.childs.set(s, new element(new TreeItem(s, { parent: parent, type: type, userData: options.userData })));
+                }
+                parent = current.childs.get(s).tree;
+                current = current.childs.get(s);
+            }
+        }
+        return root;
+    }
+    #matchFilter(filter) {
+        if (filter.types) {
+            let match = false;
+            for (const tf of filter.types) {
+                if (tf === this.type) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                return false;
+            }
+        }
+        if (filter.type !== undefined) {
+            if (filter.type !== this.type) {
+                return false;
+            }
+        }
+        return true;
+    }
+    *walk(filter = {}) {
+        let stack = [this];
+        let current;
+        do {
+            current = stack.pop();
+            if (!current) {
+                break;
+            }
+            if (current.#matchFilter(filter)) {
+                yield current;
+            }
+            for (let child of current.childs) {
+                stack.push(child);
+            }
+        } while (current);
     }
 }
 class HTMLHarmonyTreeElement extends HTMLHarmonyElement {
@@ -4376,11 +4507,17 @@ class HTMLHarmonyTreeElement extends HTMLHarmonyElement {
     #htmlContextMenu;
     #isInitialized = new Set();
     #isExpanded = new Map();
+    #actions = new Map();
+    #itemActions = new Map();
     createElement() {
         this.#shadowRoot = this.attachShadow({ mode: 'closed' });
         shadowRootStyle(this.#shadowRoot, treeCSS);
         I18n.observeElement(this.#shadowRoot);
         this.#refresh();
+    }
+    adoptStyle(css) {
+        this.initElement();
+        shadowRootStyle(this.#shadowRoot, css);
     }
     #refresh() {
         if (!this.#shadowRoot) {
@@ -4420,14 +4557,26 @@ class HTMLHarmonyTreeElement extends HTMLHarmonyElement {
     }
     #createItem(item, parent, createExpanded) {
         let childs;
+        let actions;
         const element = createElement('div', {
-            class: 'item',
+            class: `item level${item.getLevel()}`,
             parent: parent,
             childs: [
                 createElement('div', {
                     class: 'header',
-                    innerText: item.name,
-                    $click: () => this.#expandItem(item, childs),
+                    childs: [
+                        createElement('div', {
+                            class: 'title',
+                            innerText: item.name,
+                        }),
+                        actions = createElement('div', {
+                            class: 'actions',
+                        }),
+                    ],
+                    $click: () => {
+                        this.#expandItem(item, childs);
+                        this.dispatchEvent(new CustomEvent('itemclick', { detail: { item: item } }));
+                    },
                     $contextmenu: (event) => this.#contextMenuHandler(event, item),
                 }),
                 childs = createElement('div', {
@@ -4438,9 +4587,14 @@ class HTMLHarmonyTreeElement extends HTMLHarmonyElement {
         if (item.isRoot && item.name == '') {
             element.classList.add('root');
         }
+        if (item.type) {
+            element.classList.add(`type-${item.type}`);
+        }
         if (createExpanded) {
             this.#expandItem(item, childs);
         }
+        this.#itemActions.set(item, actions);
+        this.#refreshActions(item);
         return element;
     }
     #expandItem(item, parent) {
@@ -4462,6 +4616,42 @@ class HTMLHarmonyTreeElement extends HTMLHarmonyElement {
             }
             this.#isInitialized.add(item);
         }
+    }
+    addAction(name, img) {
+        const action = {
+            name: name,
+        };
+        if (typeof img == 'string') {
+            action.innerHTML = img;
+        }
+        else {
+            action.element = img;
+        }
+        this.#actions.set(name, action);
+    }
+    #refreshActions(item) {
+        const htmlActions = this.#itemActions.get(item);
+        for (const actionName of item.actions) {
+            const action = this.#actions.get(actionName);
+            if (action) {
+                createElement('div', {
+                    child: action.element,
+                    innerHTML: action.innerHTML,
+                    parent: htmlActions,
+                    $click: (event) => this.#actionHandler(event, item, actionName),
+                });
+            }
+        }
+    }
+    #actionHandler(event, item, action) {
+        this.dispatchEvent(new CustomEvent('itemaction', {
+            detail: {
+                item: item,
+                action: action,
+            },
+        }));
+        event.preventDefault();
+        event.stopPropagation();
     }
     onAttributeChanged(name, oldValue, newValue) {
         switch (name) {
@@ -4520,7 +4710,7 @@ var index = /*#__PURE__*/Object.freeze({
     get ManipulatorResizeOrigin () { return ManipulatorResizeOrigin; },
     get ManipulatorSide () { return ManipulatorSide; },
     get ManipulatorUpdatedEventType () { return ManipulatorUpdatedEventType; },
-    TreeElement: TreeElement,
+    TreeItem: TreeItem,
     cloneEvent: cloneEvent,
     createElement: createElement,
     createElementNS: createElementNS,
@@ -5870,7 +6060,7 @@ class PersistentStorage {
     }
     static async #getElement(entry, parent) {
         const childs = [];
-        const tree = new TreeElement(entry.name, { childs: childs, parent: parent, userData: entry });
+        const tree = new TreeItem(entry.name, { childs: childs, parent: parent, userData: entry });
         if (entry.kind == 'directory') {
             for await (const [key, value] of entry.entries()) {
                 if (this.#matchFilter(value)) {
