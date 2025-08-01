@@ -73,30 +73,31 @@ export declare type OptionMap = {
     [key: string]: OptionValue;
 };
 
-export declare class OptionsManager extends EventTarget {
+export declare class OptionsManager {
     #private;
-    logException: boolean;
-    constructor();
-    init(parameters: {
+    static logException: boolean;
+    static init(parameters: {
         [key: string]: any;
     }): Promise<void>;
-    addOption(option: any): void;
-    setItem(name: string, value: any): void;
-    getSubItem(name: string, subName: string): Promise<OptionValue>;
-    setSubItem(name: string, subName: string, value: any): Promise<void>;
-    removeSubItem(name: string, subName: string): void;
-    getItem(name: string): any;
-    removeItem(name: string): void;
-    resetItem(name: string): void;
-    resetItems(names: Array<string>): void;
-    resetAllItems(): void;
-    clear(): void;
-    showOptionsManager(): void;
-    getOptionsPerType(type: string): Promise<Map<string, any>>;
-    getOption(name: string): Promise<Option_2 | undefined>;
-    getOptionType(name: string): Promise<string | undefined>;
-    getList(name: string): Promise<any[] | undefined>;
+    static addOption(option: any): void;
+    static setItem(name: string, value: any): void;
+    static getSubItem(name: string, subName: string): Promise<OptionValue>;
+    static setSubItem(name: string, subName: string, value: any): Promise<void>;
+    static removeSubItem(name: string, subName: string): void;
+    static getItem(name: string): any;
+    static removeItem(name: string): void;
+    static resetItem(name: string): void;
+    static resetItems(names: Array<string>): void;
+    static resetAllItems(): void;
+    static clear(): void;
+    static showOptionsManager(): void;
+    static getOptionsPerType(type: string): Promise<Map<string, any>>;
+    static getOption(name: string): Promise<Option_2 | undefined>;
+    static getOptionType(name: string): Promise<string | undefined>;
+    static getList(name: string): Promise<any[] | undefined>;
 }
+
+export declare const OptionsManagerEvents: EventTarget;
 
 export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 

@@ -7,28 +7,24 @@ export type OptionValue = string | number | boolean | bigint | OptionMap | null 
 export type OptionMap = { [key: string]: OptionValue };
 export type SubOption = { [key: string]: Option };
 
-export class OptionsManager extends EventTarget {
-	static #instance: OptionsManager;
-	#defaultValues = new Map<string, Option>();
-	#currentValues = new Map<string, OptionValue>();
-	#categories = new Map<string, Array<any/*TODO:better type*/>>();
-	#dirtyCategories = true;
-	#initPromiseResolve?: (value?: unknown) => void;
-	#initPromise = new Promise((resolve) => this.#initPromiseResolve = resolve);
-	#currentFilter = '';
-	#optionsManagerRows = new Set<HTMLElement>();
-	#htmlOptionsTable?: HTMLTableElement;
-	#htmlOptionsManagerContentThead?: HTMLElement;
-	#uniqueId = 0;
-	#shadowRoot?: ShadowRoot;
-	logException = false;
+export const OptionsManagerEvents = new EventTarget();
 
-	constructor() {
-		if (OptionsManager.#instance) {
-			return OptionsManager.#instance;
-		}
-		super();
-		OptionsManager.#instance = this;
+export class OptionsManager {
+	static #defaultValues = new Map<string, Option>();
+	static #currentValues = new Map<string, OptionValue>();
+	static #categories = new Map<string, Array<any/*TODO:better type*/>>();
+	static #dirtyCategories = true;
+	static #initPromiseResolve?: (value?: unknown) => void;
+	static #initPromise = new Promise((resolve) => this.#initPromiseResolve = resolve);
+	static #currentFilter = '';
+	static #optionsManagerRows = new Set<HTMLElement>();
+	static #htmlOptionsTable?: HTMLTableElement;
+	static #htmlOptionsManagerContentThead?: HTMLElement;
+	static #uniqueId = 0;
+	static #shadowRoot?: ShadowRoot;
+	static logException = false;
+
+	static {
 
 		this.#defaultValues[Symbol.iterator] = function* (): MapIterator<[string, Option]> {
 			yield* [...this.entries()].sort(
@@ -37,7 +33,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	async init(parameters: { [key: string]: any }) {
+	static async init(parameters: { [key: string]: any }) {
 		if (parameters.url) {
 			await this.#initFromURL(parameters.url);
 		} else if (parameters.json) {
@@ -45,12 +41,12 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	async #initFromURL(url: string) {
+	static async #initFromURL(url: string) {
 		const response = await fetch(url);
 		this.#initFromJSON(await response.json());
 	}
 
-	#initFromJSON(json: { [key: string]: any }) {
+	static #initFromJSON(json: { [key: string]: any }) {
 		if (json) {
 			if (json.categories) {
 				json.categories.forEach((category: string) => this.#addCategory(category));
@@ -65,12 +61,12 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	#addCategory(name: string) {
+	static #addCategory(name: string) {
 		this.#categories.set(name.toLowerCase(), []);
 		this.#dirtyCategories = true;
 	}
 
-	#refreshCategories() {
+	static #refreshCategories() {
 		if (this.#dirtyCategories) {
 			for (const [categoryName, category] of this.#categories) {
 				category.length = 0;
@@ -95,7 +91,7 @@ export class OptionsManager extends EventTarget {
 		this.#dirtyCategories = false;
 	}
 
-	addOption(option: any/*TODO:better type*/) {
+	static addOption(option: any/*TODO:better type*/) {
 		if (!option) { return; }
 		const name = option.name.toLowerCase();
 
@@ -143,7 +139,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	setItem(name: string, value: any) {
+	static setItem(name: string, value: any) {
 		try {
 			if (typeof localStorage != 'undefined') {
 				localStorage.setItem(name, JSON.stringify(value));
@@ -162,7 +158,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	async getSubItem(name: string, subName: string) {
+	static async getSubItem(name: string, subName: string) {
 		try {
 			const option = await this.getOption(name);
 			if (option && option.type == 'map') {
@@ -178,7 +174,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	async setSubItem(name: string, subName: string, value: any) {
+	static async setSubItem(name: string, subName: string, value: any) {
 		try {
 			const option = await this.getOption(name);
 			if (option && option.type == 'map') {
@@ -199,7 +195,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	removeSubItem(name: string, subName: string) {
+	static removeSubItem(name: string, subName: string) {
 		try {
 			const map = this.#currentValues.get(name) ?? {};
 			if (map && (typeof map == 'object')) {
@@ -214,24 +210,24 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	#valueChanged(name: string, value: any) {
+	static #valueChanged(name: string, value: any) {
 		const option = this.#defaultValues.get(name);
 		if (!option) {
 			return;
 		}
 		const context = option.context;
-		this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
+		OptionsManagerEvents.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
 		let lastIndex = name.lastIndexOf('.');
 		while (lastIndex != -1) {
 			const wildCardName = name.slice(0, lastIndex);
-			this.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
+			OptionsManagerEvents.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
 			lastIndex = name.lastIndexOf('.', lastIndex - 1);
 		}
 
-		this.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value, context: context } }));
+		OptionsManagerEvents.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value, context: context } }));
 	}
 
-	getItem(name: string) {
+	static getItem(name: string) {
 		try {
 			if (typeof localStorage != 'undefined') {
 				const value = localStorage.getItem(name);
@@ -250,7 +246,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	removeItem(name: string) {
+	static removeItem(name: string) {
 		this.#defaultValues.delete(name);
 		try {
 			if (typeof localStorage != 'undefined') {
@@ -264,7 +260,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	resetItem(name: string) {
+	static resetItem(name: string) {
 		const item = this.#defaultValues.get(name);
 		if (item) {
 			const defaultValue = item.defaultValue;
@@ -273,13 +269,13 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	resetItems(names: Array<string>) {
+	static resetItems(names: Array<string>) {
 		for (const name of names) {
 			this.resetItem(name);
 		}
 	}
 
-	resetAllItems() {
+	static resetAllItems() {
 		for (const [item, option] of this.#defaultValues) {
 			if (option.protected) {
 				continue;
@@ -288,7 +284,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	clear() {
+	static clear() {
 		this.#defaultValues.clear();
 		try {
 			if (typeof localStorage != 'undefined') {
@@ -302,12 +298,12 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	#filter(filter: string) {
+	static #filter(filter: string) {
 		this.#currentFilter = String(filter).toLowerCase();
 		this.#applyFilter();
 	}
 
-	#applyFilter() {
+	static #applyFilter() {
 		for (const row of this.#optionsManagerRows) {
 			//let row = i[0];
 			const optionName = row.getAttribute('user-data-option-name')?.toLowerCase();
@@ -323,7 +319,7 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	#initPanel() {
+	static #initPanel() {
 		this.#shadowRoot = createShadowRoot('options-manager', {
 			parent: document.body,
 			adoptStyle: optionsManagerCSS,
@@ -387,7 +383,7 @@ export class OptionsManager extends EventTarget {
 		this.#htmlOptionsManagerContentThead = createElement('thead', { parent: this.#htmlOptionsTable });
 	}
 
-	#populateOptionRow(option: Option) {
+	static #populateOptionRow(option: Option) {
 		const htmlRow = createElement('tr');
 		const htmlResetButtonCell = createElement('td');
 		const htmlOptionNameCell = createElement('td', { innerHTML: option.name });
@@ -415,7 +411,7 @@ export class OptionsManager extends EventTarget {
 		return htmlRow;
 	}
 
-	#populateMapOptionRow(option: Option) {
+	static #populateMapOptionRow(option: Option) {
 		const htmlRow = createElement('tbody', { innerHTML: `<td></td><td colspan="3">${option.name}</td>` });
 
 		const userValue = this.getItem(option.name);
@@ -435,7 +431,7 @@ export class OptionsManager extends EventTarget {
 		return htmlRow;
 	}
 
-	#addOptionRow(option: Option) {
+	static #addOptionRow(option: Option) {
 		if (option.editable === false) {
 			return;
 		}
@@ -452,7 +448,7 @@ export class OptionsManager extends EventTarget {
 		return htmlRow;
 	}
 
-	#refreshPanel() {
+	static #refreshPanel() {
 		this.#refreshCategories();
 		if (this.#htmlOptionsManagerContentThead) {
 			this.#htmlOptionsManagerContentThead.innerText = '';
@@ -490,7 +486,7 @@ export class OptionsManager extends EventTarget {
 		this.#applyFilter();
 	}
 
-	#fillCell(cell: HTMLElement, type: string, value?: string) {
+	static #fillCell(cell: HTMLElement, type: string, value?: string) {
 		switch (type) {
 			case 'string':
 				if (value) {
@@ -516,11 +512,11 @@ export class OptionsManager extends EventTarget {
 		}
 	}
 
-	#getUniqueId() {
+	static #getUniqueId() {
 		return 'options-manager-' + (this.#uniqueId++);
 	}
 
-	#createInput(optionName: string, option: Option | undefined, value: any, resetButton: HTMLElement) {
+	static #createInput(optionName: string, option: Option | undefined, value: any, resetButton: HTMLElement) {
 		if (!option) {
 			return;
 		}
@@ -670,7 +666,7 @@ export class OptionsManager extends EventTarget {
 		return htmlElement;
 	}
 
-	showOptionsManager() {
+	static showOptionsManager() {
 		if (!this.#shadowRoot) {
 			this.#initPanel();
 		}
@@ -678,7 +674,7 @@ export class OptionsManager extends EventTarget {
 		show(this.#shadowRoot?.host as HTMLElement);
 	}
 
-	async getOptionsPerType(type: string) {
+	static async getOptionsPerType(type: string) {
 		await this.#initPromise;
 		const ret = new Map<string, any>();
 
@@ -691,17 +687,17 @@ export class OptionsManager extends EventTarget {
 		return ret;
 	}
 
-	async getOption(name: string) {
+	static async getOption(name: string) {
 		await this.#initPromise;
 		return this.#defaultValues.get(name);
 	}
 
-	async getOptionType(name: string) {
+	static async getOptionType(name: string) {
 		await this.#initPromise;
 		return this.#defaultValues.get(name)?.type;
 	}
 
-	async getList(name: string) {
+	static async getList(name: string) {
 		await this.#initPromise;
 		const option = this.#defaultValues.get(name);
 		if (option && option.type == 'list') {

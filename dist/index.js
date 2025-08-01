@@ -274,32 +274,27 @@ function runCopy() {
 
 var optionsManagerCSS = ":host{\r\n\tposition: absolute;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: auto;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\ttop:0px;\r\n\tleft: 0px;\r\n}\r\n\r\n#options-manager-inner{\r\n\tposition: relative;\r\n\t/*background-color: rgba(255, 255, 255, 1.0);*/\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--main-text-color-dark2);\r\n\tpadding:10px;\r\n\toverflow: hidden;\r\n\tmax-height: 70%;\r\n\tmax-width: 75%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\topacity: 0.9;\r\n}\r\n\r\n#options-manager-inner h1{\r\n\ttext-transform: capitalize;\r\n\ttext-align: center;\r\n}\r\n\r\n#options-manager-inner-filter{\r\n\twidth:100%;\r\n}\r\n\r\n.options-manager-button{\r\n\tcursor:pointer;\r\n\twhite-space: nowrap;\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner table{\r\n\ttext-align: left;\r\n\toverflow: hidden auto;\r\n\tdisplay: block;\r\n\theight: 100%;\r\n}\r\n\r\n#options-manager-inner thead{\r\n\tposition: sticky;\r\n\t/*display: block;*/\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner thead th{\r\n\tposition: sticky;\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner th{\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner th button, #options-manager-inner td button{\r\n\twidth: 100%;\r\n}\r\n\r\n#options-manager-title{\r\n\tcursor:move;\r\n}\r\n\r\n[draggable=true] {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] *{\r\n\tcursor: initial;\r\n}\r\n\r\n#options-manager-outer kbd{\r\n\tbackground-color: #eee;\r\n\tborder-radius: 0.25rem;\r\n\tborder: 0.1rem solid #b4b4b4;\r\n\tbox-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;\r\n\tcolor: #333;\r\n\tdisplay: inline-block;\r\n\tline-height: 1;\r\n\tpadding: 0.15rem;\r\n\twhite-space: nowrap;\r\n\tfont-weight: 1000;\r\n\tfont-size: 1.3rem;\r\n}\r\n";
 
-class OptionsManager extends EventTarget {
-    static #instance;
-    #defaultValues = new Map();
-    #currentValues = new Map();
-    #categories = new Map();
-    #dirtyCategories = true;
-    #initPromiseResolve;
-    #initPromise = new Promise((resolve) => this.#initPromiseResolve = resolve);
-    #currentFilter = '';
-    #optionsManagerRows = new Set();
-    #htmlOptionsTable;
-    #htmlOptionsManagerContentThead;
-    #uniqueId = 0;
-    #shadowRoot;
-    logException = false;
-    constructor() {
-        if (OptionsManager.#instance) {
-            return OptionsManager.#instance;
-        }
-        super();
-        OptionsManager.#instance = this;
+const OptionsManagerEvents = new EventTarget();
+class OptionsManager {
+    static #defaultValues = new Map();
+    static #currentValues = new Map();
+    static #categories = new Map();
+    static #dirtyCategories = true;
+    static #initPromiseResolve;
+    static #initPromise = new Promise((resolve) => this.#initPromiseResolve = resolve);
+    static #currentFilter = '';
+    static #optionsManagerRows = new Set();
+    static #htmlOptionsTable;
+    static #htmlOptionsManagerContentThead;
+    static #uniqueId = 0;
+    static #shadowRoot;
+    static logException = false;
+    static {
         this.#defaultValues[Symbol.iterator] = function* () {
             yield* [...this.entries()].sort((a, b) => { return a[0] < b[0] ? -1 : 1; });
         };
     }
-    async init(parameters) {
+    static async init(parameters) {
         if (parameters.url) {
             await this.#initFromURL(parameters.url);
         }
@@ -307,11 +302,11 @@ class OptionsManager extends EventTarget {
             this.#initFromJSON(parameters.json);
         }
     }
-    async #initFromURL(url) {
+    static async #initFromURL(url) {
         const response = await fetch(url);
         this.#initFromJSON(await response.json());
     }
-    #initFromJSON(json) {
+    static #initFromJSON(json) {
         if (json) {
             if (json.categories) {
                 json.categories.forEach((category) => this.#addCategory(category));
@@ -325,11 +320,11 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    #addCategory(name) {
+    static #addCategory(name) {
         this.#categories.set(name.toLowerCase(), []);
         this.#dirtyCategories = true;
     }
-    #refreshCategories() {
+    static #refreshCategories() {
         if (this.#dirtyCategories) {
             for (const [categoryName, category] of this.#categories) {
                 category.length = 0;
@@ -352,7 +347,7 @@ class OptionsManager extends EventTarget {
         }
         this.#dirtyCategories = false;
     }
-    addOption(option /*TODO:better type*/) {
+    static addOption(option /*TODO:better type*/) {
         if (!option) {
             return;
         }
@@ -401,7 +396,7 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    setItem(name, value) {
+    static setItem(name, value) {
         try {
             if (typeof localStorage != 'undefined') {
                 localStorage.setItem(name, JSON.stringify(value));
@@ -420,7 +415,7 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    async getSubItem(name, subName) {
+    static async getSubItem(name, subName) {
         try {
             const option = await this.getOption(name);
             if (option && option.type == 'map') {
@@ -436,7 +431,7 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    async setSubItem(name, subName, value) {
+    static async setSubItem(name, subName, value) {
         try {
             const option = await this.getOption(name);
             if (option && option.type == 'map') {
@@ -455,7 +450,7 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    removeSubItem(name, subName) {
+    static removeSubItem(name, subName) {
         try {
             const map = this.#currentValues.get(name) ?? {};
             if (map && (typeof map == 'object')) {
@@ -470,22 +465,22 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    #valueChanged(name, value) {
+    static #valueChanged(name, value) {
         const option = this.#defaultValues.get(name);
         if (!option) {
             return;
         }
         const context = option.context;
-        this.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
+        OptionsManagerEvents.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
         let lastIndex = name.lastIndexOf('.');
         while (lastIndex != -1) {
             const wildCardName = name.slice(0, lastIndex);
-            this.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
+            OptionsManagerEvents.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
             lastIndex = name.lastIndexOf('.', lastIndex - 1);
         }
-        this.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value, context: context } }));
+        OptionsManagerEvents.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value, context: context } }));
     }
-    getItem(name) {
+    static getItem(name) {
         try {
             if (typeof localStorage != 'undefined') {
                 const value = localStorage.getItem(name);
@@ -504,7 +499,7 @@ class OptionsManager extends EventTarget {
             return this.#defaultValues.get(name)?.defaultValue;
         }
     }
-    removeItem(name) {
+    static removeItem(name) {
         this.#defaultValues.delete(name);
         try {
             if (typeof localStorage != 'undefined') {
@@ -518,7 +513,7 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    resetItem(name) {
+    static resetItem(name) {
         const item = this.#defaultValues.get(name);
         if (item) {
             const defaultValue = item.defaultValue;
@@ -526,12 +521,12 @@ class OptionsManager extends EventTarget {
             this.setItem(name, defaultValue);
         }
     }
-    resetItems(names) {
+    static resetItems(names) {
         for (const name of names) {
             this.resetItem(name);
         }
     }
-    resetAllItems() {
+    static resetAllItems() {
         for (const [item, option] of this.#defaultValues) {
             if (option.protected) {
                 continue;
@@ -539,7 +534,7 @@ class OptionsManager extends EventTarget {
             this.resetItem(item);
         }
     }
-    clear() {
+    static clear() {
         this.#defaultValues.clear();
         try {
             if (typeof localStorage != 'undefined') {
@@ -553,11 +548,11 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    #filter(filter) {
+    static #filter(filter) {
         this.#currentFilter = String(filter).toLowerCase();
         this.#applyFilter();
     }
-    #applyFilter() {
+    static #applyFilter() {
         for (const row of this.#optionsManagerRows) {
             //let row = i[0];
             const optionName = row.getAttribute('user-data-option-name')?.toLowerCase();
@@ -572,7 +567,7 @@ class OptionsManager extends EventTarget {
             }
         }
     }
-    #initPanel() {
+    static #initPanel() {
         this.#shadowRoot = createShadowRoot('options-manager', {
             parent: document.body,
             adoptStyle: optionsManagerCSS,
@@ -623,7 +618,7 @@ class OptionsManager extends EventTarget {
         this.#htmlOptionsTable = createElement('table', { parent: optionsManagerInner });
         this.#htmlOptionsManagerContentThead = createElement('thead', { parent: this.#htmlOptionsTable });
     }
-    #populateOptionRow(option) {
+    static #populateOptionRow(option) {
         const htmlRow = createElement('tr');
         const htmlResetButtonCell = createElement('td');
         const htmlOptionNameCell = createElement('td', { innerHTML: option.name });
@@ -646,7 +641,7 @@ class OptionsManager extends EventTarget {
         }
         return htmlRow;
     }
-    #populateMapOptionRow(option) {
+    static #populateMapOptionRow(option) {
         const htmlRow = createElement('tbody', { innerHTML: `<td></td><td colspan="3">${option.name}</td>` });
         const userValue = this.getItem(option.name);
         if (userValue && typeof userValue === 'object') {
@@ -662,7 +657,7 @@ class OptionsManager extends EventTarget {
         }
         return htmlRow;
     }
-    #addOptionRow(option) {
+    static #addOptionRow(option) {
         if (option.editable === false) {
             return;
         }
@@ -676,7 +671,7 @@ class OptionsManager extends EventTarget {
         htmlRow.setAttribute('user-data-option-name', option.name);
         return htmlRow;
     }
-    #refreshPanel() {
+    static #refreshPanel() {
         this.#refreshCategories();
         if (this.#htmlOptionsManagerContentThead) {
             this.#htmlOptionsManagerContentThead.innerText = '';
@@ -706,7 +701,7 @@ class OptionsManager extends EventTarget {
         I18n.i18n();
         this.#applyFilter();
     }
-    #fillCell(cell, type, value) {
+    static #fillCell(cell, type, value) {
         switch (type) {
             case 'string':
                 if (value) {
@@ -731,10 +726,10 @@ class OptionsManager extends EventTarget {
                 }
         }
     }
-    #getUniqueId() {
+    static #getUniqueId() {
         return 'options-manager-' + (this.#uniqueId++);
     }
-    #createInput(optionName, option, value, resetButton) {
+    static #createInput(optionName, option, value, resetButton) {
         if (!option) {
             return;
         }
@@ -882,14 +877,14 @@ class OptionsManager extends EventTarget {
         showHideResetButton();
         return htmlElement;
     }
-    showOptionsManager() {
+    static showOptionsManager() {
         if (!this.#shadowRoot) {
             this.#initPanel();
         }
         this.#refreshPanel();
         show(this.#shadowRoot?.host);
     }
-    async getOptionsPerType(type) {
+    static async getOptionsPerType(type) {
         await this.#initPromise;
         const ret = new Map();
         for (const option of this.#defaultValues.values()) {
@@ -900,15 +895,15 @@ class OptionsManager extends EventTarget {
         }
         return ret;
     }
-    async getOption(name) {
+    static async getOption(name) {
         await this.#initPromise;
         return this.#defaultValues.get(name);
     }
-    async getOptionType(name) {
+    static async getOptionType(name) {
         await this.#initPromise;
         return this.#defaultValues.get(name)?.type;
     }
-    async getList(name) {
+    static async getList(name) {
         await this.#initPromise;
         const option = this.#defaultValues.get(name);
         if (option && option.type == 'list') {
@@ -1243,4 +1238,4 @@ function cleanPath(path) {
     return path;
 }
 
-export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, saveFile, setNotificationsPlacement, supportsPopover };
+export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, saveFile, setNotificationsPlacement, supportsPopover };
