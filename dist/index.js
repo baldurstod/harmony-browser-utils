@@ -1,4 +1,4 @@
-import { createElement, createShadowRoot, I18n, documentStyle, defineHarmonyCircularProgress, display, hide, show, defineHarmonyTree, TreeItem } from 'harmony-ui';
+import { createElement, documentStyle, defineHarmonyCircularProgress, createShadowRoot, display, I18n, hide, show, defineHarmonyTree, TreeItem } from 'harmony-ui';
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
 import { vec2 } from 'gl-matrix';
 
@@ -212,26 +212,16 @@ class Notification {
 }
 let htmlInner;
 let htmlCopy;
-createShadowRoot('div', {
-    parent: document.body,
-    adoptStyle: notificationsContainerCSS,
-    childs: [
-        htmlInner = createElement('div'),
-        htmlCopy = createElement('div', {
-            class: 'copy',
-            hidden: true,
-            innerHTML: contentCopySVG,
-        }),
-    ],
-});
-I18n.observeElement(htmlInner);
-setNotificationsPlacement(NotificationsPlacement.TopRight);
 let notificationId = 0;
 const notifications = new Map();
 function setNotificationsPlacement(placement) {
     htmlInner.className = `inner ${placement}`;
 }
+let initialized = false;
 function addNotification(content, type, ttl, params) {
+    if (!initialized) {
+        initialize();
+    }
     const notification = new Notification(content, type, ttl, params);
     notifications.set(notification.id, notification);
     htmlInner.append(notification.htmlElement);
@@ -244,12 +234,29 @@ function closeNotification(notification) {
     if (notification && notifications.has(notification.id)) {
         notifications.delete(notification.id);
         notification.htmlElement.remove();
-        Controller.dispatchEvent(new CustomEvent(NotificationEvents.Removed, { detail: { notification: notification } }));
+        NotificationController.dispatchEvent(new CustomEvent(NotificationEvents.Removed, { detail: { notification: notification } }));
     }
 }
-const Controller = new EventTarget();
+function initialize() {
+    initialized = true;
+    createShadowRoot('div', {
+        parent: document.body,
+        adoptStyle: notificationsContainerCSS,
+        childs: [
+            htmlInner = createElement('div'),
+            htmlCopy = createElement('div', {
+                class: 'copy',
+                hidden: true,
+                innerHTML: contentCopySVG,
+            }),
+        ],
+    });
+    I18n.observeElement(htmlInner);
+    setNotificationsPlacement(NotificationsPlacement.TopRight);
+}
+const NotificationController = new EventTarget();
 function addNotificationEventListener(type, callback, options) {
-    Controller.addEventListener(type, callback, options);
+    NotificationController.addEventListener(type, callback, options);
 }
 let startCopy;
 let startY;

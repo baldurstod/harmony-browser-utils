@@ -197,20 +197,6 @@ export class Notification {
 
 let htmlInner: HTMLElement;
 let htmlCopy: HTMLElement;
-const shadowRoot = createShadowRoot('div', {
-	parent: document.body,
-	adoptStyle: notificationsContainerCSS,
-	childs: [
-		htmlInner = createElement('div'),
-		htmlCopy = createElement('div', {
-			class: 'copy',
-			hidden: true,
-			innerHTML: contentCopySVG,
-		}),
-	],
-});
-I18n.observeElement(htmlInner);
-setNotificationsPlacement(NotificationsPlacement.TopRight);
 
 let notificationId = 0;
 const notifications = new Map<number, Notification>();
@@ -219,7 +205,11 @@ export function setNotificationsPlacement(placement: NotificationsPlacement) {
 	htmlInner.className = `inner ${placement}`;
 }
 
+let initialized = false;
 export function addNotification(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams): Notification {
+	if (!initialized) {
+		initialize();
+	}
 	const notification = new Notification(content, type, ttl, params);
 	notifications.set(notification.id, notification);
 	htmlInner.append(notification.htmlElement);
@@ -235,14 +225,33 @@ export function closeNotification(notification: Notification | number) {
 		notifications.delete(notification.id);
 		notification.htmlElement.remove();
 
-		Controller.dispatchEvent(new CustomEvent<NotificationRemovedEventData>(NotificationEvents.Removed, { detail: { notification: notification } }));
+		NotificationController.dispatchEvent(new CustomEvent<NotificationRemovedEventData>(NotificationEvents.Removed, { detail: { notification: notification } }));
 	}
 }
 
-const Controller = new EventTarget();
+function initialize() {
+	initialized = true;
+	const shadowRoot = createShadowRoot('div', {
+		parent: document.body,
+		adoptStyle: notificationsContainerCSS,
+		childs: [
+			htmlInner = createElement('div'),
+			htmlCopy = createElement('div', {
+				class: 'copy',
+				hidden: true,
+				innerHTML: contentCopySVG,
+			}),
+		],
+	});
+	I18n.observeElement(htmlInner);
+	setNotificationsPlacement(NotificationsPlacement.TopRight);
+
+}
+
+const NotificationController = new EventTarget();
 
 export function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void {
-	Controller.addEventListener(type, callback, options);
+	NotificationController.addEventListener(type, callback, options);
 }
 
 let startCopy: number;
