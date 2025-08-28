@@ -490,7 +490,7 @@ export class OptionsManager {
 		switch (type) {
 			case 'string':
 				if (value) {
-					cell.innerHTML = value;
+					cell.innerText = value;
 				}
 				break;
 			case 'shortcut':
@@ -498,7 +498,7 @@ export class OptionsManager {
 					const arr = value.split('+');
 					for (const key of arr) {
 						createElement('kbd', {
-							innerHTML: key,
+							innerText: key,
 							parent: cell,
 						});
 					}
@@ -507,7 +507,7 @@ export class OptionsManager {
 				break;
 			default:
 				if (value) {
-					cell.innerHTML = value;
+					cell.innerText = value;
 				}
 		}
 	}
