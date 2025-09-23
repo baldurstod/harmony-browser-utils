@@ -1,6 +1,6 @@
-import { Millisecond } from 'harmony-types';
+import { Second } from 'harmony-types';
 
-export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams): Notification_2;
+export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams): Notification_2;
 
 export declare function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
 
@@ -17,7 +17,7 @@ export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
 
 declare class Notification_2 {
     #private;
-    constructor(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams);
+    constructor(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams);
     get htmlElement(): HTMLElement;
     close(): void;
     get id(): NotificationId;

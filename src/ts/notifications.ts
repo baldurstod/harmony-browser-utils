@@ -3,7 +3,7 @@ import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG
 import { themeCSS } from 'harmony-css';
 import notificationsContainerCSS from '../css/notificationcontainer.css';
 import notificationsCSS from '../css/notifications.css';
-import { Millisecond } from 'harmony-types';
+import { Second } from 'harmony-types';
 
 export type NotificationContent = HTMLElement | string;
 
@@ -47,14 +47,14 @@ export class Notification {
 	#content: NotificationContent;
 	#type: NotificationType;
 	#id: NotificationId;
-	#ttl: Millisecond = 0;
+	#ttl: Second = 0;
 	#htmlType?: HTMLElement;
 	#htmlContent?: HTMLElement;
 	#htmlProgress?: HTMLHarmonyCircularProgressElement;
 	#parent?: HTMLElement | ShadowRoot;
 	#start: DOMHighResTimeStamp = 0;
 
-	constructor(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams) {
+	constructor(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams) {
 		this.#content = content;
 		this.#type = type;
 		//this.#setTtl(ttl);
@@ -209,7 +209,7 @@ export function setNotificationsPlacement(placement: NotificationsPlacement) {
 }
 
 let initialized = false;
-export function addNotification(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams): Notification {
+export function addNotification(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams): Notification {
 	if (!initialized) {
 		initialize();
 	}
