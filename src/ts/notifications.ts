@@ -3,8 +3,11 @@ import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG
 import { themeCSS } from 'harmony-css';
 import notificationsContainerCSS from '../css/notificationcontainer.css';
 import notificationsCSS from '../css/notifications.css';
+import { Millisecond } from 'harmony-types';
 
 export type NotificationContent = HTMLElement | string;
+
+export type NotificationId = number;
 
 export enum NotificationsPlacement {
 	Top = 'top',
@@ -43,15 +46,15 @@ export class Notification {
 	//#htmlElement?: HTMLElement;
 	#content: NotificationContent;
 	#type: NotificationType;
-	#id: number;
-	#ttl: number = 0;
+	#id: NotificationId;
+	#ttl: Millisecond = 0;
 	#htmlType?: HTMLElement;
 	#htmlContent?: HTMLElement;
 	#htmlProgress?: HTMLHarmonyCircularProgressElement;
 	#parent?: HTMLElement | ShadowRoot;
-	#start: number = 0;
+	#start: DOMHighResTimeStamp = 0;
 
-	constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams) {
+	constructor(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams) {
 		this.#content = content;
 		this.#type = type;
 		//this.#setTtl(ttl);
@@ -190,7 +193,7 @@ export class Notification {
 		}
 	}
 
-	get id(): number {
+	get id(): NotificationId {
 		return this.#id;
 	}
 }
@@ -199,14 +202,14 @@ let htmlInner: HTMLElement;
 let htmlCopy: HTMLElement;
 
 let notificationId = 0;
-const notifications = new Map<number, Notification>();
+const notifications = new Map<NotificationId, Notification>();
 
 export function setNotificationsPlacement(placement: NotificationsPlacement) {
 	htmlInner.className = `inner ${placement}`;
 }
 
 let initialized = false;
-export function addNotification(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams): Notification {
+export function addNotification(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams): Notification {
 	if (!initialized) {
 		initialize();
 	}
@@ -216,7 +219,7 @@ export function addNotification(content: NotificationContent, type: Notification
 	return notification;
 }
 
-export function closeNotification(notification: Notification | number) {
+export function closeNotification(notification: Notification | NotificationId) {
 	if (typeof notification == 'number') {
 		notification = notifications.get(notification)!;
 	}
@@ -254,7 +257,7 @@ export function addNotificationEventListener(type: string, callback: EventListen
 	NotificationController.addEventListener(type, callback, options);
 }
 
-let startCopy: number;
+let startCopy: DOMHighResTimeStamp;
 let startY: number;
 function copied(x: number, y: number) {
 	startCopy = performance.now();

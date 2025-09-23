@@ -1,8 +1,10 @@
-export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams): Notification_2;
+import { Millisecond } from 'harmony-types';
+
+export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams): Notification_2;
 
 export declare function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
 
-export declare function closeNotification(notification: Notification_2 | number): void;
+export declare function closeNotification(notification: Notification_2 | NotificationId): void;
 
 export declare enum EntryType {
     File = "file",
@@ -15,10 +17,10 @@ export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
 
 declare class Notification_2 {
     #private;
-    constructor(content: NotificationContent, type: NotificationType, ttl: number, params?: NotificationParams);
+    constructor(content: NotificationContent, type: NotificationType, ttl: Millisecond, params?: NotificationParams);
     get htmlElement(): HTMLElement;
     close(): void;
-    get id(): number;
+    get id(): NotificationId;
 }
 export { Notification_2 as Notification }
 
@@ -28,6 +30,8 @@ export declare enum NotificationEvents {
     Added = "notificationadded",
     Removed = "notificationremoved"
 }
+
+export declare type NotificationId = number;
 
 export declare type NotificationParams = {
     parent?: HTMLElement | ShadowRoot;
