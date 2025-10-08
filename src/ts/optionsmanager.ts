@@ -9,6 +9,12 @@ export type SubOption = { [key: string]: Option };
 
 export const OptionsManagerEvents = new EventTarget();
 
+export type OptionsManagerEvent = {
+	name: string;
+	value: OptionValue;
+	context?: string;
+}
+
 export class OptionsManager {
 	static #defaultValues = new Map<string, Option>();
 	static #currentValues = new Map<string, OptionValue>();
@@ -216,15 +222,15 @@ export class OptionsManager {
 			return;
 		}
 		const context = option.context;
-		OptionsManagerEvents.dispatchEvent(new CustomEvent(name, { detail: { name: name, value: value, context: context } }));
+		OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent>(name, { detail: { name: name, value: value, context: context } }));
 		let lastIndex = name.lastIndexOf('.');
 		while (lastIndex != -1) {
 			const wildCardName = name.slice(0, lastIndex);
-			OptionsManagerEvents.dispatchEvent(new CustomEvent(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
+			OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent>(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
 			lastIndex = name.lastIndexOf('.', lastIndex - 1);
 		}
 
-		OptionsManagerEvents.dispatchEvent(new CustomEvent('*', { detail: { name: name, value: value, context: context } }));
+		OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent>('*', { detail: { name: name, value: value, context: context } }));
 	}
 
 	static getItem(name: string) {

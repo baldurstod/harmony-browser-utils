@@ -101,6 +101,12 @@ export declare class OptionsManager {
     static getList(name: string): Promise<any[] | undefined>;
 }
 
+export declare type OptionsManagerEvent = {
+    name: string;
+    value: OptionValue;
+    context?: string;
+};
+
 export declare const OptionsManagerEvents: EventTarget;
 
 export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
