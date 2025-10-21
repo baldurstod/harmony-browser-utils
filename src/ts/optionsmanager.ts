@@ -148,6 +148,7 @@ export class OptionsManager {
 	static setItem(name: string, value: any) {
 		try {
 			if (typeof localStorage != 'undefined') {
+				// Note: undefined is stored as 'undefined', which is not valid JSON: see getItem()
 				localStorage.setItem(name, JSON.stringify(value));
 				if (this.#currentValues.has(name)) {
 					if (value == this.#currentValues.get(name)) {
@@ -238,6 +239,10 @@ export class OptionsManager {
 			if (typeof localStorage != 'undefined') {
 				const value = localStorage.getItem(name);
 				if (value) {
+					if (value == 'undefined') {
+						// 'undefined' is not valid JSON
+						return undefined;
+					}
 					const parsedValue = JSON.parse(value);
 					return parsedValue;
 				}
@@ -677,7 +682,7 @@ export class OptionsManager {
 			this.#initPanel();
 		}
 		this.#refreshPanel();
-		show(this.#shadowRoot?.host as HTMLElement);
+		show(this.#shadowRoot?.host as (HTMLElement | undefined));
 	}
 
 	static async getOptionsPerType(type: string) {

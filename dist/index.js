@@ -406,6 +406,7 @@ class OptionsManager {
     static setItem(name, value) {
         try {
             if (typeof localStorage != 'undefined') {
+                // Note: undefined is stored as 'undefined', which is not valid JSON: see getItem()
                 localStorage.setItem(name, JSON.stringify(value));
                 if (this.#currentValues.has(name)) {
                     if (value == this.#currentValues.get(name)) {
@@ -492,6 +493,10 @@ class OptionsManager {
             if (typeof localStorage != 'undefined') {
                 const value = localStorage.getItem(name);
                 if (value) {
+                    if (value == 'undefined') {
+                        // 'undefined' is not valid JSON
+                        return undefined;
+                    }
                     const parsedValue = JSON.parse(value);
                     return parsedValue;
                 }
