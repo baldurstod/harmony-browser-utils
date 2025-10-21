@@ -1,8 +1,9 @@
 import { vec2 } from 'gl-matrix';
-import { createElement, hide, show, I18n, createShadowRoot } from 'harmony-ui';
+import { I18n, createElement, createShadowRoot, hide, show } from 'harmony-ui';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
-export type Option = { name: string, editable: boolean, type: string, defaultValue?: string, datalist?: Array<any>, context?: string, protected?: boolean };
+export type DatalistElement = string | [string, string];
+export type Option = { name: string, editable: boolean, type: string, defaultValue?: string, datalist?: Array<DatalistElement>, context?: string, protected?: boolean };
 export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 export type OptionMap = { [key: string]: OptionValue };
 export type SubOption = { [key: string]: Option };
@@ -621,7 +622,12 @@ export class OptionsManager {
 				});
 				if (option.datalist) {
 					for (const o of option.datalist) {
-						createElement('option', { innerHTML: o, parent: htmlElement });
+						if (typeof o == 'string') {
+							createElement('option', { innerText: o, parent: htmlElement });
+						} else {
+							// array
+							createElement('option', { innerText: o[0], parent: htmlElement, value: o[1] });
+						}
 					}
 				}
 				(htmlElement as HTMLSelectElement).value = value;

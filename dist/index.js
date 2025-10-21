@@ -834,7 +834,13 @@ class OptionsManager {
                 });
                 if (option.datalist) {
                     for (const o of option.datalist) {
-                        createElement('option', { innerHTML: o, parent: htmlElement });
+                        if (typeof o == 'string') {
+                            createElement('option', { innerText: o, parent: htmlElement });
+                        }
+                        else {
+                            // array
+                            createElement('option', { innerText: o[0], parent: htmlElement, value: o[1] });
+                        }
                     }
                 }
                 htmlElement.value = value;

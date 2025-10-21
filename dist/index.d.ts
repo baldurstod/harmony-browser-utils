@@ -6,6 +6,8 @@ export declare function addNotificationEventListener(type: string, callback: Eve
 
 export declare function closeNotification(notification: Notification_2 | NotificationId): void;
 
+export declare type DatalistElement = string | [string, string];
+
 export declare enum EntryType {
     File = "file",
     Directory = "directory"
@@ -67,7 +69,7 @@ declare type Option_2 = {
     editable: boolean;
     type: string;
     defaultValue?: string;
-    datalist?: Array<any>;
+    datalist?: Array<DatalistElement>;
     context?: string;
     protected?: boolean;
 };
@@ -98,7 +100,7 @@ export declare class OptionsManager {
     static getOptionsPerType(type: string): Promise<Map<string, any>>;
     static getOption(name: string): Promise<Option_2 | undefined>;
     static getOptionType(name: string): Promise<string | undefined>;
-    static getList(name: string): Promise<any[] | undefined>;
+    static getList(name: string): Promise<DatalistElement[] | undefined>;
 }
 
 export declare type OptionsManagerEvent = {
