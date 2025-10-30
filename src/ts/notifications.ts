@@ -1,9 +1,9 @@
-import { createElement, I18n, createShadowRoot, documentStyle, defineHarmonyCircularProgress, HTMLHarmonyCircularProgressElement, display } from 'harmony-ui';
-import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG } from 'harmony-svg';
 import { themeCSS } from 'harmony-css';
+import { checkCircleSVG, closeSVG, contentCopySVG, errorSVG, infoSVG, warningSVG } from 'harmony-svg';
+import { Second } from 'harmony-types';
+import { createElement, createShadowRoot, defineHarmonyCircularProgress, display, documentStyle, HTMLHarmonyCircularProgressElement, I18n } from 'harmony-ui';
 import notificationsContainerCSS from '../css/notificationcontainer.css';
 import notificationsCSS from '../css/notifications.css';
-import { Second } from 'harmony-types';
 
 export type NotificationContent = HTMLElement | string;
 
@@ -200,12 +200,16 @@ export class Notification {
 
 let htmlInner: HTMLElement;
 let htmlCopy: HTMLElement;
+let defaultPlacement: NotificationsPlacement = NotificationsPlacement.TopRight;
 
 let notificationId = 0;
 const notifications = new Map<NotificationId, Notification>();
 
 export function setNotificationsPlacement(placement: NotificationsPlacement) {
-	htmlInner.className = `inner ${placement}`;
+	defaultPlacement = placement;
+	if (htmlInner) {
+		htmlInner.className = `inner ${placement}`;
+	}
 }
 
 let initialized = false;
@@ -238,7 +242,9 @@ function initialize() {
 		parent: document.body,
 		adoptStyle: notificationsContainerCSS,
 		childs: [
-			htmlInner = createElement('div'),
+			htmlInner = createElement('div', {
+				class: `inner ${defaultPlacement}`,
+			}),
 			htmlCopy = createElement('div', {
 				class: 'copy',
 				hidden: true,
@@ -247,8 +253,6 @@ function initialize() {
 		],
 	});
 	I18n.observeElement(htmlInner);
-	setNotificationsPlacement(NotificationsPlacement.TopRight);
-
 }
 
 const NotificationController = new EventTarget();

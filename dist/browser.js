@@ -4961,10 +4961,14 @@ class Notification {
 }
 let htmlInner;
 let htmlCopy;
+let defaultPlacement = NotificationsPlacement.TopRight;
 let notificationId = 0;
 const notifications = new Map();
 function setNotificationsPlacement(placement) {
-    htmlInner.className = `inner ${placement}`;
+    defaultPlacement = placement;
+    if (htmlInner) {
+        htmlInner.className = `inner ${placement}`;
+    }
 }
 let initialized$1 = false;
 function addNotification(content, type, ttl, params) {
@@ -4992,7 +4996,9 @@ function initialize() {
         parent: document.body,
         adoptStyle: notificationsContainerCSS,
         childs: [
-            htmlInner = createElement('div'),
+            htmlInner = createElement('div', {
+                class: `inner ${defaultPlacement}`,
+            }),
             htmlCopy = createElement('div', {
                 class: 'copy',
                 hidden: true,
@@ -5001,7 +5007,6 @@ function initialize() {
         ],
     });
     I18n.observeElement(htmlInner);
-    setNotificationsPlacement(NotificationsPlacement.TopRight);
 }
 const NotificationController = new EventTarget();
 function addNotificationEventListener(type, callback, options) {
