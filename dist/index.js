@@ -1,30 +1,6 @@
-import { createElement, documentStyle, defineHarmonyCircularProgress, createShadowRoot, display, I18n, hide, show, defineHarmonyTree, TreeItem } from 'harmony-ui';
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
+import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, TreeItem } from 'harmony-ui';
 import { vec2 } from 'gl-matrix';
-
-function loadScript(script) {
-    return new Promise((resolve) => {
-        createElement('script', {
-            src: script,
-            parent: document.body,
-            events: {
-                load: () => resolve(true),
-            }
-        });
-    });
-}
-async function loadScripts(scripts) {
-    const promises = [];
-    for (const script of scripts) {
-        promises.push(loadScript(script));
-    }
-    await Promise.all(promises);
-    return true;
-}
-
-function supportsPopover() {
-    return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
-}
 
 function saveFile(file) {
     const link = document.createElement('a');
@@ -1261,4 +1237,44 @@ function cleanPath(path) {
     return path;
 }
 
-export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, loadScript, loadScripts, saveFile, setNotificationsPlacement, supportsPopover };
+function identity(e) {
+    return e;
+}
+function toKeyValue(params, param) {
+    const keyValue = param.split('=');
+    const key = keyValue[0], value = keyValue[1];
+    params[key] = params[key] ? [value].concat(params[key]) : value;
+    return params;
+}
+function getQueryParams() {
+    return decodeURIComponent(document.location.search).
+        replace(/^\?/, '').split('&').
+        filter(identity).
+        reduce(toKeyValue, {});
+}
+
+function loadScript(script) {
+    return new Promise((resolve) => {
+        createElement('script', {
+            src: script,
+            parent: document.body,
+            events: {
+                load: () => resolve(true),
+            }
+        });
+    });
+}
+async function loadScripts(scripts) {
+    const promises = [];
+    for (const script of scripts) {
+        promises.push(loadScript(script));
+    }
+    await Promise.all(promises);
+    return true;
+}
+
+function supportsPopover() {
+    return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
+}
+
+export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, saveFile, setNotificationsPlacement, supportsPopover };

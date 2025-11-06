@@ -13,9 +13,11 @@ export declare enum EntryType {
     Directory = "directory"
 }
 
+export declare function getQueryParams(): Record<string, string | string[]>;
+
 export declare function loadScript(script: string): Promise<boolean>;
 
-export declare function loadScripts(scripts: Array<string>): Promise<boolean>;
+export declare function loadScripts(scripts: string[]): Promise<boolean>;
 
 declare class Notification_2 {
     #private;

@@ -1,3 +1,3 @@
-export function supportsPopover() {
+export function supportsPopover(): boolean {
 	return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }

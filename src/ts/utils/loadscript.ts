@@ -13,8 +13,8 @@ export function loadScript(script: string): Promise<boolean> {
 }
 
 
-export async function loadScripts(scripts: Array<string>): Promise<boolean> {
-	const promises: Array<Promise<boolean>> = [];
+export async function loadScripts(scripts: string[]): Promise<boolean> {
+	const promises: Promise<boolean>[] = [];
 
 	for (const script of scripts) {
 		promises.push(loadScript(script));
