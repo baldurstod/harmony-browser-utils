@@ -6,7 +6,7 @@ export declare function addNotificationEventListener(type: string, callback: Eve
 
 export declare function closeNotification(notification: Notification_2 | NotificationId): void;
 
-export declare type DatalistElement = string | [string, string];
+export declare type DatalistElement = string | number | [string, string];
 
 export declare enum EntryType {
     File = "file",

@@ -2,7 +2,7 @@ import { vec2 } from 'gl-matrix';
 import { I18n, createElement, createShadowRoot, hide, show } from 'harmony-ui';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
-export type DatalistElement = string | [string, string];
+export type DatalistElement = string | number | [string, string];
 export type Option = { name: string, editable: boolean, type: string, defaultValue?: string, datalist?: Array<DatalistElement>, context?: string, protected?: boolean };
 export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
 export type OptionMap = { [key: string]: OptionValue };
@@ -622,8 +622,8 @@ export class OptionsManager {
 				});
 				if (option.datalist) {
 					for (const o of option.datalist) {
-						if (typeof o == 'string') {
-							createElement('option', { innerText: o, parent: htmlElement });
+						if (typeof o == 'string' || typeof o == 'number') {
+							createElement('option', { innerText: String(o), parent: htmlElement });
 						} else {
 							// array
 							createElement('option', { innerText: o[0], parent: htmlElement, value: o[1] });
