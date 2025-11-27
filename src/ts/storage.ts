@@ -203,11 +203,12 @@ export class PersistentStorage {
 
 	static async writeFile(path: string, content: ArrayBuffer | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean> {
 		try {
-			const fileHandle = await this.#getHandle(path, 'file', false) as FileSystemFileHandle;
+			const fileHandle = await this.#getHandle(path, 'file', true) as FileSystemFileHandle;
 			if (fileHandle) {
 				const writable = await fileHandle.createWritable(options);
 				await writable.write(content);
 				await writable.close();
+				this.#dirty = true;
 				return true;
 			}
 		} catch (e) {

@@ -5858,7 +5858,7 @@ class ShortcutHandler {
     }
 }
 
-var storageCSS = ":host{\n\tdisplay: block;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-color: black;\n}\n";
+var storageCSS = ":host{\n\tdisplay: block;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-color: black;\n\tposition: absolute;\n\ttop: 0px;\n}\n";
 
 const SEPARATOR = '/';
 var EntryType;
@@ -6028,11 +6028,12 @@ class PersistentStorage {
     }
     static async writeFile(path, content, options) {
         try {
-            const fileHandle = await this.#getHandle(path, 'file', false);
+            const fileHandle = await this.#getHandle(path, 'file', true);
             if (fileHandle) {
                 const writable = await fileHandle.createWritable(options);
                 await writable.write(content);
                 await writable.close();
+                this.#dirty = true;
                 return true;
             }
         }
