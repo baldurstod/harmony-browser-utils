@@ -62,7 +62,7 @@ export class Notification {
 		this.#id = ++notificationId;
 		this.#parent = params?.parent;
 
-		documentStyle(themeCSS);
+		void documentStyle(themeCSS);
 	}
 
 	get htmlElement(): HTMLElement {
@@ -71,7 +71,7 @@ export class Notification {
 		}
 
 		defineHarmonyCircularProgress();
-		let svg: string = '';
+		let svg = '';
 		switch (this.#type) {
 			case NotificationType.Error:
 				svg = errorSVG;
@@ -172,11 +172,11 @@ export class Notification {
 		return false;
 	}
 
-	close() {
+	close(): void {
 		closeNotification(this);
 	}
 
-	#run() {
+	#run(): void {
 		display(this.#htmlProgress, this.#ttl > 0);
 		if (this.#ttl <= 0) {
 			return;
@@ -205,7 +205,7 @@ let defaultPlacement: NotificationsPlacement = NotificationsPlacement.TopRight;
 let notificationId = 0;
 const notifications = new Map<NotificationId, Notification>();
 
-export function setNotificationsPlacement(placement: NotificationsPlacement) {
+export function setNotificationsPlacement(placement: NotificationsPlacement): void {
 	defaultPlacement = placement;
 	if (htmlInner) {
 		htmlInner.className = `inner ${placement}`;
@@ -223,7 +223,7 @@ export function addNotification(content: NotificationContent, type: Notification
 	return notification;
 }
 
-export function closeNotification(notification: Notification | NotificationId) {
+export function closeNotification(notification: Notification | NotificationId): void {
 	if (typeof notification == 'number') {
 		notification = notifications.get(notification)!;
 	}
@@ -236,9 +236,9 @@ export function closeNotification(notification: Notification | NotificationId) {
 	}
 }
 
-function initialize() {
+function initialize(): void {
 	initialized = true;
-	const shadowRoot = createShadowRoot('div', {
+	createShadowRoot('div', {
 		parent: document.body,
 		adoptStyle: notificationsContainerCSS,
 		childs: [
@@ -263,7 +263,7 @@ export function addNotificationEventListener(type: string, callback: EventListen
 
 let startCopy: DOMHighResTimeStamp;
 let startY: number;
-function copied(x: number, y: number) {
+function copied(x: number, y: number): void {
 	startCopy = performance.now();
 	window.requestAnimationFrame(() => runCopy());
 	startY = y
@@ -272,7 +272,7 @@ function copied(x: number, y: number) {
 
 const displacement = 30;
 const delay = 1000;
-function runCopy() {
+function runCopy(): void {
 	const now = performance.now();
 	const elapsed = (now - startCopy);
 	const progress = elapsed / delay;

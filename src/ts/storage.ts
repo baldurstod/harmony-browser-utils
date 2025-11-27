@@ -1,4 +1,4 @@
-import { createElement, createShadowRoot, defineHarmonyTree, hide, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
+import { createElement, createShadowRoot, defineHarmonyTree, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
 export const SEPARATOR = '/';
@@ -19,14 +19,14 @@ export class PersistentStorage {
 	static #shadowRoot?: ShadowRoot;
 	static #htmlFilter?: HTMLInputElement;
 	static #htmlTree?: HTMLHarmonyTreeElement;
-	static #dirty: boolean = true;
+	static #dirty = true;
 	static #filter: { name: string } = { name: '' };
 
 	static async estimate(): Promise<StorageEstimate> {
 		return navigator.storage.estimate();
 	}
 
-	static #initPanel() {
+	static #initPanel(): void {
 		if (this.#shadowRoot) {
 			return;
 		}
@@ -83,18 +83,19 @@ export class PersistentStorage {
 				await root.removeEntry(key, { recursive: true });
 			}
 		} catch (e) {
+			console.error('Error while clearing the storage: ' + String(e));
 			return false;
 		}
 		return true;
 	}
 
-	static async *listEntries(path: string, options: { recursive?: boolean, absolutePath?: boolean, filter?: StorageFilter } = {})/*: AsyncGenerator<never, number, unknown>*/ {
+	static async *listEntries(path: string, options: { recursive?: boolean, absolutePath?: boolean, filter?: StorageFilter } = {}): AsyncGenerator<FileSystemHandle, null, unknown> {
 		const entry = await this.#getHandle(path, 'directory', true);
 		if (!entry || entry.kind == 'file') {
 			return null;
 		}
 
-		const stack: Array<FileSystemHandle> = [entry];
+		const stack: FileSystemHandle[] = [entry];
 		let current: FileSystemHandle | undefined;
 		do {
 			current = stack.pop();
@@ -121,7 +122,7 @@ export class PersistentStorage {
 	static async #removeEntry(path: string, kind: FileSystemHandleKind, recursive: boolean): Promise<boolean> {
 		path = cleanPath(path);
 
-		const splittedPath = path.split(SEPARATOR);
+		//const splittedPath = path.split(SEPARATOR);
 		//console.info(splittedPath);
 
 		let current = await navigator.storage.getDirectory();
@@ -150,7 +151,7 @@ export class PersistentStorage {
 	static async #getHandle(path: string, kind: FileSystemHandleKind, create: boolean): Promise<FileSystemHandle | null> {
 		path = cleanPath(path);
 
-		const splittedPath = path.split(SEPARATOR);
+		//const splittedPath = path.split(SEPARATOR);
 		//console.info(splittedPath);
 
 		let current = await navigator.storage.getDirectory();
@@ -181,7 +182,9 @@ export class PersistentStorage {
 			if (fileHandle) {
 				return await fileHandle.getFile();
 			}
-		} catch (e) { }
+		} catch (e) {
+			console.error('Error while reading the file:' + String(e));
+		}
 		return null;
 	}
 
@@ -207,16 +210,18 @@ export class PersistentStorage {
 				await writable.close();
 				return true;
 			}
-		} catch (e) { }
+		} catch (e) {
+			console.error('Error while writing the file:' + String(e));
+		}
 		return false;
 	}
 
-	static async showPanel() {
+	static showPanel(): void {
 		this.#initPanel();
-		this.#refresh();
+		void this.#refresh();
 	}
 
-	static async #refresh() {
+	static async #refresh(): Promise<void> {
 		if (this.#dirty) {
 			this.#htmlTree?.setRoot(await this.#getRoot(await navigator.storage.getDirectory()));
 			this.#dirty = false;
@@ -230,10 +235,10 @@ export class PersistentStorage {
 	}
 
 	static async #getElement(entry: FileSystemHandle, parent?: TreeItem): Promise<TreeItem> {
-		const childs: Array<TreeItem> | undefined = [];
+		const childs: TreeItem[] | undefined = [];
 		const tree = new TreeItem(entry.name, { childs: childs, parent: parent, userData: entry });
 		if (entry.kind == 'directory') {
-			for await (const [key, value] of (entry as FileSystemDirectoryHandle).entries()) {
+			for await (const [, value] of (entry as FileSystemDirectoryHandle).entries()) {
 				if (this.#matchFilter(value)) {
 					childs.push(await this.#getElement(value, tree));
 				}
@@ -242,10 +247,10 @@ export class PersistentStorage {
 		return tree;
 	}
 
-	static #setFilter(name: string) {
+	static #setFilter(name: string): void {
 		this.#filter.name = name;
 		this.#dirty = true;
-		this.#refresh();
+		void this.#refresh();
 	}
 
 	static #matchFilter(entry: FileSystemHandle): boolean {

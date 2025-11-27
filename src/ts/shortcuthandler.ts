@@ -31,7 +31,7 @@ class Shortcut {
 		}
 	}
 
-	match(context: string, keyBoardEvent: KeyboardEvent) {
+	match(context: string, keyBoardEvent: KeyboardEvent): boolean {
 		return (this.#contexts.indexOf(context) > -1) &&
 			(keyBoardEvent.altKey == this.#alt) &&
 			(keyBoardEvent.ctrlKey == this.#ctrl) &&
@@ -41,7 +41,7 @@ class Shortcut {
 	}
 }
 
-export class ShortcutHandler  {
+export class ShortcutHandler {
 	static #shortcuts = new Map<string, Set<Shortcut>>();
 	static #eventTarget = new EventTarget();
 
@@ -49,7 +49,7 @@ export class ShortcutHandler  {
 		this.addContext('window', document);
 	}
 
-	static #handleKeyDown(contextName: string, event: KeyboardEvent) {
+	static #handleKeyDown(contextName: string, event: KeyboardEvent): void {
 		const contexts = contextName.split(',');
 		for (const [name, shortcuts] of this.#shortcuts) {
 			for (const shortcut of shortcuts) {
@@ -64,11 +64,11 @@ export class ShortcutHandler  {
 		}
 	}
 
-	static addContext(name: string, element: HTMLElement | Document) {
+	static addContext(name: string, element: HTMLElement | Document): void {
 		element.addEventListener('keydown', (event: Event) => this.#handleKeyDown(name, event as KeyboardEvent));
 	}
 
-	static setShortcuts(contextName: string, shortcutMap: Map<string, string>) {
+	static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void {
 		if (!shortcutMap) {
 			return;
 		}
@@ -78,12 +78,12 @@ export class ShortcutHandler  {
 		}
 	}
 
-	static setShortcut(contextName: string, name: string, shortcut: string) {
+	static setShortcut(contextName: string, name: string, shortcut: string): void {
 		this.#shortcuts.delete(name);
 		this.addShortcut(contextName, name, shortcut);
 	}
 
-	static addShortcut(contextName: string, name: string, shortcut: string) {
+	static addShortcut(contextName: string, name: string, shortcut: string): void {
 		if (!shortcut) {
 			return;
 		}

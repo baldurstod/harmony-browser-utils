@@ -1,4 +1,6 @@
+import { JSONObject } from 'harmony-types';
 import { Second } from 'harmony-types';
+import { vec2 } from 'gl-matrix';
 
 export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams): Notification_2;
 
@@ -71,7 +73,7 @@ declare type Option_2 = {
     editable: boolean;
     type: string;
     defaultValue?: string;
-    datalist?: Array<DatalistElement>;
+    datalist?: DatalistElement[];
     context?: string;
     protected?: boolean;
 };
@@ -84,22 +86,20 @@ export declare type OptionMap = {
 export declare class OptionsManager {
     #private;
     static logException: boolean;
-    static init(parameters: {
-        [key: string]: any;
-    }): Promise<void>;
-    static addOption(option: any): void;
-    static setItem(name: string, value: any): void;
+    static init(parameters: OptionsManagerInitParams): Promise<void>;
+    static addOption(option: Option_2): void;
+    static setItem(name: string, value: OptionValue): void;
     static getSubItem(name: string, subName: string): Promise<OptionValue>;
-    static setSubItem(name: string, subName: string, value: any): Promise<void>;
+    static setSubItem(name: string, subName: string, value: OptionValue): Promise<void>;
     static removeSubItem(name: string, subName: string): void;
-    static getItem(name: string): any;
+    static getItem(name: string): OptionValue;
     static removeItem(name: string): void;
     static resetItem(name: string): void;
-    static resetItems(names: Array<string>): void;
+    static resetItems(names: string[]): void;
     static resetAllItems(): void;
     static clear(): void;
     static showOptionsManager(): void;
-    static getOptionsPerType(type: string): Promise<Map<string, any>>;
+    static getOptionsPerType(type: string): Promise<Map<string, OptionValue>>;
     static getOption(name: string): Promise<Option_2 | undefined>;
     static getOptionType(name: string): Promise<string | undefined>;
     static getList(name: string): Promise<DatalistElement[] | undefined>;
@@ -113,7 +113,12 @@ export declare type OptionsManagerEvent = {
 
 export declare const OptionsManagerEvents: EventTarget;
 
-export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined;
+declare type OptionsManagerInitParams = {
+    url?: string;
+    json?: JSONObject;
+};
+
+export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2;
 
 export declare class PersistentStorage {
     #private;
@@ -130,8 +135,8 @@ export declare class PersistentStorage {
     }): AsyncGenerator<FileSystemHandle, null, unknown>;
     static readFile(path: string): Promise<File | null>;
     static readFileAsString(path: string): Promise<string | null>;
-    static writeFile(path: string, file: ArrayBuffer | ArrayBufferView | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean>;
-    static showPanel(): Promise<void>;
+    static writeFile(path: string, content: ArrayBuffer | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean>;
+    static showPanel(): void;
 }
 
 export declare function saveFile(file: File): void;
@@ -155,9 +160,7 @@ export declare type StorageFilter = {
     name?: string;
 };
 
-export declare type SubOption = {
-    [key: string]: Option_2;
-};
+export declare type SubOption = Record<string, Option_2>;
 
 export declare function supportsPopover(): boolean;
 

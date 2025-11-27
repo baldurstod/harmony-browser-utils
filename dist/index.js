@@ -60,7 +60,7 @@ class Notification {
         this.#ttl = ttl;
         this.#id = ++notificationId;
         this.#parent = params?.parent;
-        documentStyle(theme);
+        void documentStyle(theme);
     }
     get htmlElement() {
         if (this.#shadowRoot) {
@@ -301,7 +301,7 @@ class OptionsManager {
             }
             this.#addCategory('');
             if (json.options) {
-                json.options.forEach((option /*TODO:better type*/) => this.addOption(option));
+                json.options.forEach((option) => this.addOption(option));
             }
             if (this.#initPromiseResolve) {
                 this.#initPromiseResolve();
@@ -314,7 +314,7 @@ class OptionsManager {
     }
     static #refreshCategories() {
         if (this.#dirtyCategories) {
-            for (const [categoryName, category] of this.#categories) {
+            for (const [, category] of this.#categories) {
                 category.length = 0;
             }
             for (const [optionName, option] of this.#defaultValues) {
@@ -335,13 +335,13 @@ class OptionsManager {
         }
         this.#dirtyCategories = false;
     }
-    static addOption(option /*TODO:better type*/) {
+    static addOption(option) {
         if (!option) {
             return;
         }
         const name = option.name.toLowerCase();
         const type = option.type;
-        const defaultValue = option.default;
+        const defaultValue = option.defaultValue;
         const datalist = option.datalist;
         const editable = option.editable;
         const context = option.context;
@@ -478,8 +478,7 @@ class OptionsManager {
                         // 'undefined' is not valid JSON
                         return undefined;
                     }
-                    const parsedValue = JSON.parse(value);
-                    return parsedValue;
+                    return JSON.parse(value);
                 }
             }
         }
@@ -652,7 +651,7 @@ class OptionsManager {
     }
     static #addOptionRow(option) {
         if (option.editable === false) {
-            return;
+            return null;
         }
         let htmlRow;
         if (option.type == 'map') {
@@ -682,7 +681,7 @@ class OptionsManager {
             row.remove();
         }
         this.#optionsManagerRows.clear();
-        for (const [categoryName, category] of this.#categories) {
+        for (const [, category] of this.#categories) {
             for (const option of category) {
                 const htmlRow = this.#addOptionRow(option);
                 if (htmlRow) {
@@ -724,7 +723,7 @@ class OptionsManager {
     }
     static #createInput(optionName, option, value, resetButton) {
         if (!option) {
-            return;
+            return null;
         }
         const showHideResetButton = () => {
             let defaultValue = this.#defaultValues.get(optionName)?.defaultValue;
@@ -1081,6 +1080,7 @@ class PersistentStorage {
             }
         }
         catch (e) {
+            console.error('Error while clearing the storage: ' + String(e));
             return false;
         }
         return true;
@@ -1113,7 +1113,7 @@ class PersistentStorage {
     }
     static async #removeEntry(path, kind, recursive) {
         path = cleanPath(path);
-        path.split(SEPARATOR);
+        //const splittedPath = path.split(SEPARATOR);
         //console.info(splittedPath);
         let current = await navigator.storage.getDirectory();
         const pathElements = path.split(SEPARATOR);
@@ -1137,7 +1137,7 @@ class PersistentStorage {
     }
     static async #getHandle(path, kind, create) {
         path = cleanPath(path);
-        path.split(SEPARATOR);
+        //const splittedPath = path.split(SEPARATOR);
         //console.info(splittedPath);
         let current = await navigator.storage.getDirectory();
         const pathElements = path.split(SEPARATOR);
@@ -1166,7 +1166,9 @@ class PersistentStorage {
                 return await fileHandle.getFile();
             }
         }
-        catch (e) { }
+        catch (e) {
+            console.error('Error while reading the file:' + String(e));
+        }
         return null;
     }
     static async readFile(path) {
@@ -1179,22 +1181,24 @@ class PersistentStorage {
         }
         return file.text();
     }
-    static async writeFile(path, file, options) {
+    static async writeFile(path, content, options) {
         try {
             const fileHandle = await this.#getHandle(path, 'file', false);
             if (fileHandle) {
                 const writable = await fileHandle.createWritable(options);
-                await writable.write(file);
+                await writable.write(content);
                 await writable.close();
                 return true;
             }
         }
-        catch (e) { }
+        catch (e) {
+            console.error('Error while writing the file:' + String(e));
+        }
         return false;
     }
-    static async showPanel() {
+    static showPanel() {
         this.#initPanel();
-        this.#refresh();
+        void this.#refresh();
     }
     static async #refresh() {
         if (this.#dirty) {
@@ -1211,7 +1215,7 @@ class PersistentStorage {
         const childs = [];
         const tree = new TreeItem(entry.name, { childs: childs, parent: parent, userData: entry });
         if (entry.kind == 'directory') {
-            for await (const [key, value] of entry.entries()) {
+            for await (const [, value] of entry.entries()) {
                 if (this.#matchFilter(value)) {
                     childs.push(await this.#getElement(value, tree));
                 }
@@ -1222,7 +1226,7 @@ class PersistentStorage {
     static #setFilter(name) {
         this.#filter.name = name;
         this.#dirty = true;
-        this.#refresh();
+        void this.#refresh();
     }
     static #matchFilter(entry) {
         return entry.name.includes(this.#filter.name);
@@ -1242,7 +1246,8 @@ function identity(e) {
 }
 function toKeyValue(params, param) {
     const keyValue = param.split('=');
-    const key = keyValue[0], value = keyValue[1];
+    const key = keyValue[0];
+    const value = keyValue[1];
     params[key] = params[key] ? [value].concat(params[key]) : value;
     return params;
 }
