@@ -4,7 +4,8 @@ function identity(e: string): string {
 
 function toKeyValue(params: Record<string, string | string[]>, param: string): Record<string, string | string[]> {
 	const keyValue = param.split('=');
-	const key = keyValue[0], value = keyValue[1];
+	const key = keyValue[0]!;
+	const value = keyValue[1]!;
 
 	params[key] = params[key] ? [value].concat(params[key]) : value;
 	return params;

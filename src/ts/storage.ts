@@ -127,7 +127,7 @@ export class PersistentStorage {
 		let current = await navigator.storage.getDirectory();
 		const pathElements = path.split(SEPARATOR);
 		for (let i = 0; i < pathElements.length - 1; i++) {
-			const subPath = pathElements[i];
+			const subPath = pathElements[i]!;
 			if (subPath == '') {
 				continue;
 			}
@@ -138,7 +138,7 @@ export class PersistentStorage {
 		if (current.kind == kind) {
 			try {
 
-				await current.removeEntry(pathElements[pathElements.length - 1], { recursive: recursive });
+				await current.removeEntry(pathElements[pathElements.length - 1]!, { recursive: recursive });
 				return true;
 			} catch (e) {
 				console.info(e)
@@ -156,7 +156,7 @@ export class PersistentStorage {
 		let current = await navigator.storage.getDirectory();
 		const pathElements = path.split(SEPARATOR);
 		for (let i = 0; i < pathElements.length - 1; i++) {
-			const subPath = pathElements[i];
+			const subPath = pathElements[i]!;
 			if (subPath == '') {
 				continue;
 			}
@@ -164,7 +164,7 @@ export class PersistentStorage {
 			current = await current.getDirectoryHandle(subPath, { create: create });
 		}
 
-		const name = pathElements[pathElements.length - 1];
+		const name = pathElements[pathElements.length - 1]!;
 		if (name == '') {
 			return current;
 		}
