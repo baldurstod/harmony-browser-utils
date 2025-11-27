@@ -5,7 +5,7 @@ import optionsManagerCSS from '../css/optionsmanager.css';
 
 export type DatalistElement = string | number | [string, string];
 export type Option = { name: string, editable: boolean, type: string, defaultValue?: string, datalist?: DatalistElement[], context?: string, protected?: boolean };
-export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2;
+export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2 | string[];
 export type OptionMap = { [key: string]: OptionValue };
 export type SubOption = Record<string, Option>;
 

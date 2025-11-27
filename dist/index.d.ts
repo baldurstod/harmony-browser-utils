@@ -118,7 +118,7 @@ declare type OptionsManagerInitParams = {
     json?: JSONObject;
 };
 
-export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2;
+export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2 | string[];
 
 export declare class PersistentStorage {
     #private;
