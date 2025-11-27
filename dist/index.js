@@ -301,7 +301,7 @@ class OptionsManager {
             }
             this.#addCategory('');
             if (json.options) {
-                json.options.forEach((option) => this.addOption(option));
+                json.options.forEach((option) => this.#addOption(option));
             }
             if (this.#initPromiseResolve) {
                 this.#initPromiseResolve();
@@ -335,13 +335,13 @@ class OptionsManager {
         }
         this.#dirtyCategories = false;
     }
-    static addOption(option) {
+    static #addOption(option) {
         if (!option) {
             return;
         }
         const name = option.name.toLowerCase();
         const type = option.type;
-        const defaultValue = option.defaultValue;
+        const defaultValue = option.default;
         const datalist = option.datalist;
         const editable = option.editable;
         const context = option.context;

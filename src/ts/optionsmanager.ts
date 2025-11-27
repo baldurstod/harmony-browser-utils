@@ -8,6 +8,7 @@ export type Option = { name: string, editable: boolean, type: string, defaultVal
 export type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2 | string[];
 export type OptionMap = { [key: string]: OptionValue };
 export type SubOption = Record<string, Option>;
+export type OptionJSON = { name: string, editable: boolean, type: string, default?: string, datalist?: DatalistElement[], context?: string, protected?: boolean };
 
 export const OptionsManagerEvents = new EventTarget();
 
@@ -66,7 +67,7 @@ export class OptionsManager {
 			}
 			this.#addCategory('');
 			if (json.options) {
-				(json.options as Option[]).forEach((option: Option) => this.addOption(option));
+				(json.options as Option[]).forEach((option: Option) => this.#addOption(option));
 			}
 			if (this.#initPromiseResolve) {
 				this.#initPromiseResolve();
@@ -104,12 +105,12 @@ export class OptionsManager {
 		this.#dirtyCategories = false;
 	}
 
-	static addOption(option: Option): void {
+	static #addOption(option: OptionJSON): void {
 		if (!option) { return; }
 		const name = option.name.toLowerCase();
 
 		const type = option.type;
-		const defaultValue = option.defaultValue;
+		const defaultValue = option.default;
 		const datalist = option.datalist;
 		const editable = option.editable;
 		const context = option.context;

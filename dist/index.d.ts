@@ -79,6 +79,16 @@ declare type Option_2 = {
 };
 export { Option_2 as Option }
 
+export declare type OptionJSON = {
+    name: string;
+    editable: boolean;
+    type: string;
+    default?: string;
+    datalist?: DatalistElement[];
+    context?: string;
+    protected?: boolean;
+};
+
 export declare type OptionMap = {
     [key: string]: OptionValue;
 };
@@ -87,7 +97,6 @@ export declare class OptionsManager {
     #private;
     static logException: boolean;
     static init(parameters: OptionsManagerInitParams): Promise<void>;
-    static addOption(option: Option_2): void;
     static setItem(name: string, value: OptionValue): void;
     static getSubItem(name: string, subName: string): Promise<OptionValue>;
     static setSubItem(name: string, subName: string, value: OptionValue): Promise<void>;
