@@ -6026,6 +6026,19 @@ class PersistentStorage {
         }
         return file.text();
     }
+    static async readFileAsJSON(path) {
+        const file = await this.#readFile(path);
+        if (!file) {
+            return null;
+        }
+        const content = await file.text();
+        try {
+            return JSON.parse(content);
+        }
+        catch (e) {
+            return null;
+        }
+    }
     static async writeFile(path, content, options) {
         try {
             const fileHandle = await this.#getHandle(path, 'file', true);

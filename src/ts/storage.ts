@@ -1,3 +1,4 @@
+import { JSONObject } from 'harmony-types';
 import { createElement, createShadowRoot, defineHarmonyTree, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
@@ -199,6 +200,20 @@ export class PersistentStorage {
 		}
 
 		return file.text();
+	}
+
+	static async readFileAsJSON(path: string): Promise<JSONObject | null> {
+		const file = await this.#readFile(path);
+		if (!file) {
+			return null;
+		}
+
+		const content = await file.text();
+		try {
+			return JSON.parse(content);
+		} catch (e) {
+			return null;
+		}
 	}
 
 	static async writeFile(path: string, content: ArrayBuffer | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean> {

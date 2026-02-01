@@ -144,6 +144,7 @@ export declare class PersistentStorage {
     }): AsyncGenerator<FileSystemHandle, null, unknown>;
     static readFile(path: string): Promise<File | null>;
     static readFileAsString(path: string): Promise<string | null>;
+    static readFileAsJSON(path: string): Promise<JSONObject | null>;
     static writeFile(path: string, content: ArrayBuffer | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean>;
     static showPanel(): void;
 }
