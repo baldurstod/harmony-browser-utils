@@ -1,4 +1,4 @@
-:host{
+:host {
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -7,16 +7,16 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	top:0px;
+	top: 0px;
 	left: 0px;
 }
 
-#options-manager-inner{
+#options-manager-inner {
 	position: relative;
 	/*background-color: rgba(255, 255, 255, 1.0);*/
 	background-color: var(--theme-popup-bg-color);
 	color: var(--main-text-color-dark2);
-	padding:10px;
+	padding: 10px;
 	overflow: hidden;
 	max-height: 70%;
 	max-width: 75%;
@@ -25,62 +25,63 @@
 	opacity: 0.9;
 }
 
-#options-manager-inner h1{
+#options-manager-inner h1 {
 	text-transform: capitalize;
 	text-align: center;
 }
 
-#options-manager-inner-filter{
-	width:100%;
+#options-manager-inner-filter {
+	width: 100%;
 }
 
-.options-manager-button{
-	cursor:pointer;
+.options-manager-button {
+	cursor: pointer;
 	white-space: nowrap;
 	text-transform: capitalize;
 }
 
-#options-manager-inner table{
+#options-manager-inner table {
 	text-align: left;
 	overflow: hidden auto;
 	display: block;
 	height: 100%;
 }
 
-#options-manager-inner thead{
+#options-manager-inner thead {
 	position: sticky;
 	/*display: block;*/
 	top: 0px;
 	background-color: var(--theme-popup-bg-color);
 }
 
-#options-manager-inner thead th{
+#options-manager-inner thead th {
 	position: sticky;
 	top: 0px;
 	background-color: var(--theme-popup-bg-color);
 }
 
-#options-manager-inner th{
+#options-manager-inner th {
 	text-transform: capitalize;
 }
 
-#options-manager-inner th button, #options-manager-inner td button{
+#options-manager-inner th button,
+#options-manager-inner td button {
 	width: 100%;
 }
 
-#options-manager-title{
-	cursor:move;
+#options-manager-title {
+	cursor: move;
 }
 
 [draggable=true] {
 	cursor: move;
 }
 
-[draggable=true] *{
+[draggable=true] * {
 	cursor: initial;
 }
 
-#options-manager-outer kbd{
+#options-manager-outer kbd {
 	background-color: #eee;
 	border-radius: 0.25rem;
 	border: 0.1rem solid #b4b4b4;
@@ -92,4 +93,38 @@
 	white-space: nowrap;
 	font-weight: 1000;
 	font-size: 1.3rem;
+}
+
+.copy-button * {
+	cursor: pointer;
+}
+
+.flash-ok {
+	animation-name: flashOk;
+	animation-duration: 1.5s;
+}
+
+.flash-error {
+	animation-name: flashError;
+	animation-duration: 1.5s;
+}
+
+@keyframes flashOk {
+	0% {
+		color: #189c1e;
+	}
+
+	100% {
+		color: unset;
+	}
+}
+
+@keyframes flashError {
+	0% {
+		color: #a32a15;
+	}
+
+	100% {
+		color: unset;
+	}
 }

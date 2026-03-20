@@ -5105,7 +5105,7 @@ function fromValues(x, y) {
   };
 })();
 
-var optionsManagerCSS = ":host{\r\n\tposition: absolute;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: auto;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\ttop:0px;\r\n\tleft: 0px;\r\n}\r\n\r\n#options-manager-inner{\r\n\tposition: relative;\r\n\t/*background-color: rgba(255, 255, 255, 1.0);*/\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--main-text-color-dark2);\r\n\tpadding:10px;\r\n\toverflow: hidden;\r\n\tmax-height: 70%;\r\n\tmax-width: 75%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\topacity: 0.9;\r\n}\r\n\r\n#options-manager-inner h1{\r\n\ttext-transform: capitalize;\r\n\ttext-align: center;\r\n}\r\n\r\n#options-manager-inner-filter{\r\n\twidth:100%;\r\n}\r\n\r\n.options-manager-button{\r\n\tcursor:pointer;\r\n\twhite-space: nowrap;\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner table{\r\n\ttext-align: left;\r\n\toverflow: hidden auto;\r\n\tdisplay: block;\r\n\theight: 100%;\r\n}\r\n\r\n#options-manager-inner thead{\r\n\tposition: sticky;\r\n\t/*display: block;*/\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner thead th{\r\n\tposition: sticky;\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner th{\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner th button, #options-manager-inner td button{\r\n\twidth: 100%;\r\n}\r\n\r\n#options-manager-title{\r\n\tcursor:move;\r\n}\r\n\r\n[draggable=true] {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] *{\r\n\tcursor: initial;\r\n}\r\n\r\n#options-manager-outer kbd{\r\n\tbackground-color: #eee;\r\n\tborder-radius: 0.25rem;\r\n\tborder: 0.1rem solid #b4b4b4;\r\n\tbox-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;\r\n\tcolor: #333;\r\n\tdisplay: inline-block;\r\n\tline-height: 1;\r\n\tpadding: 0.15rem;\r\n\twhite-space: nowrap;\r\n\tfont-weight: 1000;\r\n\tfont-size: 1.3rem;\r\n}\r\n";
+var optionsManagerCSS = ":host {\r\n\tposition: absolute;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\toverflow: auto;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\talign-items: center;\r\n\tjustify-content: center;\r\n\ttop: 0px;\r\n\tleft: 0px;\r\n}\r\n\r\n#options-manager-inner {\r\n\tposition: relative;\r\n\t/*background-color: rgba(255, 255, 255, 1.0);*/\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n\tcolor: var(--main-text-color-dark2);\r\n\tpadding: 10px;\r\n\toverflow: hidden;\r\n\tmax-height: 70%;\r\n\tmax-width: 75%;\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n\topacity: 0.9;\r\n}\r\n\r\n#options-manager-inner h1 {\r\n\ttext-transform: capitalize;\r\n\ttext-align: center;\r\n}\r\n\r\n#options-manager-inner-filter {\r\n\twidth: 100%;\r\n}\r\n\r\n.options-manager-button {\r\n\tcursor: pointer;\r\n\twhite-space: nowrap;\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner table {\r\n\ttext-align: left;\r\n\toverflow: hidden auto;\r\n\tdisplay: block;\r\n\theight: 100%;\r\n}\r\n\r\n#options-manager-inner thead {\r\n\tposition: sticky;\r\n\t/*display: block;*/\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner thead th {\r\n\tposition: sticky;\r\n\ttop: 0px;\r\n\tbackground-color: var(--theme-popup-bg-color);\r\n}\r\n\r\n#options-manager-inner th {\r\n\ttext-transform: capitalize;\r\n}\r\n\r\n#options-manager-inner th button,\r\n#options-manager-inner td button {\r\n\twidth: 100%;\r\n}\r\n\r\n#options-manager-title {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] {\r\n\tcursor: move;\r\n}\r\n\r\n[draggable=true] * {\r\n\tcursor: initial;\r\n}\r\n\r\n#options-manager-outer kbd {\r\n\tbackground-color: #eee;\r\n\tborder-radius: 0.25rem;\r\n\tborder: 0.1rem solid #b4b4b4;\r\n\tbox-shadow: 0 0.06rem 0.06rem rgba(0, 0, 0, .2), 0 0.1rem 0 0 rgba(255, 255, 255, .7) inset;\r\n\tcolor: #333;\r\n\tdisplay: inline-block;\r\n\tline-height: 1;\r\n\tpadding: 0.15rem;\r\n\twhite-space: nowrap;\r\n\tfont-weight: 1000;\r\n\tfont-size: 1.3rem;\r\n}\r\n\r\n.copy-button * {\r\n\tcursor: pointer;\r\n}\r\n\r\n.flash-ok {\r\n\tanimation-name: flashOk;\r\n\tanimation-duration: 1.5s;\r\n}\r\n\r\n.flash-error {\r\n\tanimation-name: flashError;\r\n\tanimation-duration: 1.5s;\r\n}\r\n\r\n@keyframes flashOk {\r\n\t0% {\r\n\t\tcolor: #189c1e;\r\n\t}\r\n\r\n\t100% {\r\n\t\tcolor: unset;\r\n\t}\r\n}\r\n\r\n@keyframes flashError {\r\n\t0% {\r\n\t\tcolor: #a32a15;\r\n\t}\r\n\r\n\t100% {\r\n\t\tcolor: unset;\r\n\t}\r\n}\r\n";
 
 const OptionsManagerEvents = new EventTarget();
 class OptionsManager {
@@ -5458,7 +5458,28 @@ class OptionsManager {
     static #populateOptionRow(option) {
         const htmlRow = createElement('tr');
         const htmlResetButtonCell = createElement('td');
-        const htmlOptionNameCell = createElement('td', { innerHTML: option.name });
+        const htmlOptionNameCell = createElement('td', {
+            childs: [
+                createElement('span', {
+                    class: 'copy-button',
+                    innerHTML: contentCopySVG,
+                    $click: async () => {
+                        try {
+                            await navigator.clipboard.writeText(option.name);
+                            htmlOptionNameCell.classList.add('flash-ok');
+                            await setTimeoutPromise(1500);
+                            htmlOptionNameCell.classList.remove('flash-ok');
+                        }
+                        catch (e) {
+                            htmlOptionNameCell.classList.add('flash-error');
+                            await setTimeoutPromise(1500);
+                            htmlOptionNameCell.classList.remove('flash-error');
+                        }
+                    },
+                }),
+                option.name,
+            ]
+        });
         const htmlDefaultValueCell = createElement('td');
         const htmlUserValueCell = createElement('td');
         const myValue = this.getItem(option.name);

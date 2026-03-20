@@ -1,6 +1,8 @@
 import { vec2 } from 'gl-matrix';
+import { contentCopySVG } from 'harmony-svg';
 import { JSONObject } from 'harmony-types';
 import { I18n, createElement, createShadowRoot, hide, show } from 'harmony-ui';
+import { setTimeoutPromise } from 'harmony-utils';
 import optionsManagerCSS from '../css/optionsmanager.css';
 
 export type DatalistElement = string | number | [string, string];
@@ -404,7 +406,27 @@ export class OptionsManager {
 	static #populateOptionRow(option: Option): HTMLElement {
 		const htmlRow = createElement('tr');
 		const htmlResetButtonCell = createElement('td');
-		const htmlOptionNameCell = createElement('td', { innerHTML: option.name });
+		const htmlOptionNameCell = createElement('td', {
+			childs: [
+				createElement('span', {
+					class: 'copy-button',
+					innerHTML: contentCopySVG,
+					$click: async () => {
+						try {
+							await navigator.clipboard.writeText(option.name);
+							htmlOptionNameCell.classList.add('flash-ok');
+							await setTimeoutPromise(1500);
+							htmlOptionNameCell.classList.remove('flash-ok');
+						} catch (e) {
+							htmlOptionNameCell.classList.add('flash-error');
+							await setTimeoutPromise(1500);
+							htmlOptionNameCell.classList.remove('flash-error');
+						}
+					},
+				}),
+				option.name,
+			]
+		});
 		const htmlDefaultValueCell = createElement('td');
 		const htmlUserValueCell = createElement('td');
 
