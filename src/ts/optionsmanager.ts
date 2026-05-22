@@ -650,7 +650,7 @@ export class OptionsManager {
 				});
 				if (option.datalist) {
 					for (const o of option.datalist) {
-						if (typeof o == 'string' || typeof o == 'number') {
+						if (typeof o === 'string' || typeof o === 'number' || o === undefined || o === null) {
 							createElement('option', { innerText: String(o), parent: htmlElement });
 						} else {
 							// array
