@@ -157,6 +157,11 @@ export declare function setNotificationsPlacement(placement: NotificationsPlacem
 
 export declare class ShortcutHandler {
     #private;
+    static getCodeState(code: string): boolean;
+    static getKeyState(key: string): boolean;
+    static getControlState(): boolean;
+    static getAltState(): boolean;
+    static getShiftState(): boolean;
     static addContext(name: string, element: HTMLElement | Document): void;
     static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void;
     static setShortcut(contextName: string, name: string, shortcut: string): void;

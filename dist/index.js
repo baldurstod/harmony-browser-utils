@@ -997,13 +997,19 @@ class Shortcut {
             (keyBoardEvent.key.toUpperCase() == this.#key);
     }
 }
+const WINDOW_CONTEXT = 'window';
 class ShortcutHandler {
     static #shortcuts = new Map();
     static #eventTarget = new EventTarget();
+    // List of activated key codes. See https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values
+    static #keyboardCodeState = new Map();
+    // List of activated keys. See https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
+    static #keyboardKeyState = new Map();
     static {
-        this.addContext('window', document);
+        this.addContext(WINDOW_CONTEXT, document);
     }
     static #handleKeyDown(contextName, event) {
+        this.#handleKey(contextName, event, true);
         const contexts = contextName.split(',');
         for (const [name, shortcuts] of this.#shortcuts) {
             for (const shortcut of shortcuts) {
@@ -1017,8 +1023,33 @@ class ShortcutHandler {
             }
         }
     }
+    static #handleKeyUp(contextName, event) {
+        this.#handleKey(contextName, event, false);
+    }
+    static #handleKey(contextName, event, state) {
+        if (contextName === WINDOW_CONTEXT) {
+            this.#keyboardCodeState.set(event.code, state);
+            this.#keyboardKeyState.set(event.key, state);
+        }
+    }
+    static getCodeState(code) {
+        return this.#keyboardCodeState.get(code) ?? false;
+    }
+    static getKeyState(key) {
+        return this.#keyboardKeyState.get(key) ?? false;
+    }
+    static getControlState() {
+        return this.#keyboardKeyState.get('Control') ?? false;
+    }
+    static getAltState() {
+        return this.#keyboardKeyState.get('Alt') ?? false;
+    }
+    static getShiftState() {
+        return this.#keyboardKeyState.get('Shift') ?? false;
+    }
     static addContext(name, element) {
         element.addEventListener('keydown', (event) => this.#handleKeyDown(name, event));
+        element.addEventListener('keyup', (event) => this.#handleKeyUp(name, event));
     }
     static setShortcuts(contextName, shortcutMap) {
         if (!shortcutMap) {
