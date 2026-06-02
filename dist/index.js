@@ -9,6 +9,19 @@ function saveFile(file) {
     link.click();
 }
 
+async function readFileAsText(file) {
+    let readPromiseResolve;
+    const readPromise = new Promise((resolve) => readPromiseResolve = resolve);
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+        (async () => {
+            readPromiseResolve(reader.result);
+        })();
+    });
+    reader.readAsText(file);
+    return readPromise;
+}
+
 var theme = "@media (prefers-color-scheme: light){\n\tbody{\n\t\t--theme-background-primary: #fff;\n\t\t--theme-background-secondary: #eee;\n\t\t--theme-background-tertiary: #c8c8c8;\n\t\t--theme-background-quaternary: #b1b1b1;\n\n\t\t--theme-background-primary-invert: #1b1b1b;\n\t\t--theme-background-secondary-invert: #101822;\n\t\t--theme-background-tertiary-invert: #343434;\n\t\t--theme-background-quaternary-invert: #4e4e4e;\n\n\t\t--theme-border-primary:  #cdcdcd;\n\t\t--theme-border-secondary:  #cdcdcd;\n\n\t\t--theme-text-primary: #1b1b1b;\n\t\t--theme-text-secondary: #4e4e4e;\n\t\t--theme-text-inactive: #9e9e9ea6;\n\t\t--theme-text-link: #0069c2;\n\t\t--theme-text-invert: #fff;\n\n\t\t--theme-accent-primary: #0085f2;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(0, 0, 0, 0.25);\n\n\t\t--theme-bg-color: #D7D3CB;\n\t\t--theme-popup-bg-color: #CCCCCC;\n\t\t--theme-text-color: #111111;\n\t\t--theme-text-bg-color: 238 238 238;\n\n\t\t--theme-text-color-warning:#ff6a00;\n\t\t--theme-filter-invert-light:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #D7D3CB;\n\t\t--theme-main-bg-color-dark: #DEDAD4;\n\t}\n}\n@media (prefers-color-scheme: dark){\n\tbody{\n\t\t--theme-background-primary: #1b1b1b;\n\t\t--theme-background-secondary: #101822;\n\t\t--theme-background-tertiary: #343434;\n\t\t--theme-background-quaternary: #4e4e4e;\n\n\t\t--theme-background-primary-invert: #fff;\n\t\t--theme-background-secondary-invert: #eee;\n\t\t--theme-background-tertiary-invert: #c8c8c8;\n\t\t--theme-background-quaternary-invert: #b1b1b1;\n\n\t\t--theme-border-primary:  #858585;\n\t\t--theme-border-secondary:  #696969;\n\n\t\t--theme-text-primary: #fff;\n\t\t--theme-text-secondary: #cdcdcd;\n\t\t--theme-text-inactive: #cdcdcda6;\n\t\t--theme-text-link: #8cb4ff;\n\t\t--theme-text-invert: #1b1b1b;\n\n\t\t--theme-accent-primary: #5e9eff;\n\n\t\t--theme-scrollbar-bg: transparent;\n\t\t--theme-scrollbar-color: rgba(255, 255, 255, 0.25);\n\n\t\t--theme-bg-color: #21252b;\n\t\t--theme-popup-bg-color: #333333;\n\t\t--theme-text-color: #EEEEEE;\n\t\t--theme-text-bg-color: 17 17 17;\n\n\t\t--theme-text-color-warning:orange;\n\t\t--theme-filter-invert-dark:invert(100%);\n\n\t\t--theme-main-bg-color-bright: #41454d;\n\t\t--theme-main-bg-color-dark: #21252b;\n\t}\n}\n";
 
 var notificationsContainerCSS = ":host {\r\n\tposition: fixed;\r\n\tz-index: 10000;\r\n\tdisplay: flex;\r\n\toverflow: hidden;\r\n\twidth: 100%;\r\n\theight: 100%;\r\n\tpointer-events: none;\r\n\ttop: 0;\r\n\tleft: 0;\r\n}\r\n\r\n.inner {\r\n\tposition: absolute;\r\n\tdisplay: flex;\r\n}\r\n\r\n.inner>* {\r\n\tpointer-events: all;\r\n}\r\n\r\n.top {\r\n\twidth: 100%;\r\n\tflex-direction: column;\r\n}\r\n\r\n.bottom {\r\n\twidth: 100%;\r\n\tflex-direction: column-reverse;\r\n\tbottom: 0;\r\n}\r\n\r\n.left,\r\n.right {\r\n\tflex-direction: column;\r\n\tjustify-content: center;\r\n\theight: 100%;\r\n}\r\n\r\n.top-right,\r\n.top-left {\r\n\tpadding: 1rem;\r\n\tflex-direction: column;\r\n}\r\n\r\n.top-right,\r\n.right,\r\n.bottom-right {\r\n\tright: 0;\r\n}\r\n\r\n.bottom-right,\r\n.bottom-left {\r\n\tbottom: 0;\r\n\tpadding: 1rem;\r\n\tflex-direction: column-reverse;\r\n}\r\n\r\n.copy {\r\n\tposition: absolute;\r\n\tcolor: white;\r\n\tbackground-color: blue;\r\n\tborder-radius: 0.5rem;\r\n\tpadding: 0.2rem;\r\n}\r\n";
@@ -1165,20 +1178,14 @@ class PersistentStorage {
         do {
             current = stack.pop();
             if (current) {
-                /*
-                if ((filter === undefined) || current.#matchFilter(filter)) {
-                    childs.add(current);
-                }
-                    */
-                if (options.recursive && current.kind == 'directory') {
-                    for await (const handle of current.values()) {
+                for await (const handle of current.values()) {
+                    if (options.recursive && current.kind == 'directory') {
                         stack.push(handle);
-                        yield handle;
                     }
+                    yield handle;
                 }
             }
         } while (current);
-        //return await this.#removeEntry(path, 'directory', recursive);
         return null;
     }
     static async #removeEntry(path, kind, recursive) {
@@ -1366,4 +1373,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, saveFile, setNotificationsPlacement, supportsPopover };
+export { EntryType, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover };

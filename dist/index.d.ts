@@ -149,6 +149,8 @@ export declare class PersistentStorage {
     static showPanel(): void;
 }
 
+export declare function readFileAsText(file: File): Promise<string>;
+
 export declare function saveFile(file: File): void;
 
 export declare const SEPARATOR = "/";

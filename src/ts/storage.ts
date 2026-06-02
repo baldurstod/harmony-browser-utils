@@ -101,22 +101,15 @@ export class PersistentStorage {
 		do {
 			current = stack.pop();
 			if (current) {
-				/*
-				if ((filter === undefined) || current.#matchFilter(filter)) {
-					childs.add(current);
-				}
-					*/
-
-				if (options.recursive && current.kind == 'directory') {
-					for await (const handle of (current as FileSystemDirectoryHandle).values()) {
+				for await (const handle of (current as FileSystemDirectoryHandle).values()) {
+					if (options.recursive && current.kind == 'directory') {
 						stack.push(handle);
-						yield handle;
 					}
+					yield handle;
 				}
 			}
 		} while (current);
 
-		//return await this.#removeEntry(path, 'directory', recursive);
 		return null;
 	}
 
