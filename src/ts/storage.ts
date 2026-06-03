@@ -116,9 +116,6 @@ export class PersistentStorage {
 	static async #removeEntry(path: string, kind: FileSystemHandleKind, recursive: boolean): Promise<boolean> {
 		path = cleanPath(path);
 
-		//const splittedPath = path.split(SEPARATOR);
-		//console.info(splittedPath);
-
 		let current = await navigator.storage.getDirectory();
 		const pathElements = path.split(SEPARATOR);
 		for (let i = 0; i < pathElements.length - 1; i++) {
@@ -130,23 +127,18 @@ export class PersistentStorage {
 			current = await current.getDirectoryHandle(subPath, { create: false });
 		}
 
-		if (current.kind == kind) {
-			try {
+		try {
 
-				await current.removeEntry(pathElements[pathElements.length - 1]!, { recursive: recursive });
-				return true;
-			} catch (e) {
-				console.info(e)
-			}
+			await current.removeEntry(pathElements[pathElements.length - 1]!, { recursive: recursive });
+			return true;
+		} catch (e) {
+			console.info(e)
 		}
 		return false;
 	}
 
 	static async #getHandle(path: string, kind: FileSystemHandleKind, create: boolean): Promise<FileSystemHandle | null> {
 		path = cleanPath(path);
-
-		//const splittedPath = path.split(SEPARATOR);
-		//console.info(splittedPath);
 
 		let current = await navigator.storage.getDirectory();
 		const pathElements = path.split(SEPARATOR);

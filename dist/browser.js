@@ -6017,8 +6017,6 @@ class PersistentStorage {
     }
     static async #removeEntry(path, kind, recursive) {
         path = cleanPath(path);
-        //const splittedPath = path.split(SEPARATOR);
-        //console.info(splittedPath);
         let current = await navigator.storage.getDirectory();
         const pathElements = path.split(SEPARATOR);
         for (let i = 0; i < pathElements.length - 1; i++) {
@@ -6028,21 +6026,17 @@ class PersistentStorage {
             }
             current = await current.getDirectoryHandle(subPath, { create: false });
         }
-        if (current.kind == kind) {
-            try {
-                await current.removeEntry(pathElements[pathElements.length - 1], { recursive: recursive });
-                return true;
-            }
-            catch (e) {
-                console.info(e);
-            }
+        try {
+            await current.removeEntry(pathElements[pathElements.length - 1], { recursive: recursive });
+            return true;
+        }
+        catch (e) {
+            console.info(e);
         }
         return false;
     }
     static async #getHandle(path, kind, create) {
         path = cleanPath(path);
-        //const splittedPath = path.split(SEPARATOR);
-        //console.info(splittedPath);
         let current = await navigator.storage.getDirectory();
         const pathElements = path.split(SEPARATOR);
         for (let i = 0; i < pathElements.length - 1; i++) {
