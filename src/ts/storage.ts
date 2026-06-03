@@ -1,5 +1,5 @@
 import { JSONObject } from 'harmony-types';
-import { createElement, createShadowRoot, defineHarmonyTree, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
+import { createElement, createShadowRoot, defineHarmonyPanel, defineHarmonyTree, HTMLHarmonyPanelElement, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
 export const SEPARATOR = '/';
@@ -22,6 +22,7 @@ export class PersistentStorage {
 	static #htmlTree?: HTMLHarmonyTreeElement;
 	static #dirty = true;
 	static #filter: { name: string } = { name: '' };
+	static #panel?: HTMLHarmonyPanelElement;
 
 	static async estimate(): Promise<StorageEstimate> {
 		return navigator.storage.estimate();
@@ -32,11 +33,18 @@ export class PersistentStorage {
 			return;
 		}
 		defineHarmonyTree();
+		defineHarmonyPanel();
 		this.#shadowRoot = createShadowRoot('persistent-storage', {
-			parent: document.body,
+			//parent: document.body,
 			adoptStyle: storageCSS,
+		});
+
+		this.#panel = createElement('harmony-panel', {
+			'title-i18n': '#storage_manager',
 			childs: [
 				this.#htmlFilter = createElement('input', {
+					class: 'filter',
+					hidden: true,
 					$input: (event: Event) => this.#setFilter((event.target as HTMLInputElement).value),
 				}) as HTMLInputElement,
 				this.#htmlTree = createElement('harmony-tree', {
@@ -48,7 +56,10 @@ export class PersistentStorage {
 								delete: {
 									i18n: '#delete', f: () => {
 										if (event.detail.item) {
-											//this.#deleteItem(event.detail.item);
+											this.deleteFile((event.detail.item.getPath(SEPARATOR)));
+
+											this.#dirty = true;
+											void this.#refresh();
 										}
 									}
 								},
@@ -57,7 +68,8 @@ export class PersistentStorage {
 					}
 				}) as HTMLHarmonyTreeElement,
 			],
-		});
+
+		}) as HTMLHarmonyPanelElement;
 	}
 
 	static async createFile(path: string): Promise<FileSystemFileHandle | null> {
@@ -217,9 +229,11 @@ export class PersistentStorage {
 		return false;
 	}
 
-	static showPanel(): void {
+	static getPanel(): HTMLHarmonyPanelElement {
 		this.#initPanel();
+		//parent.append(this.#panel!);
 		void this.#refresh();
+		return this.#panel!;
 	}
 
 	static async #refresh(): Promise<void> {

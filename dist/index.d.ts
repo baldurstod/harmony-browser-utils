@@ -1,3 +1,4 @@
+import { HTMLHarmonyPanelElement } from 'harmony-ui';
 import { JSONObject } from 'harmony-types';
 import { Second } from 'harmony-types';
 import { vec2 } from 'gl-matrix';
@@ -146,7 +147,7 @@ export declare class PersistentStorage {
     static readFileAsString(path: string): Promise<string | null>;
     static readFileAsJSON(path: string): Promise<JSONObject | null>;
     static writeFile(path: string, content: ArrayBuffer | Blob | string, options?: FileSystemCreateWritableOptions): Promise<boolean>;
-    static showPanel(): void;
+    static getPanel(): HTMLHarmonyPanelElement;
 }
 
 export declare function readFileAsText(file: File): Promise<string>;

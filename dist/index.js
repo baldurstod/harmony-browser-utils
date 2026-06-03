@@ -1,5 +1,5 @@
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
-import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, TreeItem } from 'harmony-ui';
+import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, defineHarmonyPanel, TreeItem } from 'harmony-ui';
 import { vec2 } from 'gl-matrix';
 
 function saveFile(file) {
@@ -1111,6 +1111,7 @@ class PersistentStorage {
     static #htmlTree;
     static #dirty = true;
     static #filter = { name: '' };
+    static #panel;
     static async estimate() {
         return navigator.storage.estimate();
     }
@@ -1119,11 +1120,17 @@ class PersistentStorage {
             return;
         }
         defineHarmonyTree();
+        defineHarmonyPanel();
         this.#shadowRoot = createShadowRoot('persistent-storage', {
-            parent: document.body,
+            //parent: document.body,
             adoptStyle: storageCSS,
+        });
+        this.#panel = createElement('harmony-panel', {
+            'title-i18n': '#storage_manager',
             childs: [
                 this.#htmlFilter = createElement('input', {
+                    class: 'filter',
+                    hidden: true,
                     $input: (event) => this.#setFilter(event.target.value),
                 }),
                 this.#htmlTree = createElement('harmony-tree', {
@@ -1133,7 +1140,11 @@ class PersistentStorage {
                             path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
                             delete: {
                                 i18n: '#delete', f: () => {
-                                    if (event.detail.item) ;
+                                    if (event.detail.item) {
+                                        this.deleteFile((event.detail.item.getPath(SEPARATOR)));
+                                        this.#dirty = true;
+                                        void this.#refresh();
+                                    }
                                 }
                             },
                         });
@@ -1281,9 +1292,11 @@ class PersistentStorage {
         }
         return false;
     }
-    static showPanel() {
+    static getPanel() {
         this.#initPanel();
+        //parent.append(this.#panel!);
         void this.#refresh();
+        return this.#panel;
     }
     static async #refresh() {
         if (this.#dirty) {
