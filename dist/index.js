@@ -1126,7 +1126,7 @@ class PersistentStorage {
             adoptStyle: storageCSS,
         });
         this.#panel = createElement('harmony-panel', {
-            'title-i18n': '#storage_manager',
+            i18n: '#storage_manager',
             childs: [
                 this.#htmlFilter = createElement('input', {
                     class: 'filter',
