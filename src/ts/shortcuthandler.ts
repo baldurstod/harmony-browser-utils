@@ -58,9 +58,10 @@ export class ShortcutHandler {
 	static #handleKeyDown(contextName: string, event: KeyboardEvent): void {
 		this.#handleKey(contextName, event, true);
 		const contexts = contextName.split(',');
-		for (const [name, shortcuts] of this.#shortcuts) {
-			for (const shortcut of shortcuts) {
-				for (const context of contexts) {
+		for (const context of contexts) {
+			this.#eventTarget.dispatchEvent(new CustomEvent(event.key, { detail: event }));
+			for (const [name, shortcuts] of this.#shortcuts) {
+				for (const shortcut of shortcuts) {
 					if (shortcut.match(context, event)) {
 						this.#eventTarget.dispatchEvent(new CustomEvent(name, { detail: event }));
 						event.preventDefault();

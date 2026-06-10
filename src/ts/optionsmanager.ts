@@ -465,7 +465,7 @@ export class OptionsManager {
 				const htmlSubValueCell = createElement('td');
 				htmlSubRow.append(htmlRemoveButtonCell, htmlSubNameCell, htmlSubValueCell);
 
-				createElement('input', { value: value, parent: htmlSubValueCell });
+				createElement('input', { value: String(value), parent: htmlSubValueCell });
 			}
 		}
 		return htmlRow;
@@ -577,7 +577,7 @@ export class OptionsManager {
 			case 'number':
 			case 'integer':
 				htmlElement = createElement('input', {
-					value: value,
+					value: String(value),
 					events: {
 						change: (event: Event) => {
 							const value = (event.target as HTMLInputElement).value.trim();
@@ -643,7 +643,7 @@ export class OptionsManager {
 			case 'list':
 				this.#getUniqueId();
 				htmlElement = createElement('select', {
-					value: value,
+					value: String(value),
 					events: {
 						change: (event: Event) => { this.setItem(optionName, (event.target as HTMLSelectElement).value); showHideResetButton(); }
 					}

@@ -273,18 +273,42 @@ function runCopy() {
     }
 }
 
+class Item {
+    data;
+    next = null;
+    constructor(data) {
+        this.data = data;
+    }
+}
+
+/**
+ * Static version of MyEventTarget
+ */
+class StaticEventTarget {
+    static eventTarget = new EventTarget();
+    static addEventListener(type, callback, options) {
+        this.eventTarget.addEventListener(type, callback, options);
+    }
+    static dispatchEvent(event) {
+        return this.eventTarget.dispatchEvent(event);
+    }
+    static removeEventListener(type, callback, options) {
+        this.eventTarget.removeEventListener(type, callback, options);
+    }
+}
+
 function setTimeoutPromise(timeout, signal) {
     return new Promise((resolve, reject) => {
         const timeoutID = setTimeout(resolve, timeout);
         if (signal) {
             if (signal.aborted) {
                 clearTimeout(timeoutID);
-                reject('aborted');
+                reject(new Error('timeout aborted'));
             }
             else {
                 signal.addEventListener('abort', () => {
                     clearTimeout(timeoutID);
-                    reject('aborted');
+                    reject(new Error('timeout aborted'));
                 });
             }
         }
@@ -696,7 +720,7 @@ class OptionsManager {
                 const htmlSubNameCell = createElement('td', { innerHTML: key });
                 const htmlSubValueCell = createElement('td');
                 htmlSubRow.append(htmlRemoveButtonCell, htmlSubNameCell, htmlSubValueCell);
-                createElement('input', { value: value, parent: htmlSubValueCell });
+                createElement('input', { value: String(value), parent: htmlSubValueCell });
             }
         }
         return htmlRow;
@@ -794,7 +818,7 @@ class OptionsManager {
             case 'number':
             case 'integer':
                 htmlElement = createElement('input', {
-                    value: value,
+                    value: String(value),
                     events: {
                         change: (event) => {
                             const value = event.target.value.trim();
@@ -859,7 +883,7 @@ class OptionsManager {
             case 'list':
                 this.#getUniqueId();
                 htmlElement = createElement('select', {
-                    value: value,
+                    value: String(value),
                     events: {
                         change: (event) => { this.setItem(optionName, event.target.value); showHideResetButton(); }
                     }
@@ -1024,9 +1048,10 @@ class ShortcutHandler {
     static #handleKeyDown(contextName, event) {
         this.#handleKey(contextName, event, true);
         const contexts = contextName.split(',');
-        for (const [name, shortcuts] of this.#shortcuts) {
-            for (const shortcut of shortcuts) {
-                for (const context of contexts) {
+        for (const context of contexts) {
+            this.#eventTarget.dispatchEvent(new CustomEvent(event.key, { detail: event }));
+            for (const [name, shortcuts] of this.#shortcuts) {
+                for (const shortcut of shortcuts) {
                     if (shortcut.match(context, event)) {
                         this.#eventTarget.dispatchEvent(new CustomEvent(name, { detail: event }));
                         event.preventDefault();
@@ -1306,7 +1331,7 @@ class PersistentStorage {
     }
     static async #getRoot(entry) {
         const root = await this.#getElement(entry);
-        root.isRoot = true;
+        //root.isRoot = true;
         return root;
     }
     static async #getElement(entry, parent) {
