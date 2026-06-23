@@ -115,9 +115,9 @@ export declare class OptionsManager {
     static getList(name: string): Promise<DatalistElement[] | undefined>;
 }
 
-export declare type OptionsManagerEvent = {
+export declare type OptionsManagerEvent<T extends OptionValue> = {
     name: string;
-    value: OptionValue;
+    value: T;
     context?: string;
 };
 

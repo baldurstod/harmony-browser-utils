@@ -14,9 +14,9 @@ export type OptionJSON = { name: string, editable: boolean, type: string, defaul
 
 export const OptionsManagerEvents = new EventTarget();
 
-export type OptionsManagerEvent = {
+export type OptionsManagerEvent <T extends OptionValue>= {
 	name: string;
-	value: OptionValue;
+	value: T;
 	context?: string;
 }
 
@@ -233,15 +233,15 @@ export class OptionsManager {
 			return;
 		}
 		const context = option.context;
-		OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent>(name, { detail: { name: name, value: value, context: context } }));
+		OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent<OptionValue>>(name, { detail: { name: name, value: value, context: context } }));
 		let lastIndex = name.lastIndexOf('.');
 		while (lastIndex != -1) {
 			const wildCardName = name.slice(0, lastIndex);
-			OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent>(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
+			OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent<OptionValue>>(wildCardName + '.*', { detail: { name: name, value: value, context: context } }));
 			lastIndex = name.lastIndexOf('.', lastIndex - 1);
 		}
 
-		OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent>('*', { detail: { name: name, value: value, context: context } }));
+		OptionsManagerEvents.dispatchEvent(new CustomEvent<OptionsManagerEvent<OptionValue>>('*', { detail: { name: name, value: value, context: context } }));
 	}
 
 	static getItem(name: string): OptionValue {
