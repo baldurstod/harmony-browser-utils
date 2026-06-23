@@ -245,7 +245,7 @@ export class PersistentStorage {
 
 	static async #getRoot(entry: FileSystemDirectoryHandle): Promise<TreeItem> {
 		const root = await this.#getElement(entry);
-		root.isRoot = true;
+		//root.isRoot = true;
 		return root;
 	}
 
