@@ -103,8 +103,9 @@ export class Notification {
 						}),
 					],
 				}),
-				this.#htmlContent = createElement('div', {
+				this.#htmlContent = createElement('slot', {
 					class: 'notification-content',
+					name: 'content',
 					$click: (event: Event) => this.#copyContent(event as MouseEvent),
 				}),
 				createElement('div', {
@@ -147,9 +148,13 @@ export class Notification {
 
 
 		if (this.#content instanceof HTMLElement) {
-			this.#htmlContent.append(this.#content);
+			createElement('div', {
+				slot: 'content',
+				child: this.#content,
+				parent: this.#shadowRoot.host,
+			});
 		} else {
-			this.#htmlContent.innerHTML = this.#content;
+			this.#htmlContent.innerText = this.#content;
 		}
 
 		if (this.#ttl != 0) {

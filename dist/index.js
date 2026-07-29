@@ -111,8 +111,9 @@ class Notification {
                         }),
                     ],
                 }),
-                this.#htmlContent = createElement('div', {
+                this.#htmlContent = createElement('slot', {
                     class: 'notification-content',
+                    name: 'content',
                     $click: (event) => this.#copyContent(event),
                 }),
                 createElement('div', {
@@ -152,10 +153,14 @@ class Notification {
         });
         this.#htmlType.classList.add(this.#type);
         if (this.#content instanceof HTMLElement) {
-            this.#htmlContent.append(this.#content);
+            createElement('div', {
+                slot: 'content',
+                child: this.#content,
+                parent: this.#shadowRoot.host,
+            });
         }
         else {
-            this.#htmlContent.innerHTML = this.#content;
+            this.#htmlContent.innerText = this.#content;
         }
         if (this.#ttl != 0) {
             this.#start = performance.now();
