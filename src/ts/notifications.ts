@@ -204,6 +204,7 @@ export class Notification {
 }
 
 let htmlInner: HTMLElement;
+let htmlNotifications: HTMLSlotElement;
 let htmlCopy: HTMLElement;
 let defaultPlacement: NotificationsPlacement = NotificationsPlacement.TopRight;
 
@@ -224,7 +225,7 @@ export function addNotification(content: NotificationContent, type: Notification
 	}
 	const notification = new Notification(content, type, ttl, params);
 	notifications.set(notification.id, notification);
-	htmlInner.append(notification.htmlElement);
+	htmlNotifications.append(notification.htmlElement);
 	return notification;
 }
 
@@ -243,12 +244,15 @@ export function closeNotification(notification: Notification | NotificationId): 
 
 function initialize(): void {
 	initialized = true;
-	createShadowRoot('div', {
+	const shadowRoot = createShadowRoot('div', {
 		parent: document.body,
 		adoptStyle: notificationsContainerCSS,
 		childs: [
 			htmlInner = createElement('div', {
 				class: `inner ${defaultPlacement}`,
+				child: createElement('slot', {
+					name: 'notifications',
+				}),
 			}),
 			htmlCopy = createElement('div', {
 				class: 'copy',
@@ -257,6 +261,12 @@ function initialize(): void {
 			}),
 		],
 	});
+
+	shadowRoot.host.append(
+		htmlNotifications = createElement('div', {
+			slot: 'notifications',
+		}) as HTMLSlotElement,
+	);
 	I18n.observeElement(htmlInner);
 }
 
