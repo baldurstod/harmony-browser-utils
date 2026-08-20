@@ -1,5 +1,5 @@
 import { JSONObject } from 'harmony-types';
-import { createElement, createShadowRoot, defineHarmonyPanel, defineHarmonyTree, HTMLHarmonyPanelElement, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
+import { createElement, createShadowRoot, defineHarmonyPanel, defineHarmonyTree, HarmonyPanel, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
 export const SEPARATOR = '/';
@@ -22,7 +22,7 @@ export class PersistentStorage {
 	static #htmlTree?: HTMLHarmonyTreeElement;
 	static #dirty = true;
 	static #filter: { name: string } = { name: '' };
-	static #panel?: HTMLHarmonyPanelElement;
+	static #panel?: HarmonyPanel;
 
 	static async estimate(): Promise<StorageEstimate> {
 		return navigator.storage.estimate();
@@ -39,37 +39,38 @@ export class PersistentStorage {
 			adoptStyle: storageCSS,
 		});
 
-		this.#panel = createElement('harmony-panel', {
-			i18n: '#storage_manager',
-			childs: [
-				this.#htmlFilter = createElement('input', {
-					class: 'filter',
-					hidden: true,
-					$input: (event: Event) => this.#setFilter((event.target as HTMLInputElement).value),
-				}) as HTMLInputElement,
-				this.#htmlTree = createElement('harmony-tree', {
-					$contextmenu: (event: CustomEvent<TreeContextMenuEventData>) => {
-						console.info(event, event.detail.item);
-						event.detail.buildContextMenu(
-							{
-								path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
-								delete: {
-									i18n: '#delete', f: () => {
-										if (event.detail.item) {
-											this.deleteFile((event.detail.item.getPath(SEPARATOR)));
+		this.#panel = new HarmonyPanel({
+			titleI18n: '#storage_manager',
+		});
 
-											this.#dirty = true;
-											void this.#refresh();
-										}
-									}
-								},
+		this.#htmlFilter = createElement('input', {
+			class: 'filter',
+			hidden: true,
+			$input: (event: Event) => this.#setFilter((event.target as HTMLInputElement).value),
+		}) as HTMLInputElement;
+		this.#htmlTree = createElement('harmony-tree', {
+			$contextmenu: (event: CustomEvent<TreeContextMenuEventData>) => {
+				console.info(event, event.detail.item);
+				event.detail.buildContextMenu(
+					{
+						path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
+						delete: {
+							i18n: '#delete', f: () => {
+								if (event.detail.item) {
+									this.deleteFile((event.detail.item.getPath(SEPARATOR)));
+
+									this.#dirty = true;
+									void this.#refresh();
+								}
 							}
-						)
+						},
 					}
-				}) as HTMLHarmonyTreeElement,
-			],
+				)
+			}
+		}) as HTMLHarmonyTreeElement;
 
-		}) as HTMLHarmonyPanelElement;
+
+		this.#panel.append(this.#htmlFilter, this.#htmlTree);
 	}
 
 	static async createFile(path: string): Promise<FileSystemFileHandle | null> {
@@ -229,7 +230,7 @@ export class PersistentStorage {
 		return false;
 	}
 
-	static getPanel(): HTMLHarmonyPanelElement {
+	static getPanel(): HarmonyPanel {
 		this.#initPanel();
 		//parent.append(this.#panel!);
 		void this.#refresh();

@@ -1,5 +1,5 @@
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
-import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, defineHarmonyPanel, TreeItem } from 'harmony-ui';
+import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, defineHarmonyPanel, HarmonyPanel, TreeItem } from 'harmony-ui';
 import { vec2 } from 'gl-matrix';
 
 function saveFile(file) {
@@ -282,6 +282,97 @@ function runCopy() {
     htmlCopy.style.top = `${String(startY - displacement * progress)}px`;
     if (progress < 1) {
         window.requestAnimationFrame(() => runCopy());
+    }
+}
+
+/**
+ * Set2 holds a key-key pair using an underlying Set
+ * Any value can be used as either keys
+ */
+class Set2 {
+    #map = new Map();
+    clear() {
+        this.#map.clear();
+    }
+    delete(key1, key2) {
+        return this.#map.get(key1)?.delete(key2) ?? false;
+    }
+    forEach(callbackfn, thisArg) {
+        this.#map.forEach((value, key1) => {
+            value.forEach((key2) => callbackfn.call(thisArg, key1, key2, this));
+        });
+    }
+    getMap() {
+        return this.#map;
+    }
+    getSubSet(key1) {
+        return this.#map.get(key1);
+    }
+    has(key1, key2) {
+        return this.#map.get(key1)?.has(key2) ?? false;
+    }
+    add(key1, key2) {
+        if (!this.#map.has(key1)) {
+            this.#map.set(key1, new Set());
+        }
+        this.#map.get(key1).add(key2);
+        return this;
+    }
+    get size() {
+        let size = 0;
+        for (const [, m] of this.#map) {
+            size += m.size;
+        }
+        return size;
+    }
+    [Symbol.iterator] = () => {
+        const iterator1 = this.#map.entries();
+        let iterator2 = null;
+        let current1;
+        const next = () => {
+            if (iterator2 == null) {
+                current1 = iterator1.next();
+                if (current1.done) {
+                    return { done: true };
+                }
+                iterator2 = current1.value[1].keys();
+            }
+            const current2 = iterator2.next();
+            if (current2.done) {
+                iterator2 = null;
+                return next();
+            }
+            return { value: [current1.value[0], current2.value], done: false };
+        };
+        return {
+            next: next,
+            [Symbol.iterator]() {
+                return this;
+            },
+        };
+    };
+}
+
+class BugReporter {
+    static #eventTarget = new EventTarget();
+    static #dispatched = new Set2();
+    static addEventListener(type, callback, options) {
+        this.#eventTarget.addEventListener(type, callback, options);
+    }
+    static removeEventListener(type, callback, options) {
+        this.#eventTarget.removeEventListener(type, callback, options);
+    }
+    static reportBug(severity, message) {
+        if (this.#dispatched.has(severity, message)) {
+            return;
+        }
+        this.#dispatched.add(severity, message);
+        this.#eventTarget.dispatchEvent(new CustomEvent('report', {
+            detail: {
+                severity,
+                message,
+            },
+        }));
     }
 }
 
@@ -1162,33 +1253,32 @@ class PersistentStorage {
             //parent: document.body,
             adoptStyle: storageCSS,
         });
-        this.#panel = createElement('harmony-panel', {
-            i18n: '#storage_manager',
-            childs: [
-                this.#htmlFilter = createElement('input', {
-                    class: 'filter',
-                    hidden: true,
-                    $input: (event) => this.#setFilter(event.target.value),
-                }),
-                this.#htmlTree = createElement('harmony-tree', {
-                    $contextmenu: (event) => {
-                        console.info(event, event.detail.item);
-                        event.detail.buildContextMenu({
-                            path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
-                            delete: {
-                                i18n: '#delete', f: () => {
-                                    if (event.detail.item) {
-                                        this.deleteFile((event.detail.item.getPath(SEPARATOR)));
-                                        this.#dirty = true;
-                                        void this.#refresh();
-                                    }
-                                }
-                            },
-                        });
-                    }
-                }),
-            ],
+        this.#panel = new HarmonyPanel({
+            titleI18n: '#storage_manager',
         });
+        this.#htmlFilter = createElement('input', {
+            class: 'filter',
+            hidden: true,
+            $input: (event) => this.#setFilter(event.target.value),
+        });
+        this.#htmlTree = createElement('harmony-tree', {
+            $contextmenu: (event) => {
+                console.info(event, event.detail.item);
+                event.detail.buildContextMenu({
+                    path: { i18n: '#path', f: () => console.info(event.detail.item?.getPath(SEPARATOR)) },
+                    delete: {
+                        i18n: '#delete', f: () => {
+                            if (event.detail.item) {
+                                this.deleteFile((event.detail.item.getPath(SEPARATOR)));
+                                this.#dirty = true;
+                                void this.#refresh();
+                            }
+                        }
+                    },
+                });
+            }
+        });
+        this.#panel.append(this.#htmlFilter, this.#htmlTree);
     }
     static async createFile(path) {
         return this.#getHandle(path, 'file', true);
