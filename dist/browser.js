@@ -8160,7 +8160,6 @@ class PersistentStorage {
             return;
         }
         defineHarmonyTree();
-        defineHarmonyPanel();
         this.#shadowRoot = createShadowRoot('persistent-storage', {
             //parent: document.body,
             adoptStyle: storageCSS,

@@ -1,4 +1,5 @@
 export * from './ts/file';
+export * from './ts/file/export';
 export * from './ts/notifications';
 export * from './ts/optionsmanager';
 export * from './ts/shortcuthandler';

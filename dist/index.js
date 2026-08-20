@@ -1,5 +1,5 @@
 import { contentCopySVG, closeSVG, checkCircleSVG, warningSVG, infoSVG, errorSVG } from 'harmony-svg';
-import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, defineHarmonyPanel, HarmonyPanel, TreeItem } from 'harmony-ui';
+import { documentStyle, defineHarmonyCircularProgress, createShadowRoot, createElement, display, I18n, hide, show, defineHarmonyTree, HarmonyPanel, TreeItem } from 'harmony-ui';
 import { vec2 } from 'gl-matrix';
 
 function saveFile(file) {
@@ -1248,7 +1248,6 @@ class PersistentStorage {
             return;
         }
         defineHarmonyTree();
-        defineHarmonyPanel();
         this.#shadowRoot = createShadowRoot('persistent-storage', {
             //parent: document.body,
             adoptStyle: storageCSS,
