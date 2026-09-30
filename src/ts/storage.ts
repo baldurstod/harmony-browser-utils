@@ -1,5 +1,5 @@
 import { JSONObject } from 'harmony-types';
-import { createElement, createShadowRoot, defineHarmonyPanel, defineHarmonyTree, HarmonyPanel, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
+import { createElement, createShadowRoot, defineHarmonyTree, HarmonyPanel, HTMLHarmonyTreeElement, TreeContextMenuEventData, TreeItem } from 'harmony-ui';
 import storageCSS from '../css/storage.css';
 
 export const SEPARATOR = '/';
@@ -181,7 +181,7 @@ export class PersistentStorage {
 				return await fileHandle.getFile();
 			}
 		} catch (e) {
-			console.error('Error while reading the file:' + String(e));
+			console.error(`Error while reading the file ${path} : ${String(e)}`);
 		}
 		return null;
 	}

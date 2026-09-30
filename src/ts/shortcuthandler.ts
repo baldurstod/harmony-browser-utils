@@ -108,11 +108,11 @@ export class ShortcutHandler {
 		element.addEventListener('keyup', (event: Event) => this.#handleKeyUp(name, event as KeyboardEvent));
 	}
 
-	static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void {
-		if (!shortcutMap) {
-			return;
-		}
+	static clearShortcuts(): void {
 		this.#shortcuts.clear();
+	}
+
+	static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void {
 		for (const [name, shortcut] of shortcutMap) {
 			this.addShortcut(contextName, name, shortcut);
 		}

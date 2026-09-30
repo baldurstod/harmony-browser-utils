@@ -166,6 +166,7 @@ export declare class ShortcutHandler {
     static getAltState(): boolean;
     static getShiftState(): boolean;
     static addContext(name: string, element: HTMLElement | Document): void;
+    static clearShortcuts(): void;
     static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void;
     static setShortcut(contextName: string, name: string, shortcut: string): void;
     static addShortcut(contextName: string, name: string, shortcut: string): void;

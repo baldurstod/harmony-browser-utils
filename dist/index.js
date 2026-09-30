@@ -1192,11 +1192,10 @@ class ShortcutHandler {
         element.addEventListener('keydown', (event) => this.#handleKeyDown(name, event));
         element.addEventListener('keyup', (event) => this.#handleKeyUp(name, event));
     }
-    static setShortcuts(contextName, shortcutMap) {
-        if (!shortcutMap) {
-            return;
-        }
+    static clearShortcuts() {
         this.#shortcuts.clear();
+    }
+    static setShortcuts(contextName, shortcutMap) {
         for (const [name, shortcut] of shortcutMap) {
             this.addShortcut(contextName, name, shortcut);
         }
@@ -1375,7 +1374,7 @@ class PersistentStorage {
             }
         }
         catch (e) {
-            console.error('Error while reading the file:' + String(e));
+            console.error(`Error while reading the file ${path} : ${String(e)}`);
         }
         return null;
     }
