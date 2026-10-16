@@ -166,8 +166,19 @@ export class Notification {
 
 	async #copyContent(event: MouseEvent): Promise<boolean> {
 		try {
-			if (navigator.clipboard) {
-				await navigator.clipboard.writeText(this.#htmlContent!.innerText);
+			if (navigator.clipboard && this.#shadowRoot) {
+				const divs = this.#shadowRoot.host.getElementsByTagName('div');
+				let text = '';
+				for (const div of divs) {
+					if (div.getAttribute('slot') === 'content') {
+						text = div.innerText;
+					}
+				}
+				if (text === "") {
+					return false;
+				}
+
+				await navigator.clipboard.writeText(text);
 				copied(event.clientX, event.clientY);
 				return true;
 			}
