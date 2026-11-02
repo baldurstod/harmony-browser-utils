@@ -8067,6 +8067,7 @@ class ShortcutHandler {
     static #keyboardCodeState = new Map();
     // List of activated keys. See https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
     static #keyboardKeyState = new Map();
+    static #knowContextes = new Set2();
     static {
         this.addContext(WINDOW_CONTEXT, document);
     }
@@ -8111,14 +8112,21 @@ class ShortcutHandler {
         return this.#keyboardKeyState.get('Shift') ?? false;
     }
     static addContext(name, element) {
+        // Prevents an identical pair context / element from being added several times
+        if (this.#knowContextes.has(name, element)) {
+            return;
+        }
         element.addEventListener('keydown', (event) => this.#handleKeyDown(name, event));
         element.addEventListener('keyup', (event) => this.#handleKeyUp(name, event));
+        this.#knowContextes.add(name, element);
     }
     static clearShortcuts() {
         this.#shortcuts.clear();
     }
     static setShortcuts(contextName, shortcutMap) {
         for (const [name, shortcut] of shortcutMap) {
+            // Delete a previous shortcut of the same name
+            this.#shortcuts.delete(name);
             this.addShortcut(contextName, name, shortcut);
         }
     }

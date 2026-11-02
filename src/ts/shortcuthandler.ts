@@ -1,3 +1,5 @@
+import { Set2 } from 'harmony-utils';
+
 class Shortcut {
 	#contexts;
 	#key;
@@ -50,6 +52,7 @@ export class ShortcutHandler {
 	static #keyboardCodeState = new Map<string, boolean>();
 	// List of activated keys. See https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
 	static #keyboardKeyState = new Map<string, boolean>();
+	static #knowContextes = new Set2<string, HTMLElement | Document>();
 
 	static {
 		this.addContext(WINDOW_CONTEXT, document);
@@ -104,8 +107,14 @@ export class ShortcutHandler {
 	}
 
 	static addContext(name: string, element: HTMLElement | Document): void {
+		// Prevents an identical pair context / element from being added several times
+		if (this.#knowContextes.has(name, element)) {
+			return;
+		}
 		element.addEventListener('keydown', (event: Event) => this.#handleKeyDown(name, event as KeyboardEvent));
 		element.addEventListener('keyup', (event: Event) => this.#handleKeyUp(name, event as KeyboardEvent));
+
+		this.#knowContextes.add(name, element);
 	}
 
 	static clearShortcuts(): void {
@@ -114,6 +123,8 @@ export class ShortcutHandler {
 
 	static setShortcuts(contextName: string, shortcutMap: Map<string, string>): void {
 		for (const [name, shortcut] of shortcutMap) {
+			// Delete a previous shortcut of the same name
+			this.#shortcuts.delete(name);
 			this.addShortcut(contextName, name, shortcut);
 		}
 	}
