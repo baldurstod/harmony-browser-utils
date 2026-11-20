@@ -54,7 +54,7 @@ async function postBuildCommands() {
 		'api-extractor run --local --verbose --typescript-compiler-folder ./node_modules/typescript',
 		(error) => {
 			if (error) {
-				window.console.log(error);
+				console.log(error);
 			}
 			resolve("done")
 		},

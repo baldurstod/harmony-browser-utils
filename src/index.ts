@@ -3,6 +3,8 @@ export * from './ts/file/export';
 export * from './ts/notifications';
 export * from './ts/optionsmanager';
 export * from './ts/shortcuthandler';
+export * from './ts/spa/page';
+export * from './ts/spa/singlepageapplication';
 export * from './ts/storage';
 export * from './ts/utils/getqueryparams';
 export * from './ts/utils/loadscript';

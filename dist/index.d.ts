@@ -7,6 +7,8 @@ export declare function addNotification(content: NotificationContent, type: Noti
 
 export declare function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
 
+export declare const BadPagePathError: Error;
+
 export declare function closeNotification(notification: Notification_2 | NotificationId): void;
 
 export declare type DatalistElement = string | number | [string, string];
@@ -15,6 +17,8 @@ export declare enum EntryType {
     File = "file",
     Directory = "directory"
 }
+
+export declare const ExistingPathError: Error;
 
 export declare function getQueryParams(): Record<string, string | string[]>;
 
@@ -130,6 +134,14 @@ declare type OptionsManagerInitParams = {
 
 export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2 | string[];
 
+export declare abstract class Page {
+    readonly htmlElement: HTMLElement;
+    readonly path: string;
+    constructor(path: string);
+    abstract activated(): void;
+    abstract deactivated(): void;
+}
+
 export declare class PersistentStorage {
     #private;
     static estimate(): Promise<StorageEstimate>;
@@ -173,6 +185,31 @@ export declare class ShortcutHandler {
     static addEventListener(type: string, callback: (evt: CustomEvent<KeyboardEvent>) => void, options?: AddEventListenerOptions | boolean): void;
 }
 
+export declare abstract class SinglePageApplication {
+    #private;
+    readonly htmlElement: HTMLElement;
+    init(pages?: Page[]): Promise<void>;
+    /**
+     * Add several pages
+     * @param pages The pages to add
+     */
+    addPages(pages: Page[]): void;
+    /**
+     * Add a single page
+     * @param page The page to add. Overwrite an existing page of the same path
+     * @throws BadPagePathError, ExistingPathError
+     */
+    addPage(page: Page): void;
+    /**
+     * Remove a single page
+     * @param path The path of the page to remove. Does nothing if the path doesn't exist
+     */
+    removePage(path: string): void;
+    abstract initApplication(): Promise<void>;
+    abstract pageActivated(): void;
+    navigateTo(path: string, replaceSate?: boolean): Promise<void>;
+}
+
 export declare type StorageFilter = {
     directories?: boolean;
     files?: boolean;
@@ -182,5 +219,7 @@ export declare type StorageFilter = {
 export declare type SubOption = Record<string, Option_2>;
 
 export declare function supportsPopover(): boolean;
+
+export declare const UnknownPageError: Error;
 
 export { }

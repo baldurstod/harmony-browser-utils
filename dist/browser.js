@@ -8153,6 +8153,89 @@ class ShortcutHandler {
     }
 }
 
+class Page {
+    htmlElement = createElement('div');
+    path;
+    constructor(path) {
+        this.path = path;
+    }
+}
+
+var applicationCSS = ".application {\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n}\r\n";
+
+const BadPagePathError = new Error('Bad page path, path must only contain a-z0-9');
+const ExistingPathError = new Error('This path already exist');
+const UnknownPageError = new Error('Unknown page');
+documentStyle(applicationCSS);
+class SinglePageApplication {
+    #pages = new Map();
+    #activePage;
+    htmlElement = createElement('div', { class: 'application' });
+    async init(pages) {
+        if (pages) {
+            this.addPages(pages);
+        }
+        await this.initApplication();
+        await this.#handleLocation();
+    }
+    /**
+     * Add several pages
+     * @param pages The pages to add
+     */
+    addPages(pages) {
+        pages.forEach(page => this.addPage(page));
+    }
+    /**
+     * Add a single page
+     * @param page The page to add. Overwrite an existing page of the same path
+     * @throws BadPagePathError, ExistingPathError
+     */
+    addPage(page) {
+        if (!/^[a-z0-9]*$/.test(page.path)) {
+            throw BadPagePathError;
+        }
+        if (this.#pages.has(page.path)) {
+            throw ExistingPathError;
+        }
+        this.#pages.set(page.path, page);
+        this.htmlElement.append(page.htmlElement);
+        hide(page.htmlElement);
+    }
+    /**
+     * Remove a single page
+     * @param path The path of the page to remove. Does nothing if the path doesn't exist
+     */
+    removePage(path) {
+        this.#pages.delete(path);
+    }
+    async navigateTo(path, replaceSate = false) {
+        if (this.#pages.get(path)) {
+            throw UnknownPageError;
+        }
+        const url = '/' + path;
+        history[replaceSate ? 'replaceState' : 'pushState']({}, '', url);
+        await this.#handleLocation();
+    }
+    async #handleLocation() {
+        const pathname = document.location.pathname.toLowerCase().replace(/^\/*/, '');
+        for (const [path, page] of this.#pages) {
+            if (path === pathname) {
+                this.#activatePage(page);
+                return;
+            }
+        }
+    }
+    #activatePage(page) {
+        if (this.#activePage) {
+            hide(this.#activePage.htmlElement);
+            this.#activePage.deactivated();
+        }
+        this.#activePage = page;
+        page.activated();
+        show(page.htmlElement);
+    }
+}
+
 var storageCSS = ":host{\n\tdisplay: block;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-color: black;\n\tposition: absolute;\n\ttop: 0px;\n}\n";
 
 const SEPARATOR = '/';
@@ -8435,4 +8518,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { EntryType, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, PersistentStorage, SEPARATOR, ShortcutHandler, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover };
+export { BadPagePathError, EntryType, ExistingPathError, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, Page, PersistentStorage, SEPARATOR, ShortcutHandler, SinglePageApplication, UnknownPageError, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover };
