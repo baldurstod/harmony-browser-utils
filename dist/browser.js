@@ -8154,23 +8154,21 @@ class ShortcutHandler {
 }
 
 class Page {
-    htmlElement = createElement('div');
     path;
     constructor(path) {
         this.path = path;
     }
 }
 
-var applicationCSS = ".application {\r\n\tdisplay: flex;\r\n\tflex-direction: column;\r\n}\r\n";
-
 const BadPagePathError = new Error('Bad page path, path must only contain a-z0-9');
 const ExistingPathError = new Error('This path already exist');
 const UnknownPageError = new Error('Unknown page');
-documentStyle(applicationCSS);
 class SinglePageApplication {
     #pages = new Map();
     #activePage;
-    htmlElement = createElement('div', { class: 'application' });
+    constructor() {
+        addEventListener('popstate', () => { void this.#handleLocation(); });
+    }
     async init(pages) {
         if (pages) {
             this.addPages(pages);

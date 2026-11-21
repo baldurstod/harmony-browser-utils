@@ -1,8 +1,7 @@
-import { createElement } from 'harmony-ui';
 
 export abstract class Page {
-	readonly htmlElement = createElement('div');
 	readonly path: string;
+	abstract htmlElement: HTMLElement;
 
 	constructor(path: string) {
 		this.path = path;

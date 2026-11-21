@@ -135,8 +135,8 @@ declare type OptionsManagerInitParams = {
 export declare type OptionValue = string | number | boolean | bigint | OptionMap | null | undefined | vec2 | string[];
 
 export declare abstract class Page {
-    readonly htmlElement: HTMLElement;
     readonly path: string;
+    abstract htmlElement: HTMLElement;
     constructor(path: string);
     abstract activated(): void;
     abstract deactivated(): void;
@@ -187,7 +187,8 @@ export declare class ShortcutHandler {
 
 export declare abstract class SinglePageApplication {
     #private;
-    readonly htmlElement: HTMLElement;
+    abstract htmlElement: HTMLElement;
+    constructor();
     init(pages?: Page[]): Promise<void>;
     /**
      * Add several pages

@@ -1,17 +1,18 @@
-import { createElement, documentStyle, hide, show } from 'harmony-ui';
-import applicationCSS from '../../css/singlepageapplication.css';
+import { hide, show } from 'harmony-ui';
 import { Page } from './page';
 
 export const BadPagePathError = new Error('Bad page path, path must only contain a-z0-9');
 export const ExistingPathError = new Error('This path already exist');
 export const UnknownPageError = new Error('Unknown page');
 
-documentStyle(applicationCSS);
-
 export abstract class SinglePageApplication {
 	#pages = new Map<string, Page>();
 	#activePage?: Page;
-	readonly htmlElement = createElement('div', { class: 'application' });
+	abstract htmlElement: HTMLElement;
+
+	constructor() {
+		addEventListener('popstate', () => { void this.#handleLocation() });
+	}
 
 	async init(pages?: Page[]): Promise<void> {
 		if (pages) {
