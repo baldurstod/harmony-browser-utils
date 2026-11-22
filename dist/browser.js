@@ -8475,6 +8475,33 @@ function cleanPath(path) {
     return path;
 }
 
+/**
+ * Write a blob to the clipboard.
+ * @param blob The blob to write to the clipboard.
+ * @param options The options passed to the ClipboardItem constructor.
+ * @returns An error if the function fail, or null.
+ */
+async function writeBlobToClipboard(blob, options) {
+    try {
+        const status = await navigator.permissions.query({ name: 'clipboard-write' });
+        if (status.state === 'denied') {
+            return new Error('Unable to write to clipboard: permission denied');
+        }
+        if (!ClipboardItem.supports(blob.type)) {
+            return new Error(`Unsupported mime type: ${blob.type}`);
+        }
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                [blob.type]: blob
+            }, options),
+        ]);
+        return null;
+    }
+    catch (err) {
+        return new Error(`Unable to write to clipboard: ${err}`);
+    }
+}
+
 function identity(e) {
     return e;
 }
@@ -8516,4 +8543,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { BadPagePathError, EntryType, ExistingPathError, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, Page, PersistentStorage, SEPARATOR, ShortcutHandler, SinglePageApplication, UnknownPageError, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover };
+export { BadPagePathError, EntryType, ExistingPathError, index as HarmonyUi, index$1 as HarmonyUtils, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, Page, PersistentStorage, SEPARATOR, ShortcutHandler, SinglePageApplication, UnknownPageError, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover, writeBlobToClipboard };

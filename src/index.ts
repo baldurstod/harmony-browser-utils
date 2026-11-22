@@ -6,6 +6,7 @@ export * from './ts/shortcuthandler';
 export * from './ts/spa/page';
 export * from './ts/spa/singlepageapplication';
 export * from './ts/storage';
+export * from './ts/utils/clipboard';
 export * from './ts/utils/getqueryparams';
 export * from './ts/utils/loadscript';
 export * from './ts/utils/supportspopover';

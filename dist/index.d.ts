@@ -223,4 +223,12 @@ export declare function supportsPopover(): boolean;
 
 export declare const UnknownPageError: Error;
 
+/**
+ * Write a blob to the clipboard.
+ * @param blob The blob to write to the clipboard.
+ * @param options The options passed to the ClipboardItem constructor.
+ * @returns An error if the function fail, or null.
+ */
+export declare function writeBlobToClipboard(blob: Blob, options?: ClipboardItemOptions): Promise<Error | null>;
+
 export { }
