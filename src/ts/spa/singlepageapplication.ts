@@ -8,7 +8,7 @@ export const UnknownPageError = new Error('Unknown page');
 export abstract class SinglePageApplication {
 	#pages = new Map<string, Page>();
 	#activePage?: Page;
-	abstract htmlElement: HTMLElement;
+	abstract htmlElement: HTMLElement | ShadowRoot;
 
 	constructor() {
 		addEventListener('popstate', () => { void this.#handleLocation() });

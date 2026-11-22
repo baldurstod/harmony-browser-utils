@@ -136,7 +136,7 @@ export declare type OptionValue = string | number | boolean | bigint | OptionMap
 
 export declare abstract class Page {
     readonly path: string;
-    abstract htmlElement: HTMLElement;
+    abstract htmlElement: HTMLElement | ShadowRoot;
     constructor(path: string);
     abstract activated(): void;
     abstract deactivated(): void;
@@ -187,7 +187,7 @@ export declare class ShortcutHandler {
 
 export declare abstract class SinglePageApplication {
     #private;
-    abstract htmlElement: HTMLElement;
+    abstract htmlElement: HTMLElement | ShadowRoot;
     constructor();
     init(pages?: Page[]): Promise<void>;
     /**

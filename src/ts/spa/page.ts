@@ -1,7 +1,7 @@
 
 export abstract class Page {
 	readonly path: string;
-	abstract htmlElement: HTMLElement;
+	abstract htmlElement: HTMLElement | ShadowRoot;
 
 	constructor(path: string) {
 		this.path = path;
