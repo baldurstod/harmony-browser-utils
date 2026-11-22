@@ -227,6 +227,14 @@ function setNotificationsPlacement(placement) {
     }
 }
 let initialized = false;
+/**
+ * Create and display a notification containing a string or an HTML element.
+ * @param content The string or HTML element.
+ * @param type The notification type.
+ * @param ttl The time to live, in second.
+ * @param params The params to create the notification with.
+ * @returns The created notification.
+ */
 function addNotification(content, type, ttl, params) {
     if (!initialized) {
         initialize();
@@ -235,6 +243,17 @@ function addNotification(content, type, ttl, params) {
     notifications.set(notification.id, notification);
     htmlNotifications.append(notification.htmlElement);
     return notification;
+}
+/**
+ * Create and display a notification containing an internationalized string.
+ * @param content The string to internationalize.
+ * @param type The notification type.
+ * @param ttl The time to live, in second.
+ * @param params The params to create the notification with.
+ * @returns The created notification.
+ */
+function addNotificationI18n(content, type, ttl, params) {
+    return addNotification(I18n.getString(content), type, ttl, params);
 }
 function closeNotification(notification) {
     if (typeof notification == 'number') {
@@ -1631,4 +1650,4 @@ function supportsPopover() {
     return Object.prototype.hasOwnProperty.call(HTMLElement, 'popover');
 }
 
-export { BadPagePathError, EntryType, ExistingPathError, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, Page, PersistentStorage, SEPARATOR, ShortcutHandler, SinglePageApplication, UnknownPageError, addNotification, addNotificationEventListener, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover, writeBlobToClipboard };
+export { BadPagePathError, EntryType, ExistingPathError, Notification, NotificationEvents, NotificationType, NotificationsPlacement, OptionsManager, OptionsManagerEvents, Page, PersistentStorage, SEPARATOR, ShortcutHandler, SinglePageApplication, UnknownPageError, addNotification, addNotificationEventListener, addNotificationI18n, closeNotification, getQueryParams, loadScript, loadScripts, readFileAsText, saveFile, setNotificationsPlacement, supportsPopover, writeBlobToClipboard };

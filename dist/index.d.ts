@@ -3,9 +3,27 @@ import { JSONObject } from 'harmony-types';
 import { Second } from 'harmony-types';
 import { vec2 } from 'gl-matrix';
 
+/**
+ * Create and display a notification containing a string or an HTML element.
+ * @param content The string or HTML element.
+ * @param type The notification type.
+ * @param ttl The time to live, in second.
+ * @param params The params to create the notification with.
+ * @returns The created notification.
+ */
 export declare function addNotification(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams): Notification_2;
 
 export declare function addNotificationEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+
+/**
+ * Create and display a notification containing an internationalized string.
+ * @param content The string to internationalize.
+ * @param type The notification type.
+ * @param ttl The time to live, in second.
+ * @param params The params to create the notification with.
+ * @returns The created notification.
+ */
+export declare function addNotificationI18n(content: string, type: NotificationType, ttl: Second, params?: NotificationParams): Notification_2;
 
 export declare const BadPagePathError: Error;
 

@@ -230,6 +230,14 @@ export function setNotificationsPlacement(placement: NotificationsPlacement): vo
 }
 
 let initialized = false;
+/**
+ * Create and display a notification containing a string or an HTML element.
+ * @param content The string or HTML element.
+ * @param type The notification type.
+ * @param ttl The time to live, in second.
+ * @param params The params to create the notification with.
+ * @returns The created notification.
+ */
 export function addNotification(content: NotificationContent, type: NotificationType, ttl: Second, params?: NotificationParams): Notification {
 	if (!initialized) {
 		initialize();
@@ -238,6 +246,18 @@ export function addNotification(content: NotificationContent, type: Notification
 	notifications.set(notification.id, notification);
 	htmlNotifications.append(notification.htmlElement);
 	return notification;
+}
+
+/**
+ * Create and display a notification containing an internationalized string.
+ * @param content The string to internationalize.
+ * @param type The notification type.
+ * @param ttl The time to live, in second.
+ * @param params The params to create the notification with.
+ * @returns The created notification.
+ */
+export function addNotificationI18n(content: string, type: NotificationType, ttl: Second, params?: NotificationParams): Notification {
+	return addNotification(I18n.getString(content), type, ttl, params);
 }
 
 export function closeNotification(notification: Notification | NotificationId): void {
