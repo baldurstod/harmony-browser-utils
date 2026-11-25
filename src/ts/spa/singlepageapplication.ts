@@ -61,7 +61,7 @@ export abstract class SinglePageApplication {
 	abstract pageActivated(): void;
 
 	async navigateTo(path: string, replaceSate = false): Promise<void> {
-		if (this.#pages.get(path)) {
+		if (!this.#pages.get(path)) {
 			throw UnknownPageError;
 		}
 

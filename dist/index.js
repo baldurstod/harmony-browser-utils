@@ -1314,7 +1314,7 @@ class SinglePageApplication {
         this.#pages.delete(path);
     }
     async navigateTo(path, replaceSate = false) {
-        if (this.#pages.get(path)) {
+        if (!this.#pages.get(path)) {
             throw UnknownPageError;
         }
         const url = '/' + path;
