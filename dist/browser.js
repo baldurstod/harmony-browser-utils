@@ -8248,8 +8248,8 @@ class SinglePageApplication {
             this.#activePage.deactivated();
         }
         this.#activePage = page;
-        page.activated();
         show(page.htmlElement);
+        page.activated();
     }
 }
 

@@ -88,7 +88,7 @@ export abstract class SinglePageApplication {
 		}
 
 		this.#activePage = page;
-		page.activated();
 		show(page.htmlElement);
+		page.activated();
 	}
 }
