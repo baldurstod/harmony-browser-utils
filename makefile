@@ -3,3 +3,6 @@ run:
 
 https:
 	python3 serve.py
+
+lint:
+	clear && npx eslint ./src

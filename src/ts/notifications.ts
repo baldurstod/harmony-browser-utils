@@ -106,18 +106,18 @@ export class Notification {
 				this.#htmlContent = createElement('slot', {
 					class: 'notification-content',
 					name: 'content',
+					// eslint-disable-next-line @typescript-eslint/no-misused-promises
 					$click: (event: Event) => this.#copyContent(event as MouseEvent),
 				}),
 				createElement('div', {
 					class: 'notification-copy',
 					innerHTML: contentCopySVG,
-					events: {
-						click: async (event: Event) => {
-							if (await this.#copyContent(event as MouseEvent)) {
-								(event.target as HTMLElement).parentElement?.classList.toggle('notification-copy-success');
-							}
-						},
-					}
+					// eslint-disable-next-line @typescript-eslint/no-misused-promises
+					$click: async (event: Event) => {
+						if (await this.#copyContent(event as MouseEvent)) {
+							(event.target as HTMLElement).parentElement?.classList.toggle('notification-copy-success');
+						}
+					},
 				}),
 				createElement('div', {
 					class: 'notification-close',

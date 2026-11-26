@@ -14,7 +14,7 @@ export type OptionJSON = { name: string, editable: boolean, type: string, defaul
 
 export const OptionsManagerEvents = new EventTarget();
 
-export type OptionsManagerEvent <T extends OptionValue>= {
+export type OptionsManagerEvent<T extends OptionValue> = {
 	name: string;
 	value: T;
 	context?: string;
@@ -411,12 +411,14 @@ export class OptionsManager {
 				createElement('span', {
 					class: 'copy-button',
 					innerHTML: contentCopySVG,
+					// eslint-disable-next-line @typescript-eslint/no-misused-promises
 					$click: async () => {
 						try {
 							await navigator.clipboard.writeText(option.name);
 							htmlOptionNameCell.classList.add('flash-ok');
 							await setTimeoutPromise(1500);
 							htmlOptionNameCell.classList.remove('flash-ok');
+							// eslint-disable-next-line @typescript-eslint/no-unused-vars
 						} catch (e) {
 							htmlOptionNameCell.classList.add('flash-error');
 							await setTimeoutPromise(1500);
@@ -465,7 +467,7 @@ export class OptionsManager {
 				const htmlSubValueCell = createElement('td');
 				htmlSubRow.append(htmlRemoveButtonCell, htmlSubNameCell, htmlSubValueCell);
 
-				createElement('input', { value: String(value), parent: htmlSubValueCell });
+				createElement('input', { value: JSON.stringify(value), parent: htmlSubValueCell });
 			}
 		}
 		return htmlRow;
@@ -577,7 +579,7 @@ export class OptionsManager {
 			case 'number':
 			case 'integer':
 				htmlElement = createElement('input', {
-					value: String(value),
+					value: JSON.stringify(value),
 					events: {
 						change: (event: Event) => {
 							const value = (event.target as HTMLInputElement).value.trim();
@@ -643,7 +645,7 @@ export class OptionsManager {
 			case 'list':
 				this.#getUniqueId();
 				htmlElement = createElement('select', {
-					value: String(value),
+					value: JSON.stringify(value),
 					events: {
 						change: (event: Event) => { this.setItem(optionName, (event.target as HTMLSelectElement).value); showHideResetButton(); }
 					}

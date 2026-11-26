@@ -56,10 +56,7 @@ export class PersistentStorage {
 						delete: {
 							i18n: '#delete', f: () => {
 								if (event.detail.item) {
-									this.deleteFile((event.detail.item.getPath(SEPARATOR)));
-
-									this.#dirty = true;
-									void this.#refresh();
+									void this.#deleteItem(event.detail.item);
 								}
 							}
 						},
@@ -68,8 +65,14 @@ export class PersistentStorage {
 			}
 		}) as HTMLHarmonyTreeElement;
 
-
 		this.#panel.append(this.#htmlFilter, this.#htmlTree);
+	}
+
+	static async #deleteItem(item: TreeItem): Promise<void> {
+		await this.deleteFile((item.getPath(SEPARATOR)));
+
+		this.#dirty = true;
+		await this.#refresh();
 	}
 
 	static async createFile(path: string): Promise<FileSystemFileHandle | null> {
@@ -207,7 +210,8 @@ export class PersistentStorage {
 
 		const content = await file.text();
 		try {
-			return JSON.parse(content);
+			return JSON.parse(content) as JSONObject;
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (e) {
 			return null;
 		}

@@ -24,6 +24,7 @@ export async function writeBlobToClipboard(blob: Blob, options?: ClipboardItemOp
 			),
 		]);
 		return null;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	} catch (err: any) {
 		return new Error(`Unable to write to clipboard: ${err}`);
 	}
