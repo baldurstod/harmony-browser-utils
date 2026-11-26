@@ -75,20 +75,20 @@ export abstract class SinglePageApplication {
 
 		for (const [path, page] of this.#pages) {
 			if (path === pathname) {
-				this.#activatePage(page);
+				await this.#activatePage(page);
 				return;
 			}
 		}
 	}
 
-	#activatePage(page: Page): void {
+	async #activatePage(page: Page): Promise<void> {
 		if (this.#activePage) {
 			hide(this.#activePage.htmlElement);
-			this.#activePage.deactivated();
+			await this.#activePage.deactivated();
 		}
 
 		this.#activePage = page;
 		show(page.htmlElement);
-		page.activated();
+		await page.activated();
 	}
 }

@@ -156,8 +156,8 @@ export declare abstract class Page {
     readonly path: string;
     abstract htmlElement: HTMLElement | ShadowRoot;
     constructor(path: string);
-    abstract activated(): void;
-    abstract deactivated(): void;
+    abstract activated(): Promise<void>;
+    abstract deactivated(): Promise<void>;
 }
 
 export declare class PersistentStorage {

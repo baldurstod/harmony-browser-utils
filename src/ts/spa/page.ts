@@ -7,6 +7,6 @@ export abstract class Page {
 		this.path = path;
 	}
 
-	abstract activated(): void;
-	abstract deactivated(): void;
+	abstract activated(): Promise<void>;
+	abstract deactivated(): Promise<void>;
 }

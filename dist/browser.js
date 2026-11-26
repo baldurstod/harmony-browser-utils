@@ -10,9 +10,11 @@ async function readFileAsText(file) {
     const readPromise = new Promise((resolve) => readPromiseResolve = resolve);
     const reader = new FileReader();
     reader.addEventListener('load', () => {
-        (async () => {
-            readPromiseResolve(reader.result);
+        readPromiseResolve(reader.result);
+        /*
+        (async (): Promise<void> => {
         })();
+        */
     });
     reader.readAsText(file);
     return readPromise;
@@ -7063,18 +7065,18 @@ class Notification {
                 this.#htmlContent = createElement('slot', {
                     class: 'notification-content',
                     name: 'content',
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     $click: (event) => this.#copyContent(event),
                 }),
                 createElement('div', {
                     class: 'notification-copy',
                     innerHTML: contentCopySVG,
-                    events: {
-                        click: async (event) => {
-                            if (await this.#copyContent(event)) {
-                                event.target.parentElement?.classList.toggle('notification-copy-success');
-                            }
-                        },
-                    }
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    $click: async (event) => {
+                        if (await this.#copyContent(event)) {
+                            event.target.parentElement?.classList.toggle('notification-copy-success');
+                        }
+                    },
                 }),
                 createElement('div', {
                     class: 'notification-close',
@@ -7717,12 +7719,14 @@ class OptionsManager {
                 createElement('span', {
                     class: 'copy-button',
                     innerHTML: contentCopySVG,
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     $click: async () => {
                         try {
                             await navigator.clipboard.writeText(option.name);
                             htmlOptionNameCell.classList.add('flash-ok');
                             await setTimeoutPromise(1500);
                             htmlOptionNameCell.classList.remove('flash-ok');
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         }
                         catch (e) {
                             htmlOptionNameCell.classList.add('flash-error');
@@ -7764,7 +7768,7 @@ class OptionsManager {
                 const htmlSubNameCell = createElement('td', { innerHTML: key });
                 const htmlSubValueCell = createElement('td');
                 htmlSubRow.append(htmlRemoveButtonCell, htmlSubNameCell, htmlSubValueCell);
-                createElement('input', { value: String(value), parent: htmlSubValueCell });
+                createElement('input', { value: JSON.stringify(value), parent: htmlSubValueCell });
             }
         }
         return htmlRow;
@@ -7862,7 +7866,7 @@ class OptionsManager {
             case 'number':
             case 'integer':
                 htmlElement = createElement('input', {
-                    value: String(value),
+                    value: JSON.stringify(value),
                     events: {
                         change: (event) => {
                             const value = event.target.value.trim();
@@ -7927,7 +7931,7 @@ class OptionsManager {
             case 'list':
                 this.#getUniqueId();
                 htmlElement = createElement('select', {
-                    value: String(value),
+                    value: JSON.stringify(value),
                     events: {
                         change: (event) => { this.setItem(optionName, event.target.value); showHideResetButton(); }
                     }
@@ -8237,19 +8241,19 @@ class SinglePageApplication {
         const pathname = document.location.pathname.toLowerCase().replace(/^\/*/, '');
         for (const [path, page] of this.#pages) {
             if (path === pathname) {
-                this.#activatePage(page);
+                await this.#activatePage(page);
                 return;
             }
         }
     }
-    #activatePage(page) {
+    async #activatePage(page) {
         if (this.#activePage) {
             hide(this.#activePage.htmlElement);
-            this.#activePage.deactivated();
+            await this.#activePage.deactivated();
         }
         this.#activePage = page;
         show(page.htmlElement);
-        page.activated();
+        await page.activated();
     }
 }
 
@@ -8297,9 +8301,7 @@ class PersistentStorage {
                     delete: {
                         i18n: '#delete', f: () => {
                             if (event.detail.item) {
-                                this.deleteFile((event.detail.item.getPath(SEPARATOR)));
-                                this.#dirty = true;
-                                void this.#refresh();
+                                void this.#deleteItem(event.detail.item);
                             }
                         }
                     },
@@ -8307,6 +8309,11 @@ class PersistentStorage {
             }
         });
         this.#panel.append(this.#htmlFilter, this.#htmlTree);
+    }
+    static async #deleteItem(item) {
+        await this.deleteFile((item.getPath(SEPARATOR)));
+        this.#dirty = true;
+        await this.#refresh();
     }
     static async createFile(path) {
         return this.#getHandle(path, 'file', true);
@@ -8426,6 +8433,7 @@ class PersistentStorage {
         const content = await file.text();
         try {
             return JSON.parse(content);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         }
         catch (e) {
             return null;
@@ -8515,6 +8523,7 @@ async function writeBlobToClipboard(blob, options) {
             }, options),
         ]);
         return null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (err) {
         return new Error(`Unable to write to clipboard: ${err}`);
